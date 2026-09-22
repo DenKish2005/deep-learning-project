@@ -1,0 +1,42 @@
+robustness-to-noise/
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── configs/
+│   ├── clean_cnn.yaml
+│   └── robust_cnn.yaml
+├── data/
+│   ├── raw/
+│   │   └── .gitkeep
+│   └── processed/
+│       └── .gitkeep
+├── src/
+│   ├── __init__.py
+│   ├── data.py
+│   ├── corruptions.py
+│   ├── models.py
+│   ├── train.py
+│   ├── evaluate.py
+│   ├── metrics.py
+│   └── utils.py
+├── scripts/
+│   ├── download_data.py
+│   ├── run_all_evaluations.py
+│   └── make_plots.py
+├── notebooks/
+│   └── 01_eda_and_sanity.ipynb
+├── tests/
+│   ├── __init__.py
+│   ├── test_corruptions.py
+│   └── test_data_pipeline.py
+├── outputs/
+│   ├── checkpoints/
+│   │   └── .gitkeep
+│   ├── metrics/
+│   │   └── .gitkeep
+│   └── figures/
+│       └── .gitkeep
+└── report/
+    ├── proposal.md
+    └── final_report/
+        └── README.md

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Data
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Outputs / checkpoints
+outputs/checkpoints/*
+outputs/metrics/*
+outputs/figures/*
+!outputs/checkpoints/.gitkeep
+!outputs/metrics/.gitkeep
+!outputs/figures/.gitkeep
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Experiment trackers
+wandb/
+
+# Secrets / local config
+.env
