@@ -2,8 +2,11 @@
 
 import hashlib
 import io
+import json
 import pickle
 import socket
+import subprocess
+import sys
 import tarfile
 
 import numpy as np
@@ -11,6 +14,7 @@ import pytest
 from torchvision.datasets import CIFAR10
 
 from src import data
+from scripts import download_data
 
 
 @pytest.fixture(autouse=True)
@@ -253,3 +257,126 @@ def test_archive_missing_member_not_extracted(tmp_path, batches, monkeypatch):
         data.ensure_cifar10(tmp_path)
     assert not (tmp_path / data.BASE_FOLDER).exists()
     assert (tmp_path / data.ARCHIVE).read_bytes() == value
+
+
+def test_inspection_has_no_unverified_archive_claim(raw):
+    result = data.inspect_cifar10(raw)
+    assert result['archive'] is None
+    assert len(result['files']) == 7
+    assert result['partitions']['train']['class_counts'] == [2] * 10
+    assert result['partitions']['test']['class_counts'] == [1] * 10
+    assert result['files']['test_batch']['sha256'] == hashlib.sha256(
+        (raw / data.BASE_FOLDER / 'test_batch').read_bytes()).hexdigest()
+
+
+def test_cli_verify_only_no_manifest_write(raw, capsys):
+    before = snapshot(raw)
+    assert download_data.main(['--root', str(raw), '--verify-only']) == 0
+    result = json.loads(capsys.readouterr().out)
+    assert result['status'] == 'verified'
+    assert result['manifest'] == 'not_created'
+    assert result['archive_verified'] is False
+    assert snapshot(raw) == before
+
+
+def test_cli_manifest_and_idempotence(raw, capsys):
+    assert download_data.main(['--root', str(raw)]) == 0
+    capsys.readouterr()
+    record = json.loads((raw / download_data.MANIFEST).read_text())
+    assert record['schema_version'] == 1
+    assert record['provenance']['method'] == 'preexisting_files'
+    assert record['provenance']['download_url'] is None
+    assert 'unknown' in record['provenance']['note']
+    assert record['inspection']['archive'] is None
+    assert set(record['verifier']['code_sha256_lf']) == {'src/data.py', 'scripts/download_data.py'}
+    before = snapshot(raw)
+    for flags in ([], ['--verify-only']):
+        assert download_data.main(['--root', str(raw), *flags]) == 0
+        assert json.loads(capsys.readouterr().out)['manifest'] == 'unchanged'
+    assert snapshot(raw) == before
+
+
+def test_cli_download_records_actual_provenance(tmp_path, batches, monkeypatch):
+    value = archive_bytes(batches)
+    set_archive_reference(monkeypatch, value)
+    def fake_download(path):
+        path.write_bytes(value)
+        return data.SOURCE_URL
+    monkeypatch.setattr(data, '_download_archive', fake_download)
+    assert download_data.main(['--root', str(tmp_path)]) == 0
+    record = json.loads((tmp_path / download_data.MANIFEST).read_text())
+    assert record['provenance']['method'] == 'official_https_download'
+    assert record['provenance']['download_url'] == data.SOURCE_URL
+    assert record['inspection']['archive']['md5'] == data.ARCHIVE_MD5
+
+
+@pytest.mark.parametrize('flags', [[], ['--verify-only']])
+def test_manifest_cannot_hide_corrupt_data(raw, flags, capsys):
+    assert download_data.main(['--root', str(raw)]) == 0
+    capsys.readouterr()
+    (raw / data.BASE_FOLDER / 'test_batch').write_bytes(b'damaged after verification')
+    before = snapshot(raw)
+    assert download_data.main(['--root', str(raw), *flags]) == 1
+    assert 'checksum mismatch' in json.loads(capsys.readouterr().err)['error']
+    assert snapshot(raw) == before
+
+
+@pytest.mark.parametrize('contents', ['{invalid', '{}', '[]', 'null'])
+def test_conflicting_manifest_preserved(raw, contents, capsys):
+    (raw / download_data.MANIFEST).write_text(contents)
+    before = snapshot(raw)
+    for flags in ([], ['--verify-only']):
+        assert download_data.main(['--root', str(raw), *flags]) == 1
+        assert 'manifest' in json.loads(capsys.readouterr().err)['error']
+    assert snapshot(raw) == before
+
+
+def test_stale_manifest_not_overwritten(raw, capsys):
+    assert download_data.main(['--root', str(raw)]) == 0
+    capsys.readouterr()
+    path = raw / download_data.MANIFEST
+    record = json.loads(path.read_text())
+    record['inspection']['partitions']['train']['count'] = 123
+    path.write_text(json.dumps(record))
+    before = snapshot(raw)
+    assert download_data.main(['--root', str(raw)]) == 1
+    assert 'fresh inspection mismatch' in capsys.readouterr().err
+    assert snapshot(raw) == before
+
+
+@pytest.mark.parametrize('field,value', [('provenance', {}), ('verifier', {}),
+                                       ('verified_utc', 'yesterday')])
+def test_missing_provenance_rejected(raw, capsys, field, value):
+    assert download_data.main(['--root', str(raw)]) == 0
+    capsys.readouterr()
+    path = raw / download_data.MANIFEST
+    record = json.loads(path.read_text())
+    record[field] = value
+    path.write_text(json.dumps(record))
+    before = snapshot(raw)
+    assert download_data.main(['--root', str(raw), '--verify-only']) == 1
+    assert snapshot(raw) == before
+
+
+def test_cli_missing_verify_does_not_create_root(tmp_path, capsys):
+    root = tmp_path / 'missing'
+    assert download_data.main(['--root', str(root), '--verify-only']) == 1
+    assert json.loads(capsys.readouterr().err)['status'] == 'failed'
+    assert not root.exists()
+
+
+@pytest.mark.parametrize('flags,code', [(['--help'], 0), (['--prepare-split'], 2),
+                                     (['--root'], 2), (['--unknown'], 2)])
+def test_cli_argument_contract(flags, code):
+    with pytest.raises(SystemExit) as result:
+        download_data.main(flags)
+    assert result.value.code == code
+
+
+def test_cli_module_invocation_failure(tmp_path):
+    result = subprocess.run([sys.executable, '-m', 'scripts.download_data',
+                             '--root', str(tmp_path / 'absent'), '--verify-only'],
+                            capture_output=True, text=True, timeout=60)
+    assert result.returncode == 1
+    assert json.loads(result.stderr)['status'] == 'failed'
+    assert not (tmp_path / 'absent').exists()

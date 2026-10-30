@@ -138,6 +138,26 @@ def load_cifar10(root: Path, train: bool, download=False) -> CIFAR10:
     return _read_partition(root, train)
 
 
+def inspect_cifar10(root: Path) -> dict:
+    """Fresh read-only integrity evidence for both original partitions.
+
+    Test partition inspection here is solely for integrity, never model design.
+    A missing archive is explicitly null, not an inferred checksum verification.
+    """
+    files = verify_cifar10_files(root)
+    partitions = {}
+    for train, name in ((True, 'train'), (False, 'test')):
+        dataset = _read_partition(Path(root), train)
+        partitions[name] = _validate_partition(dataset, train)
+        del dataset
+    return {'dataset': 'cifar10-python', 'source_page': SOURCE_PAGE,
+            'source_url': SOURCE_URL, 'archive_name': ARCHIVE,
+            'expected_archive_md5': ARCHIVE_MD5,
+            'checksum_reference': 'https://github.com/pytorch/vision/blob/v0.24.0/torchvision/datasets/cifar.py',
+            **files, 'classes': list(CLASSES),
+            'class_to_idx': dict(zip(CLASSES, range(10))), 'partitions': partitions}
+
+
 def _allowed_url(url: str) -> bool:
     parsed = urlparse(url)
     return (parsed.scheme == 'https' and parsed.hostname in
