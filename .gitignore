@@ -34,3 +34,13 @@ wandb/
 
 # Secrets / local config
 .env
+
+# Local verification and future run artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+tmp/
+outputs/runs/
+outputs/predictions/
+.env.*
+!.env.example

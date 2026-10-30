@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-10-30T07:13:10.317234+00:00",
+  "python": "3.12.10",
+  "platform": "Windows",
+  "machine": "AMD64",
+  "packages": {
+    "torch": "2.9.0+cu126",
+    "torchvision": "0.24.0+cu126",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "scikit-learn": "1.9.1",
+    "matplotlib": "3.11.2",
+    "tqdm": "4.70.1",
+    "PyYAML": "6.0.3",
+    "pytest": "9.2.0",
+    "Pillow": "13.0.0"
+  },
+  "torch_cuda_build": "12.6",
+  "cudnn": 91002,
+  "png_roundtrip": "PASS",
+  "cpu": {
+    "forward_backward": "PASS",
+    "torchvision_nms": "PASS"
+  },
+  "cuda_available": true,
+  "deterministic_algorithms": true,
+  "cudnn_benchmark": false,
+  "cudnn_deterministic": true,
+  "cuda_matmul_fp32_precision": "ieee",
+  "cudnn_conv_fp32_precision": "ieee",
+  "requirements_lock_sha256_lf": "255a7e272f8cf8e1e2d0efe0226c1466fd5f017862ac0c3469d072521a44bbcb",
+  "nvidia_driver": [
+    "555.97"
+  ],
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 3060 Laptop GPU",
+    "vram_bytes": 6441926656,
+    "capability": [
+      8,
+      6
+    ],
+    "architectures": [
+      "sm_50",
+      "sm_60",
+      "sm_61",
+      "sm_70",
+      "sm_75",
+      "sm_80",
+      "sm_86",
+      "sm_90"
+    ],
+    "checks": {
+      "forward_backward": "PASS",
+      "torchvision_nms": "PASS"
+    }
+  }
+}

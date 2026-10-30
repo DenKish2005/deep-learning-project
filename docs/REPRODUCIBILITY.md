@@ -1,34 +1,76 @@
-# Воспроизводимость и плановые команды
+# Воспроизводимость: проверенный setup и будущий pipeline
 
-Все ML CLI ниже — **целевые интерфейсы после реализации соответствующих tasks**, сейчас source/scripts пустые. Нельзя запуск успешного empty script интерпретировать как выполненную задачу. На стадии планирования команды не выполнялись, dependencies не устанавливались.
+SETUP-002 выполнен локально 30.10.2026; config validation относится к SETUP-003.
+Раздел «Плановые команды pipeline» ниже остаётся будущим интерфейсом: data/train/
+evaluate/metrics/plots ещё пустые. Успешный empty script не является выполненной задачей.
 
 ## Окружение
 
-Reference Python **3.12.x**, зафиксировать patch после проверки (локально обнаружен 3.12.10). PyTorch и torchvision выбирать согласованной парой из официального [compatibility table](https://github.com/pytorch/vision). Предложенный консервативный install candidate: torch 2.9.0 / torchvision 0.24.0; он ещё не проверен на машине команды. Это не утверждение о последней версии. Установленные metadata2.14.0/0.29.0 не доказывают совместимость imports/ops или CUDA.
+Проверено: **Python3.12.10, Windows AMD64**, отдельная `.venv` с
+`include-system-site-packages=false`. torch2.9.0+cu126 / torchvision0.24.0+cu126.
+[Official compatibility table](https://github.com/pytorch/vision) включает Python3.12
+для пары2.9/0.24; [official install combinations](https://pytorch.org/get-started/previous-versions/)
+содержит эту пару для Windows/CUDA12.6. Candidate принят только после реальной
+установки, imports, compiled ops и CPU/CUDA forward/backward. Глобальное окружение
+не изменялось. Это проверенный выбор, не утверждение о latest version.
 
-SETUP-002: создать отдельный venv; проверить candidate CPU import/forward, `pip check`, dataset decoding и tests. Затем зафиксировать exact versions всех восьми runtime packages и pytest, hashes/installation source в lock и environment metadata. При непригодности candidate выбрать другую **документированную пару**, не смешивать torch и vision independently. Не фиксировать выдуманный полный lock до resolver и smoke. [Официальные install combinations](https://docs.pytorch.org/get-started/previous-versions/).
+Exact direct versions — [requirements.txt](../requirements.txt), все38 installed
+packages включая pip/setuptools — [requirements-lock.txt](../requirements-lock.txt).
+Источники: PyTorch cu126 index для torch/vision и их первой dependency resolution;
+PyPI для остальных packages. Полный snapshot и результаты —
+[setup_environment.json](../report/setup_environment.json). Snapshot намеренно
+не содержит username/absolute paths. Lock — version lock, **без hashes wheel-файлов**;
+не гарантирует сохранение binaries на index, bitwise cross-platform или offline install.
 
-План Windows PowerShell, из repo root; отдельный interpreter без необходимости Activate.ps1:
+Проверенная bootstrap последовательность Windows PowerShell, из repo root;
+`python` здесь должен быть Python3.12.10. Launcher `py -3.12` на этой машине
+не находит interpreter, поэтому используется доступный `python`. TEMP/TMP внутри
+ignored `tmp/` обходят подтверждённую sandbox ошибку ensurepip с default temp:
 
 ```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install torch==2.9.0 torchvision==0.24.0 --index-url https://download.pytorch.org/whl/cpu
-.\.venv\Scripts\python.exe -m pip install numpy pandas scikit-learn matplotlib tqdm pyyaml pytest
+python --version
+New-Item -ItemType Directory -Force tmp/setup | Out-Null
+$env:TEMP=(Resolve-Path tmp/setup).Path
+$env:TMP=$env:TEMP
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt --disable-pip-version-check
 .\.venv\Scripts\python.exe -m pip check
-.\.venv\Scripts\python.exe -c "import torch, torchvision; print(torch.__version__, torchvision.__version__, torch.cuda.is_available())"
-.\.venv\Scripts\python.exe -m pip freeze > requirements-lock.txt
+$env:CUBLAS_WORKSPACE_CONFIG=':4096:8'
+$env:MPLCONFIGDIR=(Resolve-Path .venv).Path + '/mplconfig'
+.\.venv\Scripts\python.exe -m scripts.check_environment
 ```
 
-First-install commands содержат unpinned non-torch packages только для **разрешения candidate**. Core runs разрешены после проверки и exact lock. В будущем воспроизведение: установить нужный torch/vision backend по записанному install recipe, затем `python -m pip install -r requirements-lock.txt`; lock различает CPU/CUDA wheel suffixes. Не коммитить machine-specific absolute URLs/tokens из freeze. requirements.txt обновить согласованно; pytest можно оставить dev section комментариями в простом файле.
+При первом создании `.venv` реально выполнены `pip install torch==2.9.0
+torchvision==0.24.0 --index-url https://download.pytorch.org/whl/cu126`, затем
+`pip install numpy pandas scikit-learn matplotlib tqdm pyyaml pytest --index-url
+https://pypi.org/simple`. Resolver freeze сохранён после успешных checks.
+Повторный install из lock в этом env прошёл без изменений. Новый полный install
+именно из lock на второй машине не выполнен: это REPRO-002. Не обновлять lock
+автоматически при каждом запуске и не заменять backend suffix молча.
 
-GPU recipe не выбирается до проверки `nvidia-smi`, GPU/VRAM, driver, torch.version.cuda/cuDNN и подходящего official wheel. System CUDA toolkit version сама по себе не доказывает wheel compatibility. Person 6 сохраняет точную pip command/index URL в environment.json и выполняет CUDA forward/backward smoke. Не запускать два concurrent jobs на одном GPU без memory profile.
+Проверенный GPU: NVIDIA GeForce RTX3060 Laptop,6144MiB, capability8.6;
+driver555.97, torch CUDA12.6, cuDNN91002; sm_86 есть в wheel architectures.
+`nvidia-smi` показывает CUDA12.5 — это driver capability, не версия runtime wheel.
+[NVIDIA minor compatibility](https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html)
+допускает CUDA12.x на подходящем старшем driver с ограничениями (например PTX/new
+features); actual CUDA smoke прошёл. Не обновляли driver/toolkit. Это не проверка
+всех CUDA operations, project CNN или memory/time budget для full training.
+CPU-only wheel и Linux/macOS/Colab на этом этапе **не проверены**; CPU ops
+проверены внутри того же cu126 wheel. На машине без CUDA script явно пишет SKIP.
 
 Colab: fresh runtime, version check до imports, согласованная install pair, restart runtime если packages заменены, code commit/copy hash и mounted persistent artifact storage. Пути через pathlib, workers 0 reference. Не полагаться на ephemeral `/content` для единственной копии checkpoints. Результаты разных platforms отмечать, paired models по возможности обучать на одном backend.
 
 ## Determinism
 
-Перед CUDA init в PowerShell: `$env:CUBLAS_WORKSPACE_CONFIG=':4096:8'`; затем `random.seed`, NumPy seed, torch.manual_seed и cuda.manual_seed_all при наличии. `torch.use_deterministic_algorithms(True)`, cudnn.benchmark=False, cudnn.deterministic=True; отключить TF32 для reference comparison. Unsupported nondeterministic operation должна fail с diagnostic, не silent warn-only. [PyTorch reproducibility guidance](https://docs.pytorch.org/docs/2.15/notes/randomness.html).
+Перед CUDA init в PowerShell: `$env:CUBLAS_WORKSPACE_CONFIG=':4096:8'`; затем
+в будущем seed utilities: random.seed, NumPy seed, torch.manual_seed и cuda seeds.
+В environment smoke уже проверены `torch.use_deterministic_algorithms(True)`,
+cudnn.benchmark=False, cudnn.deterministic=True. TF32 отключён через новый API2.9:
+`torch.backends.cuda.matmul.fp32_precision='ieee'` и
+`torch.backends.cudnn.conv.fp32_precision='ieee'`. Не смешивать old/new TF32 API.
+[Official CUDA semantics](https://docs.pytorch.org/docs/2.9/notes/cuda.html),
+[reproducibility guidance](https://docs.pytorch.org/docs/2.9/notes/randomness.html).
+Полная determinism/resume infrastructure остаётся REPRO-001/TRAIN-002.
 
 PyTorch не обещает одинаковые results между releases/platforms и CPU/GPU; deterministic mode может замедлить вычисления. Reference claims ограничивать locked software/backend. CPU pixel corruption и stable per-image streams обеспечивают общие inputs; model outputs across hardware сравнивать с заранее записанными tolerances, не заявлять bitwise cross-platform.
 
