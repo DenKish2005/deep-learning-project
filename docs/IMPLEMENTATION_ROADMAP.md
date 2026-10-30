@@ -20,7 +20,12 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 поэтому текущие tasks PARTIAL даже при technical acceptance PASS. Это не блокирует
 независимую техническую подготовку; external approvals нужны до соответствующих gates.
 
-Ветка по умолчанию `codex/<task-id-lowercase>`; можно объединить тесно связанные tasks в один feature PR с одним owner. PR scope — перечисленные файлы и конкретная функция, без unrelated cleanup. DONE не ставится по наличию filename. Диапазоны task IDs в прочих документах обозначают перечисленные существующие IDs, не скрытые задачи.
+Актуальное указание пользователя после foundation: все изменения, маленькие
+проверенные commits и обычный push выполняются только в `main`; feature branches
+не создаются. Поля Branch и Commit/PR scope ниже — исторические рекомендации
+первоначального плана; их branch names заменены этим правилом, границы задач и
+требования проверок сохранены. DONE не ставится по наличию filename или push.
+Диапазоны task IDs обозначают существующие IDs, не скрытые задачи.
 
 ## Phases и evidence gates
 

@@ -1,5 +1,11 @@
 # Работа шести участников
 
+Актуальное правило пользователя после foundation: работать, коммитить и пушить
+только в `main`, небольшими проверенными блоками. Не создавать `codex/*` или другие
+feature branches. Ниже сохранены исходные role/review планы; старые branch/PR
+рекомендации заменены этим явным указанием. Human review не считается выполненным
+из-за прямого push. Следующий этап: [готовый промпт DATA-001](NEXT_STEP_PROMPT.md).
+
 Person 1..6 — placeholders до TEAM-001. Имена найдены в локальном candidate
 proposal S2b, но submitted roster, mapping к ролям и availability не подтверждены.
 TEAM-001 **PARTIAL**: проверен role/file plan; согласие участников/backup/reviewers

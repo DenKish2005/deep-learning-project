@@ -1,5 +1,13 @@
 # CURRENT PROJECT STATUS
 
+## Обновление Git workflow
+
+После foundation пользователь разрешил push и потребовал все следующие commits
+и push только в `main`. Foundation commits перенесены в локальную `main`
+fast-forward без переписывания истории. Snapshot этапа ниже описывает предыдущее
+состояние до публикации; актуальную синхронизацию проверять через Git.
+Следующий ограниченный этап — [DATA-001 prompt](NEXT_STEP_PROMPT.md).
+
 ## Текущее состояние после foundation — 30.10.2026
 
 База продолжения: commit0633f67, исходная ветка main была clean; последующих
