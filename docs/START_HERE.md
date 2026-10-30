@@ -1,12 +1,21 @@
 # С чего начать
 
-Сейчас нужен **план перед реализацией**. Аудит завершён,14planning docs созданы. ML pipeline пока не работает:14Python files пустые, configs comment-only, notebook без cells, данных/checkpoints/results нет. Официальные course guidelines и submitted proposal отсутствуют. Модели не обучались.
+Foundation этап выполнен в локальном техническом объёме: отдельная `.venv`, exact
+versions, CPU/CUDA environment smoke, complete YAMLs и strict validation с116
+passing tests. ML pipeline ещё не реализован; данные не скачаны, модели не обучены.
+Найдены guidelines/CSR и proposal candidates; submitted version, policy precedence
+и human approvals pending. Актуальные статусы полного DoD — в CURRENT_STATUS,
+проверенные команды — README, evidence — report/reproduction.md.
 
 Сначала прочитайте [MASTER_PROJECT_PLAN.md](MASTER_PROJECT_PLAN.md), затем [CURRENT_STATUS.md](CURRENT_STATUS.md). Перед кодом — [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md); перед своим PR — [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md) и карточку задачи в [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md).
 
 ## Первые 15 действий команды
 
-Это очередь на implementation phase, а не выполненные задачи. Независимые действия идут параллельно; prerequisites в roadmap обязательны. Full training начинается только после smoke/scientific gate.
+Это reference очередь implementation phase. SETUP-001/PROTO-001/TEAM-001 частично
+закрыты; у SETUP-002/003 local technical acceptance PASS, formal human review
+pending. Следующая реализация — DATA-001/002/003 и REPRO-001 primitives. Независимая
+техническая подготовка не ждёт missing source/team information; full training
+начинается только после policy/protocol и smoke/scientific gates.
 
 | # / Task ID | Конкретное действие и файлы | Кто | Evidence завершения |
 |---|---|---|---|
@@ -28,7 +37,9 @@
 
 Следом: TRAIN-002 checkpoint/resume → TRAIN-003 overfit/pilot; TRAIN-004 orchestrator и EVAL-001/PLOT-001 → TEST-001/002 smoke/scientific gate → core training. Не выбирать probabilities, epochs или checkpoint по test accuracy.
 
-Команды в [REPRODUCIBILITY.md](REPRODUCIBILITY.md) пока являются целевыми интерфейсами, **не verified working commands**.
+Install/check_environment/config validation/pytest команды в README и начальном
+разделе [REPRODUCIBILITY.md](REPRODUCIBILITY.md) проверены. Раздел «Плановые команды
+pipeline» остаётся будущим интерфейсом, его CLI ещё не работают.
 
 ## Очередь каждого участника
 

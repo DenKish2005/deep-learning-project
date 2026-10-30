@@ -1,6 +1,36 @@
 # CURRENT PROJECT STATUS
 
-Read-only аудит проведён 30.10.2026 до создания `docs/`. Обследованы все 29 tracked файлов, включая пустые, локальная структура, конфигурации, notebook, зависимости и Git metadata. Программный pipeline ещё отсутствует.
+## Текущее состояние после foundation — 30.10.2026
+
+База продолжения: commit0633f67, исходная ветка main была clean; последующих
+commits при старте не было. Создана `codex/setup-foundation`, локальные commits
+по логическим блокам; push/merge/fetch не выполнялись. Remote freshness неизвестна.
+Применимых AGENTS.md в repository/родительской цепочке нет.
+
+| Task | Статус полного DoD | Фактически выполнено / осталось |
+|---|---|---|
+| SETUP-001 | PARTIAL | Найдены local guidelines2026, CSR, 2proposal candidates; реестр hashes/pages. Pending: LMS freshness, detailed rubric, receipt/version, policy precedence, точные cutoff/slot |
+| PROTO-001 | PARTIAL | Technical architecture/protocol review и corrections записаны; team approval/freeze pending |
+| TEAM-001 | PARTIAL | Role/file plan проверен, имена найдены в candidate; mapping/availability/backup/reviewer acceptance pending |
+| SETUP-002 | PARTIAL, local technical acceptance PASS | `.venv`,38 exact versions, recipe, pip check/imports/CPU+CUDA smoke PASS; formal human review pending |
+| SETUP-003 | PARTIAL, local technical acceptance PASS | 2YAML, strict schema/config CLI,116 tests PASS; formal human review/protocol acceptance pending |
+
+Это завершённый **локальный технический объём текущего этапа**, не team sign-off.
+[Evidence](../report/reproduction.md), [environment snapshot](../report/setup_environment.json),
+[source registry](../report/course_materials/README.md), [decisions](SETUP_DECISIONS.md).
+
+Реализованы только config functions в src/utils.py, test_utils и environment smoke.
+Данные не скачивались, test set не читался, CNN/training/evaluation/plotting не
+реализованы и не запускались. Split/stats paths декларативные, hashes null.
+REPRO-001 TODO (ignore protection добавлена, identity/manifests/backup ещё нет).
+Следующий технический этап: DATA-001 → DATA-002 → DATA-003 с REPRO-001 primitives;
+course policy/team approvals уточняются отдельно до соответствующих gates.
+
+## Исторический аудит до planning commit
+
+Весь текст ниже сохраняет snapshot на 5ce6b1a до создания `docs/`; его размеры,
+версии, статусы и команды не описывают текущую рабочую ветку. Обследованы все29
+исходных tracked файлов. Текущее состояние и проверки перечислены выше.
 
 ## Наблюдаемые факты
 

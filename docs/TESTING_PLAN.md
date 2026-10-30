@@ -1,6 +1,13 @@
 # План тестирования и QA
 
-Статус 30.10.2026: существующие tests пустые; ни один тест ниже не выполнен. Это будущие обязательные проверки ML implementation. ID `TEST-*` в таблицах — test cases, а `TEST-001..003` в roadmap — tasks, которые их интегрируют.
+Статус 30.10.2026 после foundation: TEST-U01 реализован в tests/test_utils.py;
+полная текущая suite **116 passed**, 0failed/0skipped. Проверены schema/types/ranges,
+required/unknown/duplicate keys, probabilities, exact severity maps, controlled
+settings, invalid CLI и config loading без dataset artifacts. Environment smoke
+CPU/CUDA/Pillow/torchvision проходит отдельно: [evidence](../report/reproduction.md).
+Остальные test cases ниже — будущие проверки ML implementation; пустые
+test_data_pipeline/test_corruptions не считаются покрытием. ID TEST-* — cases,
+а TEST-001..003 в roadmap — tasks, которые их интегрируют.
 
 ## Организация fixtures
 

@@ -51,7 +51,9 @@ PR границы: SETUP config/schema; DATA split/loaders; CORR primitives; MOD
 
 Merge gate: ≥1reviewer вне автора; relevant tests+synthetic integration; no unintended controlled-field differences; no secrets/large artifacts; docs/interfaces updated. Data/scientific PR дополнительно reviewer5 или 1; core training не запускать с локальным unreviewed scientific fix. После source freeze run SHA/config metadata совпадают с release identity; исправления корректности делают новый versioned run, а не меняют старые метрики.
 
-В рамках текущей planning task commits, branches, push и remote changes не делались. Этот workflow описывает последующие действия команды.
+В planning snapshot0633f67 branches/push не менялись. В foundation этапе созданы
+ветка codex/setup-foundation и небольшие локальные commits по разрешению
+пользователя. Push/merge не выполнялись. Team review/acceptance остаются pending.
 
 ## Общая готовность участников
 

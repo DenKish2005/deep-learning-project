@@ -1,10 +1,24 @@
 # Подробный implementation roadmap
 
-Дата: 30.10.2026. Все implementation tasks **TODO**; только AUDIT-001 завершён данным planning package. Это план, код и experiments не запускаются. Канонические interfaces: [TECHNICAL_ARCHITECTURE](TECHNICAL_ARCHITECTURE.md); methodology: [EXPERIMENT_PROTOCOL](EXPERIMENT_PROTOCOL.md); tests: [TESTING_PLAN](TESTING_PLAN.md); даты: [PROJECT_SCHEDULE](PROJECT_SCHEDULE.md).
+Дата: 30.10.2026. AUDIT-001 DONE; SETUP-001/002/003, PROTO-001 и TEAM-001
+**PARTIAL** по полному DoD. У SETUP-002/003 вся локальная техническая реализация
+и acceptance выполнены, human reviewer approval ещё pending. Остальные tasks TODO.
+Нет данных, training или evaluation. Evidence: [CURRENT_STATUS](CURRENT_STATUS.md),
+[reproduction record](../report/reproduction.md). Канонические interfaces:
+[TECHNICAL_ARCHITECTURE](TECHNICAL_ARCHITECTURE.md); methodology:
+[EXPERIMENT_PROTOCOL](EXPERIMENT_PROTOCOL.md); tests: [TESTING_PLAN](TESTING_PLAN.md).
 
 ## Как выполнять карточки
 
-Task dependencies имеют приоритет над номерами phase. Независимые API/fixtures/report drafts делаются параллельно; core compute начинается только после gates. Person 1..6 — роли, не известные имена. Оценки — **active person-hours**, не GPU wall time и не promises. В каждом task все 20 полей заданы; Input, Output и Artifacts разделены явно. Definition of Done (DoD) каждой карточки = её acceptance criterion + test evidence + reviewer approval + updated status/artifact paths. Review/merge относится к последующей реализации; в текущей planning task Git не меняется.
+Task dependencies имеют приоритет над номерами phase. Независимые API/fixtures/report
+drafts делаются параллельно; core compute начинается только после gates. Person1..6 —
+роли, mapping имён pending. Оценки — active person-hours, не GPU wall time/promises.
+В каждом task20 полей; Input/Output/Artifacts разделены. Полный DoD = acceptance +
+test evidence + reviewer approval + updated status/artifact paths. Foundation
+сохраняется небольшими локальными commits в codex/setup-foundation по запросу
+пользователя; push/merge не выполняются. Self-review не считается reviewer approval,
+поэтому текущие tasks PARTIAL даже при technical acceptance PASS. Это не блокирует
+независимую техническую подготовку; external approvals нужны до соответствующих gates.
 
 Ветка по умолчанию `codex/<task-id-lowercase>`; можно объединить тесно связанные tasks в один feature PR с одним owner. PR scope — перечисленные файлы и конкретная функция, без unrelated cleanup. DONE не ставится по наличию filename. Диапазоны task IDs в прочих документах обозначают перечисленные существующие IDs, не скрытые задачи.
 
@@ -68,7 +82,7 @@ Task dependencies имеют приоритет над номерами phase. �
 - **1. ID:** SETUP-001.
 - **2. Title:** Получить course sources и proposal.
 - **3. Purpose:** Установить официальные ограничения.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — local source search/register выполнены; latest LMS/rubric, submitted version/receipt, AI-policy precedence, cutoff/slot и independent source review pending. Evidence: report/course_materials/README.md, report/proposal.md, report/ai_usage.md.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 1 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** AUDIT-001.
@@ -91,7 +105,7 @@ Task dependencies имеют приоритет над номерами phase. �
 - **1. ID:** PROTO-001.
 - **2. Title:** Review и freeze protocol v1.
 - **3. Purpose:** Предотвратить post-test tuning.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — technical consistency review и corrections выполнены (docs/SETUP_DECISIONS.md); actual team acceptance, Persons2/5 review, source conflicts и freeze pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 1 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** AUDIT-001; SETUP-001.
@@ -114,7 +128,7 @@ Task dependencies имеют приоритет над номерами phase. �
 - **1. ID:** TEAM-001.
 - **2. Title:** Назначить owners и reviews.
 - **3. Purpose:** Обеспечить параллельную работу.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — role/file plan проверен, candidate roster найден; submitted roster, names-to-roles mapping, availability/backup и participant/reviewer acceptance pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 1 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** AUDIT-001.
@@ -137,7 +151,7 @@ Task dependencies имеют приоритет над номерами phase. �
 - **1. ID:** SETUP-002.
 - **2. Title:** Проверить и зафиксировать environment.
 - **3. Purpose:** Получить общий CPU/GPU runtime.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — local technical acceptance PASS: isolated Python3.12.10,38 exact versions, pip check/imports/CPU+CUDA smoke, install recipe/sanitized evidence. Остался formal human reviewer approval по DoD; independent fresh-machine replay относится к REPRO-002.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 6 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** AUDIT-001.
@@ -160,7 +174,7 @@ Task dependencies имеют приоритет над номерами phase. �
 - **1. ID:** SETUP-003.
 - **2. Title:** Schema и common configs.
 - **3. Purpose:** Сделать параметры однозначными.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — local technical acceptance PASS: оба YAML, schema/config CLI, controlled validation,116 passing tests. Остались formal human reviewer approval и team protocol acceptance; data artifacts относятся к DATA-002/003 и будущему training gate.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 1 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** PROTO-001; SETUP-002.

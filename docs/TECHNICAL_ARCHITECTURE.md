@@ -51,6 +51,7 @@ robustness-to-noise/
 │   ├── evaluate.py
 │   └── metrics.py
 ├── scripts/
+│   ├── check_environment.py           # implemented offline dependency/backend smoke
 │   ├── download_data.py
 │   ├── run_all_evaluations.py
 │   ├── run_experiments.py              # обоснован: 6 training runs, status/resume
@@ -94,7 +95,10 @@ robustness-to-noise/
         └── slides.pdf
 ```
 
-`.gitkeep` в существующих data/output dirs сохраняются. Tree показывает рекомендуемый end state; сейчас созданы только 14 planning docs. Report source format можно выбрать командой без влияния на scientific protocol. Не нужны отдельные trainer frameworks, web apps, databases, MLflow/W&B server или copy-paste training loops.
+`.gitkeep` в существующих data/output dirs сохраняются. Tree показывает будущий
+end state, а не inventory готовых файлов. Сейчас реализованы configs/config utils,
+их tests и environment checker; полный pipeline ещё отсутствует. Report source
+format можно выбрать командой. Дополнительные frameworks/services не нужны.
 
 ## Направление зависимостей
 

@@ -1,6 +1,8 @@
 # MASTER PROJECT PLAN — CSCI 494 Robustness to Noise
 
-**Главная точка входа для команды.** Дата:30 октября 2026, Asia/Qyzylorda. Этап: аудит и planning. Этот пакет не реализует ML pipeline и не содержит измеренных результатов.
+**Главная точка входа для команды.** Дата:30 октября 2026, Asia/Qyzylorda.
+Этап: foundation перед data pipeline. Local environment/config acceptance PASS;
+ML pipeline и measured experiment results пока отсутствуют.
 
 ## Что нужно сделать и зачем
 
@@ -12,15 +14,33 @@ Core: один stratified split45k/5k исходного train и original10k te
 
 ## Что уже есть
 
-Аудит commit5ce6b1a показал 29 tracked files,20 zero-byte files и **14 пустых Python files**. README описывает repository scaffold. YAML содержат только comments, notebook без cells, proposal пуст. Нет данных, training/evaluation pipeline, работающих tests, checkpoints, metrics и figures. Dependency names есть, versions/lock/pytest отсутствуют.
+Исторический аудит5ce6b1a обнаружил scaffold:29 tracked files,20zero-byte и14пустых
+Python files; planning package сохранён в0633f67. Foundation продолжен с clean main
+на ветке codex/setup-foundation. Теперь есть отдельная `.venv`, exact38-package
+lock, CPU/CUDA smoke и sanitized evidence,2полных YAML, strict config validation
+и116passing tests. Notebook, data/model/train/eval/plots остаются placeholders;
+данные не скачивались, test set не читался.
 
-Созданные 14 docs — завершённый planning package, не реализация компонентов. Git commits, push и branches не менялись. Подробный inventory всех файлов, Git/env facts и blockers: [CURRENT_STATUS.md](CURRENT_STATUS.md).
+Локальные commits сделаны по логическим блокам; push/merge не выполнялись.
+Полный task DoD остаётся PARTIAL у SETUP-001/002/003, PROTO-001, TEAM-001 из-за
+неполученного human review/source/team evidence, при закрытом local technical
+acceptance SETUP-002/003. [CURRENT_STATUS](CURRENT_STATUS.md) и
+[reproduction record](../report/reproduction.md) разделяют эти уровни готовности.
 
 ## Что требует курс и что выбрала команда
 
-Оригиналов guidelines, rubric, AI policy и submitted proposal нет. По пересказу в MASTER PROMPT нужны: чёткая problem, dataset, baseline, ≥1team-trained NN, controlled comparison, quantitative evaluation, honest limitations, report и presentation. Weights30%presentation/70%report/project25%course **не подтверждены**. Report12.12.2026 и presentation Week 14 также требуют сверки; cutoff/timezone неизвестны. Proposal20.09 уже прошёл.
+Найдены local guidelines Fall2026, CSR и2proposal candidates. Guidelines подтверждают
+problem/dataset/baseline/team-trained NN/controlled quantitative comparison/honest
+discussion/report/presentation, weights30%/70% и dates Sep20/Week14/Dec12. CSR
+содержит project25%course, но semester applicability pending. Точные cutoff/timezone
+и presentation slot не указаны. Latest LMS/rubric и submitted version/receipt pending.
+Есть конфликт AI policy guidelines/CSR; разрешение курса на объём помощи не
+объявлено. [Реестр с pages/hashes](../report/course_materials/README.md).
 
-Два training regimes, три families, три seeds и 96evaluations — явный scope пользователя. Нельзя приписывать эти commitments submitted proposal, пока он не найден. Tests/hashes/backups/paired statistics — engineering и research quality requirements этого плана. CIFAR-10-C, ECE и дополнительные CI — optional.
+Два regimes/три families согласуются с обоими proposal candidates; exact3seeds,
+96evaluations,40epochs, severity maps и train policy — последующий scope пользователя
+и protocol, не текст submitted proposal. Tests/hashes/backups/paired statistics —
+engineering/research requirements плана. CIFAR-10-C, ECE и дополнительные CI optional.
 
 Матрица требований с source, priority, tasks, evidence и status: [REQUIREMENTS.md](REQUIREMENTS.md). Person 1 закрывает source gaps в SETUP-001 и уточняет actual AI policy до последующей реализации и сдачи.
 
@@ -101,8 +121,16 @@ Full DoD:6runs/96eval, shared inputs/training controls, raw artifacts/hashes, co
 
 Canonical constants:6 runs,96 conditions, seeds42/123/2026, split 494, eval 100494,40 epochs,14080updates/run,288746 params, clean-val selection и pixel-space corruption. Task dependencies должны быть без cycles, local links — действительными; future tree не означает working implementation.
 
-Проверки planning package:14required docs,96unique matrix rows,49task cards с 20 полями, links и dependency graph, original29 tracked files unchanged. Код, обучение и ML tests/evaluation не запускались. Итоговый результат проверок указан в ответе чата. При изменении protocol обновлять затронутые requirements/tasks/schedule/acceptance одним согласованным PR.
+Историческая проверка planning package:14required docs,96unique matrix rows,
+49task cards с20полями, links/dependency graph и original29files unchanged тогда.
+Текущая foundation проверка:116tests PASS, schema/controlled-pair CLI PASS,
+pip check/imports/CPU+CUDA environment smoke PASS. Data/training/evaluation не
+запускались. При изменении protocol обновлять requirements/tasks/acceptance вместе.
 
 ## Что ещё неизвестно
 
-Нужны actual course guidelines/rubric/AI policy, submitted proposal, presentation date/slot/language/demo, report cutoff/timezone, имена и availability команды, GPU/driver/VRAM, artifact storage. Эти неизвестные не блокируют planning; Persons1/6 закрывают их до соответствующих execution/submission gates. До проверки status — VERIFY.
+Неизвестны latest LMS/rubric, AI-policy precedence, submitted proposal version,
+presentation date/slot/language/demo, report cutoff/timezone, confirmed roster/role
+mapping/availability, artifact storage. GPU/driver/VRAM проверены локально, но full
+training runtime/memory не измерены. Независимая техническая работа продолжается;
+team/protocol/course compliance остаются pending до соответствующих gates.
