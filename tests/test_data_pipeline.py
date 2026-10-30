@@ -380,3 +380,37 @@ def test_cli_module_invocation_failure(tmp_path):
     assert result.returncode == 1
     assert json.loads(result.stderr)['status'] == 'failed'
     assert not (tmp_path / 'absent').exists()
+
+
+@pytest.mark.parametrize('failure', [None, 'range', 'short', 'host'])
+def test_bounded_official_download(tmp_path, monkeypatch, failure):
+    payload = b'a' * (1024 * 1024) + b'final fragment'
+    monkeypatch.setattr(data, 'ARCHIVE_BYTES', len(payload))
+    requests = []
+    class Response(io.BytesIO):
+        status = 206
+        def __init__(self, start, end):
+            contents = payload[start:end + 1]
+            super().__init__(contents[:-1] if failure == 'short' else contents)
+            self.headers = {'Content-Range': f'bytes {start}-{end}/{len(payload)}'}
+            if failure == 'range':
+                self.headers['Content-Range'] = 'wrong range'
+        def geturl(self):
+            return 'https://mirror.example/file' if failure == 'host' else data.SOURCE_URL
+    class Opener:
+        def open(self, request, timeout):
+            assert timeout == 60
+            assert request.full_url == data.SOURCE_URL
+            header = request.get_header('Range')
+            requests.append(header)
+            start, end = map(int, header.removeprefix('bytes=').split('-'))
+            return Response(start, end)
+    monkeypatch.setattr(data, 'build_opener', lambda *args: Opener())
+    path = tmp_path / 'download'
+    if failure:
+        with pytest.raises(data.DataIntegrityError):
+            data._download_archive(path)
+    else:
+        assert data._download_archive(path) == data.SOURCE_URL
+        assert path.read_bytes() == payload
+        assert requests == [f'bytes=0-{1024 * 1024 - 1}', f'bytes={1024 * 1024}-{len(payload) - 1}']

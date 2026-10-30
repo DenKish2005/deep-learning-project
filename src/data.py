@@ -11,7 +11,7 @@ import shutil
 import tarfile
 import tempfile
 from urllib.parse import urlparse
-from urllib.request import HTTPRedirectHandler, build_opener
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 import numpy as np
 from torchvision.datasets import CIFAR10
@@ -22,6 +22,7 @@ SOURCE_URL = 'https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz'
 BASE_FOLDER = 'cifar-10-batches-py'
 ARCHIVE = 'cifar-10-python.tar.gz'
 ARCHIVE_MD5 = 'c58f30108f718f92721af3b95e74349a'
+ARCHIVE_BYTES = 170498071  # Official HTTPS Content-Length, checked 2026-10-30.
 FILE_MD5 = {
     'data_batch_1': 'c99cafc152244af753f735de768cd75f',
     'data_batch_2': 'd4bba439e000b95fd0a9bffe97cbabec',
@@ -175,12 +176,29 @@ class _OfficialRedirects(HTTPRedirectHandler):
 
 
 def _download_archive(destination: Path) -> str:
-    with build_opener(_OfficialRedirects()).open(SOURCE_URL, timeout=60) as response:
-        final_url = response.geturl()
-        if not _allowed_url(final_url):
-            raise _error(f'Refusing download source: {final_url}')
-        with destination.open('xb') as output:
-            shutil.copyfileobj(response, output)
+    # Bounded requests avoid a confirmed stalled full-body GET on this source.
+    # Each response must cover exactly its requested byte range; the complete
+    # assembled archive still has to match the upstream MD5 before publication.
+    opener = build_opener(_OfficialRedirects())
+    final_url = SOURCE_URL
+    chunk_bytes = 1024 * 1024
+    with destination.open('xb') as output:
+        for start in range(0, ARCHIVE_BYTES, chunk_bytes):
+            end = min(start + chunk_bytes, ARCHIVE_BYTES) - 1
+            request = Request(SOURCE_URL, headers={'Range': f'bytes={start}-{end}'})
+            with opener.open(request, timeout=60) as response:
+                final_url = response.geturl()
+                if not _allowed_url(final_url):
+                    raise _error(f'Refusing download source: {final_url}')
+                expected_range = f'bytes {start}-{end}/{ARCHIVE_BYTES}'
+                if response.status != 206 or response.headers.get('Content-Range') != expected_range:
+                    raise _error(f'Official source returned an unexpected byte range: '
+                                 f'{response.headers.get("Content-Range")} (expected {expected_range})')
+                contents = response.read(end - start + 2)
+                if len(contents) != end - start + 1:
+                    raise _error(f'Incomplete official archive range {start}-{end}: {len(contents)} bytes')
+                output.write(contents)
+                output.flush()
     return final_url
 
 
