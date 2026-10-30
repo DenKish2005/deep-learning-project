@@ -7,8 +7,12 @@ versions, two complete YAML configs, strict schema/controlled comparison validat
 and 116 passing offline tests. The planned experiment compares the same CNN trained
 on clean images and with corruption-aware augmentation on CIFAR-10.
 
-Data loading, corruptions, CNN, training, evaluation and plotting remain future
-work. No CIFAR-10 download or training has been performed.
+DATA-001 adds verified raw CIFAR-10 loading, explicit acquisition, a read-only
+integrity CLI and a versioned local manifest. Split, normalization, corruptions,
+CNN, training, evaluation and plotting remain future work. No training has run.
+Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
+RGB32×32, all archive/file checksums and class counts pass. Current checks:
+180 offline tests pass (3 opt-in tests skipped); separately all 3 actual tests pass.
 
 ## Working installation and checks
 
@@ -60,6 +64,42 @@ Dataset paths are declarations: `split_sha256` and `normalization_sha256` remain
 does not create, download, open or authenticate these artifacts, and does not
 assert training readiness. Artifact verification is a future training gate.
 
+## Working raw CIFAR-10 interface (DATA-001)
+
+Run from the repository root using the existing environment:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-only
+.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-tmp
+# Separate opt-in: missing/corrupt local data is a failure, never a download/skip.
+$env:RUN_CIFAR_INTEGRATION='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_cifar10_local.py -q --basetemp=.venv/pytest-cifar-local
+Remove-Item Env:RUN_CIFAR_INTEGRATION
+```
+
+`load_cifar10(root: Path, train: bool, download=False)` in `src/data.py` returns
+torchvision CIFAR10 with raw PIL RGB 32×32 images and integer labels. Default
+loading is offline. Acquisition uses only official Toronto HTTPS endpoints and
+upstream archive/file MD5 references, with SHA-256 observations in the manifest.
+Both partitions' files are checked before unpickling; only the requested partition
+is decoded by the loader. Full integrity inspection checks 50000/10000 samples,
+10-class mapping and 5000/1000 samples per class. Test inspection is solely integrity.
+
+The acquire command reuses valid existing data/archive and creates
+`data/raw/cifar10_integrity_v1.json` once. Historical acquisition of preexisting
+artifacts is recorded as unknown. Repeated runs recheck data and preserve the
+manifest. `--verify-only` performs no dataset/manifest writes and can verify valid
+extracted files without an archive, explicitly reporting `archive_verified=false`.
+It never infers verification from a previous manifest.
+
+Missing/corrupt/conflicting artifacts cause a nonzero exit with the failing path
+and recovery action. Preserve damaged artifacts and retry with a new empty root;
+automatic repair/overwrite is deliberately absent. Failed acquisition staging is
+retained for diagnosis. Raw data, archives and the manifest stay ignored by Git.
+`--prepare-split` and `--split-seed` are future interfaces and currently rejected.
+Actual check results and source limits: [reproduction record](report/reproduction.md).
+
 ## Project documents and next work
 
 Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
@@ -68,7 +108,9 @@ Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
 CSR and proposal candidates; submitted version, current rubric/LMS confirmation,
 AI-policy conflict and team approvals remain pending.
 
-Next: DATA-001 integrity/offline loading, then DATA-002 persisted stratified split
-and DATA-003 train-only normalization/loaders, alongside required REPRO-001 identity
-utilities. No pipeline CLI is implemented yet. Commands in the future-pipeline
-section of [REPRODUCIBILITY](docs/REPRODUCIBILITY.md) describe planned interfaces.
+Next: DATA-002 persisted stratified split, then DATA-003 train-only normalization/
+loaders, alongside required REPRO-001 identity utilities. Full DATA-001 DoD remains
+PARTIAL until independent human review; agent checks do not replace that gate.
+All commits and ordinary pushes use `main`, per the user's current instruction.
+Commands in the future-pipeline section of [REPRODUCIBILITY](docs/REPRODUCIBILITY.md)
+describe planned interfaces beyond the working raw-data commands above.

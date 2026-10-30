@@ -1,7 +1,8 @@
 # Техническая архитектура
 
 Это преимущественно проект будущих интерфейсов. SETUP-003 реализует только
-config validation в utils, оба YAML и test_utils; остальные production APIs ниже
+config validation в utils, оба YAML и test_utils; DATA-001 реализует load_cifar10,
+file/partition inspection и acquisition CLI/manifest. Остальные production APIs ниже
 ещё не реализованы. Состояние: [CURRENT_STATUS.md](CURRENT_STATUS.md), уточнения
 и причины: [SETUP_DECISIONS.md](SETUP_DECISIONS.md). Протокол —
 [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md). Новые frameworks не вводятся.
@@ -119,6 +120,7 @@ format можно выбрать командой. Дополнительные 
 ### `src/data.py`
 
 - `load_cifar10(root: Path, train: bool, download=False) -> torchvision.datasets.CIFAR10`: raw RGB/PIL + labels, dataset integrity через torchvision; offline missing data → actionable error, не silent network call.
+- **DATA-001 implemented:** explicit official-HTTPS acquisition, archive/seven-file checksum verification before unpickle, requested partition semantic contract; `inspect_cifar10(root)` проверяет оба original partitions только для integrity. CLI supports only `--root`/`--verify-only`, schema-v1 local manifest ignored. Split/stats/transforms APIs ниже остаются future.
 - `create_split(targets: Sequence[int], split_seed: int, out_dir: Path) -> dict`: stratified indices train/val, save manifest; при существующем manifest сначала verify, не перезаписывать.
 - `load_split(path: Path, targets) -> tuple[np.ndarray, np.ndarray]`: uniqueness/disjointness/exhaustiveness/hash checks.
 - `compute_normalization(raw_data: np.ndarray, train_indices) -> dict`: channel mean/std float64 accumulation по uint8/255, save full precision; только 45k.
@@ -190,7 +192,7 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 
 | Файл | Интерфейс и I/O | Ошибки / зависимости | Тест и DoD |
 |---|---|---|---|
-| scripts/download_data.py | `main(argv=None)`; --root, --prepare-split, --split-seed, --verify-only; outputs raw/split/stats | src.data; bad checksum/network/offline state → nonzero | TEST-D01, D02; повтор без изменения split |
+| scripts/download_data.py | **Working DATA-001:** `main(argv=None)`; --root, --verify-only; raw data + ignored integrity manifest. **Future DATA-002/003:** --prepare-split, --split-seed, split/stats | src.data; bad checksum/network/offline/manifest state → nonzero; verify-only read-only | TEST-D01 implemented; D02 future; repeated verification preserves raw artifacts |
 | scripts/run_experiments.py (новый) | `main`; --configs [2 paths], --seeds [3 ints], --profile core/smoke, --device, --dry-run, --resume-incomplete; шесть train_run | utils/train; sequential default, no GPU oversubscription; wrong config/duplicate ID → error | TEST-T03/S01; dry run ровно 6 core entries |
 | scripts/run_all_evaluations.py | `main`; --checkpoints-root, --device, --require-complete, --dry-run; calls evaluate; 96 entries | evaluate/utils; missing checkpoint or stale hash → nonzero; skip только verified complete result | TEST-E02; rerun idempotent |
 | scripts/make_plots.py | `load_tables(root)`, `plot_corruption_grid(...)`, `plot_learning_curves(...)`, `plot_robustness(...)`, `plot_tradeoff(...)`, `plot_per_class(...)`, `plot_confusion(...)`, `main`; --metrics, --runs, --output | metrics/data/matplotlib; missing columns/NaNs/source → error, никакой fake data | TEST-P01; figure manifest + PNG/PDF |

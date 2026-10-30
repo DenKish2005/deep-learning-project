@@ -2,7 +2,9 @@
 
 Foundation этап выполнен в локальном техническом объёме: отдельная `.venv`, exact
 versions, CPU/CUDA environment smoke, complete YAMLs и strict validation с116
-passing tests. ML pipeline ещё не реализован; данные не скачаны, модели не обучены.
+passing tests. DATA-001 теперь реализует raw loader/acquisition/CLI/manifest;
+default suite180 PASS,3 actual opt-in SKIP; отдельно3actual PASS/0SKIP. Evidence — в
+report/reproduction.md. Следующая реализация — DATA-002, модели не обучены.
 Найдены guidelines/CSR и proposal candidates; submitted version, policy precedence
 и human approvals pending. Актуальные статусы полного DoD — в CURRENT_STATUS,
 проверенные команды — README, evidence — report/reproduction.md.
@@ -13,7 +15,8 @@ passing tests. ML pipeline ещё не реализован; данные не �
 
 Это reference очередь implementation phase. SETUP-001/PROTO-001/TEAM-001 частично
 закрыты; у SETUP-002/003 local technical acceptance PASS, formal human review
-pending. Следующая реализация — DATA-001/002/003 и REPRO-001 primitives. Независимая
+pending. DATA-001 остаётся PARTIAL до independent human review; следующая реализация
+— DATA-002/003 и REPRO-001 primitives. Независимая
 техническая подготовка не ждёт missing source/team information; full training
 начинается только после policy/protocol и smoke/scientific gates.
 

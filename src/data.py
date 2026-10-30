@@ -176,7 +176,7 @@ class _OfficialRedirects(HTTPRedirectHandler):
 
 
 def _download_archive(destination: Path) -> str:
-    # Bounded requests avoid a confirmed stalled full-body GET on this source.
+    # Bounded requests make large transfers inspectable in validated pieces.
     # Each response must cover exactly its requested byte range; the complete
     # assembled archive still has to match the upstream MD5 before publication.
     opener = build_opener(_OfficialRedirects())

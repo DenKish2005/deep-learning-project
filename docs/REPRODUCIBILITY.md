@@ -1,8 +1,9 @@
 # Воспроизводимость: проверенный setup и будущий pipeline
 
 SETUP-002 выполнен локально 30.10.2026; config validation относится к SETUP-003.
-Раздел «Плановые команды pipeline» ниже остаётся будущим интерфейсом: data/train/
-evaluate/metrics/plots ещё пустые. Успешный empty script не является выполненной задачей.
+DATA-001 реализует raw-data loader, acquisition/verification CLI и local manifest.
+Раздел «Плановые команды pipeline» ниже остаётся будущим интерфейсом для split,
+stats/train/evaluate/metrics/plots. Успешный empty script не является выполненной задачей.
 
 ## Окружение
 
@@ -78,14 +79,59 @@ Worker initialization и Windows spawn требуют top-level worker functions
 
 Не использовать global RNG для robust policy: отдельные keyed generators сохраняют одинаковые init, crop/flip и sample order между моделями. Полные seed namespaces: [EXPERIMENT_PROTOCOL §4](EXPERIMENT_PROTOCOL.md).
 
+## Работающие команды DATA-001
+
+Из root, без изменения dependencies:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-only
+.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-tmp
+$env:RUN_CIFAR_INTEGRATION='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_cifar10_local.py -q --basetemp=.venv/pytest-cifar-local
+Remove-Item Env:RUN_CIFAR_INTEGRATION
+```
+
+Default tests используют synthetic batches с заменёнными reference hashes/counts,
+запрещают network в data tests; три actual tests отдельно opt-in. При opt-in missing
+данные — FAIL. `CIFAR10_ROOT` при необходимости задаёт другой local root.
+`--verify-only` не создаёт root/manifest и не меняет dataset artifacts. Каждый
+запуск заново проверяет files и semantic counts; stale manifest не заменяется.
+
+Sources проверены по [official dataset page](https://cave.cs.toronto.edu/kriz/cifar.html)
+и [torchvision v0.24.0 CIFAR source](https://github.com/pytorch/vision/blob/v0.24.0/torchvision/datasets/cifar.py),
+сверенным с установленной0.24.0+cu126. Python archive MD5
+`c58f30108f718f92721af3b95e74349a`, семь file MD5 в src/data.py. При наличии
+archive он тоже проверяется; при его отсутствии observation=null, без claim PASS.
+HTTPS redirects разрешены только для проверенных Toronto paths/hosts, без HTTP
+fallback/mirrors. Acquisition запрашивает проверяемые ranges по1MiB, проверяет
+206/Content-Range/длину, затем полный archive MD5; ожидаемый размер170498071 bytes
+подтверждён official HTTPS headers30.10.2026. MD5 — upstream integrity reference, не доказательство
+cryptographic authenticity; SHA-256 — фактическая identity локальных bytes.
+
+Ignored `data/raw/cifar10_integrity_v1.json` (schema_version1) содержит fresh
+inspection, source URLs/reference, archive/files MD5/SHA-256/size, оба counts/shape,
+classes/mapping, UTC verification timestamp, acquisition method/final URL,
+Python/torchvision и LF-normalized SHA-256 двух verifier source files. Existing
+artifacts не выдаются за download этого запуска: historical acquisition unknown.
+Manifest создаётся эксклюзивно, flush+fsync; при interrupted write partial record
+остаётся диагностикой и следующий запуск отвергает его. Это не generic atomic
+write/backup implementation REPRO-001; эта задача остаётся TODO.
+
+Corrupt data/archive, foreign/incomplete dataset directory или conflicting manifest
+не удаляются/не перезаписываются; ошибка указывает путь и предлагает новый empty
+root с сохранением старого. Failed acquisition оставляет uniquely named staging.
+Не хранить единственную копию будущих unique artifacts в ignored directories.
+Test partition здесь инспектируется только ради integrity, без scientific decisions.
+Split/stats hashes остаются null; training готовность не заявлена.
+
 ## Плановые команды pipeline
 
 В примерах `python` обозначает interpreter проверенного env; на Windows можно заменить на `.\.venv\Scripts\python.exe`. Команды из root. Device cpu — рабочий fallback после реализации; cuda допустим только после validation. Parameters subset/profile относятся только к smoke/debug и запрещены для core profile.
 
 ```powershell
-# DATA-001..003: download + checksum + saved split494 + train-only stats
+# FUTURE DATA-002/003: flags not implemented, currently rejected
 python -m scripts.download_data --root data/raw --prepare-split --split-seed 494
-python -m scripts.download_data --root data/raw --verify-only
 
 # TEST-001: offline synthetic unit/integration tests после написания
 python -m pytest tests -q

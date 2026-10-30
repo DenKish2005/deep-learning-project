@@ -1,14 +1,45 @@
 # CURRENT PROJECT STATUS
 
+## DATA-001 — 30–31.10.2026
+
+Работа идёт непосредственно в `main`; initial fetch подтвердил main=origin/main
+на7658894, исходное рабочее дерево clean. AGENTS.md в repository и родительской
+цепочке не найден. Foundation dependencies/backend/configs сохранены.
+
+Реализованы raw CIFAR-10 loader с offline default, official HTTPS acquisition,
+archive/seven-file checksums до unpickle, оба partition contracts, working CLI
+`--root`/`--verify-only` и ignored versioned integrity manifest. Повторный acquire
+переиспользует проверенные данные; verify-only не пишет artifacts; corrupt/foreign/
+stale artifacts не заменяются. Default suite:180 PASS,3 actual opt-in SKIP.
+Actual official archive170498071 bytes и7files прошли MD5/SHA-256 inspection;
+train50000/test10000, RGB32×32,10classes,5000/1000per class PASS. Отдельные actual
+tests:3PASS/0SKIP, включая read-only/idempotence hashes+mtime. Acquisition manifest
+schema1 сохранён ignored с actual source/provenance. Команды/checksums — в
+[reproduction record](../report/reproduction.md); default SKIP не означает CIFAR PASS.
+
+| Task | Полный DoD | Результат / остаток |
+|---|---|---|
+| DATA-001 | PARTIAL, local technical acceptance PASS | Loader/CLI/manifest,180offline PASS +3actual PASS; independent human artifact/code/test reviewer approval pending |
+| DATA-002/003 | TODO | Split/stats/transforms/loaders отсутствуют; оба config hashes остаются null |
+| REPRO-001 | TODO | Только минимальный dataset manifest helper; generic identity/RNG/atomic checkpoint/backup infrastructure не реализована |
+
+Training/model/evaluation/corruptions/plots не реализованы и не запускались.
+Test partition разрешён только для integrity inspection, без scientific tuning.
+Policy/LMS/submitted proposal/roles и human approvals остаются pending.
+Следующий конкретный этап — DATA-002: persisted stratified split494 исходного
+train50k→45k/5k,4500/500 per class, disjoint/exhaustive indices, manifests/hashes
+и tamper/idempotence tests; test partition не участвует в split decisions.
+
 ## Обновление Git workflow
 
 После foundation пользователь разрешил push и потребовал все следующие commits
 и push только в `main`. Foundation commits перенесены в локальную `main`
 fast-forward без переписывания истории. Snapshot этапа ниже описывает предыдущее
 состояние до публикации; актуальную синхронизацию проверять через Git.
-Следующий ограниченный этап — [DATA-001 prompt](NEXT_STEP_PROMPT.md).
+[DATA-001 prompt](NEXT_STEP_PROMPT.md) сохранён как scope этого этапа;
+следующая реализация — DATA-002.
 
-## Текущее состояние после foundation — 30.10.2026
+## Историческое состояние после foundation — 30.10.2026
 
 База продолжения: commit0633f67, исходная ветка main была clean; последующих
 commits при старте не было. Создана `codex/setup-foundation`, локальные commits

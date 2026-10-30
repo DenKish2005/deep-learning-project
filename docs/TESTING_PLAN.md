@@ -5,8 +5,18 @@
 required/unknown/duplicate keys, probabilities, exact severity maps, controlled
 settings, invalid CLI и config loading без dataset artifacts. Environment smoke
 CPU/CUDA/Pillow/torchvision проходит отдельно: [evidence](../report/reproduction.md).
-Остальные test cases ниже — будущие проверки ML implementation; пустые
-test_data_pipeline/test_corruptions не считаются покрытием. ID TEST-* — cases,
+DATA-001 добавил TEST-D01: tests/test_data_pipeline.py содержит64 synthetic offline
+cases для missing/corrupt files/archive, semantic count/label/shape/class contract,
+official source restrictions, explicit acquisition/reuse/failure preservation,
+CLI exit codes, read-only verification, stale/tampered manifests и idempotence.
+С foundation текущая default suite: **180 passed, 3 skipped**. Три skipped actual
+cases в tests/test_cifar10_local.py требуют explicit opt-in, это не CIFAR PASS.
+Команда и отдельно полученный actual result: [reproduction record](../report/reproduction.md).
+Actual opt-in run: **3passed,0failed,0skipped**; full original partitions, archive/
+seven-file checksums, RGB/labels/mapping/counts и unchanged SHA-256+mtime после CLI
+verify/acquire/verify при запрещённой сети. Default SKIP отделён от этого PASS.
+Default tests не используют local CIFAR и не скачивают его. Остальные cases ниже
+остаются будущими проверками ML implementation. ID TEST-* — cases,
 а TEST-001..003 в roadmap — tasks, которые их интегрируют.
 
 ## Организация fixtures

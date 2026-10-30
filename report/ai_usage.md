@@ -1,5 +1,24 @@
 # AI assistance record
 
+## DATA-001 — 30–31.10.2026
+
+По прямому запросу пользователя Codex реализовал raw offline CIFAR-10 loader,
+official-HTTPS acquisition с проверкой archive/seven-file checksums до unpickle,
+оба partition contracts, CLI acquire/verify-only, ignored schema-v1 manifest,
+64 synthetic offline cases и3 separate opt-in actual tests. Сверены official
+dataset page, torchvision v0.24.0 source и установленная0.24.0+cu126. Данные реально
+получены и инспектированы только для integrity; test images/labels не применялись
+к scientific decisions. Configs, dependencies/backend и training scope не менялись.
+
+Agent checks, команды, actual results и ограничения — [reproduction.md](reproduction.md).
+Код/tests опубликованы небольшими проверенными commits5fd4088/f159fd7/50a9fc4
+на main; обычный push после каждого. Отдельный documentation/evidence commit
+фиксирует текущий этап. Review выполнял агент; independent human reviewer,
+course-policy clarification и подтверждение понимания кода командой остаются
+PENDING. Полный DATA-001 DoD — PARTIAL; технические PASS не являются team sign-off.
+
+## Исторический foundation record
+
 30.10.2026: Codex использован по прямому запросу пользователя для source audit,
 проверки protocol/architecture, isolated environment, configs/schema validation,
 tests и обновления инструкций. Изменения доступны как локальные Git commits.

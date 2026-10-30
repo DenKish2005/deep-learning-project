@@ -2,8 +2,10 @@
 
 Дата: 30.10.2026. AUDIT-001 DONE; SETUP-001/002/003, PROTO-001 и TEAM-001
 **PARTIAL** по полному DoD. У SETUP-002/003 вся локальная техническая реализация
-и acceptance выполнены, human reviewer approval ещё pending. Остальные tasks TODO.
-Нет данных, training или evaluation. Evidence: [CURRENT_STATUS](CURRENT_STATUS.md),
+и acceptance выполнены, human reviewer approval ещё pending. DATA-001: raw
+loader/acquisition/CLI/manifest и offline tests реализованы; полный DoD PARTIAL
+до independent human review. Actual data evidence — в reproduction record.
+Остальные tasks TODO. Training/evaluation не запускались. Evidence: [CURRENT_STATUS](CURRENT_STATUS.md),
 [reproduction record](../report/reproduction.md). Канонические interfaces:
 [TECHNICAL_ARCHITECTURE](TECHNICAL_ARCHITECTURE.md); methodology:
 [EXPERIMENT_PROTOCOL](EXPERIMENT_PROTOCOL.md); tests: [TESTING_PLAN](TESTING_PLAN.md).
@@ -15,8 +17,8 @@ drafts делаются параллельно; core compute начинаетс�
 роли, mapping имён pending. Оценки — active person-hours, не GPU wall time/promises.
 В каждом task20 полей; Input/Output/Artifacts разделены. Полный DoD = acceptance +
 test evidence + reviewer approval + updated status/artifact paths. Foundation
-сохраняется небольшими локальными commits в codex/setup-foundation по запросу
-пользователя; push/merge не выполняются. Self-review не считается reviewer approval,
+исторически выполнялся в codex/setup-foundation; теперь работа и публикация
+идут только в main по актуальному указанию пользователя. Self-review не считается reviewer approval,
 поэтому текущие tasks PARTIAL даже при technical acceptance PASS. Это не блокирует
 независимую техническую подготовку; external approvals нужны до соответствующих gates.
 
@@ -202,7 +204,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** DATA-001.
 - **2. Title:** Download и integrity CIFAR-10.
 - **3. Purpose:** Получить проверенный dataset.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL, local technical acceptance PASS;180offline PASS/3default opt-in SKIP, separately3actual PASS/0SKIP. Official archive/files/counts verified; evidence in report/reproduction.md; independent human artifact/code/test reviewer approval pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 2 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** SETUP-002.
@@ -211,14 +213,14 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **10. Functions/classes:** load_cifar10; download main.
 - **11. Inputs:** official CIFAR source.
 - **12. Outputs:** verified raw dataset + manifest.
-- **13. Artifacts:** перечисленные outputs в указанных files/dirs + test/review evidence; paths/hash записать в task/PR.
+- **13. Artifacts:** ignored data/raw/cifar-10-python.tar.gz, cifar-10-batches-py/ и cifar10_integrity_v1.json (schema1); tests/test_cifar10_local.py; report/reproduction.md. Actual verification evidence recorded separately; no dataset artifacts in Git.
 - **14. Testing:** TEST-D01.
 - **15. Acceptance:** 50k/10k RGB32×32,10 classes, checksums pass.
 - **16. DoD:** acceptance выполнен; тестовые результаты и artifacts проверены reviewer; status обновлён. Для OPTIONAL допустимо SKIPPED с причиной, без объявления PASS.
 - **17. Effort:** 3-4 person-hours, без full-training wait time.
 - **18. Risks/common mistakes:** Network failure/неверный archive.
-- **19. Branch:** codex/data-001.
-- **20. Commit/PR scope:** Download и integrity CIFAR-10; только файлы пункта 9, включая relevant tests/docs; один logical PR, owner Person 2.
+- **19. Branch:** main only (current explicit user workflow).
+- **20. Commit/PR scope:** Small verified commits: loader/acquisition + tests; CLI/manifest + tests; bounded source requests + tests; evidence/docs. Ordinary push after each commit; no feature branch/PR required by current user workflow.
 
 ### DATA-002 — Persist stratified split
 

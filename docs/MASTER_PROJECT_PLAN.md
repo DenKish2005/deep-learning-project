@@ -1,8 +1,11 @@
 # MASTER PROJECT PLAN — CSCI 494 Robustness to Noise
 
 **Главная точка входа для команды.** Дата:30 октября 2026, Asia/Qyzylorda.
-Этап: foundation перед data pipeline. Local environment/config acceptance PASS;
-ML pipeline и measured experiment results пока отсутствуют.
+Этап: DATA-001 raw loader/acquisition/CLI/manifest реализованы; actual evidence
+и ограничения — CURRENT_STATUS/report/reproduction.md. Default suite180PASS,
+3default actual opt-in SKIP; отдельно3actual PASS/0SKIP. Full DoD PARTIAL до independent human review. Следующий
+этап DATA-002 persisted split. Работа/commits/push только main по указанию пользователя.
+Local environment/config acceptance PASS; training/measured results отсутствуют.
 
 ## Что нужно сделать и зачем
 
@@ -12,7 +15,7 @@ Core: один stratified split45k/5k исходного train и original10k te
 
 Полные RQ1–RQ4 и hypotheses: [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md). Гипотезы ещё не проверены. Ориентир clean loss≤2pp — предложенный practical criterion, не official requirement и не significance test.
 
-## Что уже есть
+## Исторический foundation snapshot
 
 Исторический аудит5ce6b1a обнаружил scaffold:29 tracked files,20zero-byte и14пустых
 Python files; planning package сохранён в0633f67. Foundation продолжен с clean main
