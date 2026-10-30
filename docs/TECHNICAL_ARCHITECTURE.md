@@ -1,6 +1,10 @@
 # Техническая архитектура
 
-Это проект интерфейсов, а не описание реализованного кода. Состояние файлов: [CURRENT_STATUS.md](CURRENT_STATUS.md). Протокол — [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md). Сохраняем существующие `src/`, `scripts/`, configs и output directories; не вводим framework, сервисы и frontend.
+Это преимущественно проект будущих интерфейсов. SETUP-003 реализует только
+config validation в utils, оба YAML и test_utils; остальные production APIs ниже
+ещё не реализованы. Состояние: [CURRENT_STATUS.md](CURRENT_STATUS.md), уточнения
+и причины: [SETUP_DECISIONS.md](SETUP_DECISIONS.md). Протокол —
+[EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md). Новые frameworks не вводятся.
 
 ## Рекомендуемое итоговое дерево
 
@@ -147,7 +151,9 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 - `seed_everything(seed: int, deterministic=True) -> None`; `seed_worker(worker_id: int) -> None`; `stable_seed(*parts) -> int`: SHA-256 UTF-8 canonical representation, low 63 bits; не Python hash().
 - `config_hash(cfg: dict) -> str`; `sha256_file(path) -> str`; `capture_environment() -> dict`; `write_json_atomic(path, value)`; `save_checkpoint_atomic(path, state)`; `load_checkpoint(path, device) -> dict`.
 - Для atomic writes — temporary file в том же filesystem и replace после flush; отказ overwrite чужого run, incomplete files не считаются complete.
-- `validate_controlled_configs(clean, robust) -> None`: разрешены только model_name, augmentation policy и paths/identity metadata; scientific settings равны.
+- `validate_controlled_configs(clean, robust) -> None`: разрешены только model_name,
+  augmentation.enabled/probabilities и output paths; остальные settings равны,
+  включая dataset paths/hashes и runtime. Unknown identity metadata keys запрещены.
 - `load_checkpoint` только для собственных trusted артефактов; явные map_location и serialization policy для version-locked PyTorch. RNG states сериализовать совместимыми primitive/tensor types и проверить round trip.
 - Tests TEST-U01..04, integration checkpoint/resume. DoD: config errors до GPU work, repeatable hashes, environment provenance, safe output paths и recovery evidence.
 
@@ -191,7 +197,12 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 
 ## Полная схема configuration v1
 
-Оба файла самостоятельные YAML, не наследуют друг друга. Валидация сравнивает common fields, чтобы два скопированных файла не разошлись. Все численные default ниже — **плановые**, их ещё нет в YAML.
+Оба файла самостоятельные YAML, не наследуют друг друга. Валидация сравнивает
+common fields, чтобы файлы не разошлись. Значения ниже реализованы в YAML;
+schema_version1 фиксирует core scientific constants из proposed protocol,
+их изменение требует согласованного изменения protocol/schema/tests. Freeze
+командой ещё pending. Это preparation schema, не schema для будущих smoke/debug
+overrides: отдельные profiles/validators появятся в TRAIN/TEST tasks.
 
 | Key | Default / смысл |
 |---|---|
@@ -202,6 +213,7 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 | dataset.name, dataset.root | cifar10; data/raw |
 | dataset.split_path | data/splits/cifar10_split_v1.npz |
 | dataset.normalization_path | data/splits/normalization.json |
+| dataset.split_sha256, normalization_sha256 | null до DATA-002/003; затем 64 lowercase hex; loader не verifies artifact |
 | dataset.split_seed | 494; общий, не run seed |
 | dataset.train_size, val_size, test_size | 45000; 5000; 10000 |
 | seeds | [42,123,2026] |
@@ -227,9 +239,18 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 | output.root, checkpoint_root, metrics_root | outputs/runs; outputs/checkpoints; outputs/metrics |
 | output.predictions_root, figures_root | outputs/predictions; outputs/figures |
 
-Device/paths могут отличаться между машинами и сохраняются в execution metadata. Для paired core training выбирается один backend/hardware, насколько доступно. Изменение batch/epochs/optimizer после freeze требует новой protocol version и одинакового изменения обеих моделей.
+Device/paths могут отличаться между машинами и сохраняются в execution metadata.
+В пределах одной controlled пары dataset paths/hashes и runtime должны совпадать;
+output paths могут различаться. Config v1 принимает переносимые repository-relative
+пути с `/`, без `..`; cwd не зашивается в config. Отсутствующие файлы допускаются
+при чтении config, но не являются verified data. Paired core training выбирает
+один backend/hardware; trainer позже проверяет artifact existence и hashes.
 
-Normalization values вычисляются до обучения только на 45k train, затем замораживаются; в config хранится путь и hash. Это устраняет неоднозначность разных «стандартных CIFAR stats». Hash identity считается по resolved config со stats/split/architecture/policy; operational timestamp/path excluded, а seed и profile добавляются в run identity.
+Normalization values вычисляются до обучения только на 45k train, затем замораживаются;
+в preparation config путь и null hash, позже hash сверяется с реальным artifact.
+Это устраняет неоднозначность разных «стандартных CIFAR stats». Будущий hash identity
+считается по resolved config со stats/split/architecture/policy; operational
+timestamp/path excluded, а seed и profile добавляются в run identity (REPRO-001).
 
 ## Артефакты, имена, retention
 

@@ -1,1 +1,65 @@
-# Placeholder configuration for Robust CNN
+# Preparation config: split/stats artifacts are unresolved.
+schema_version: 1
+model_name: robust_cnn
+architecture: compact_cnn_v1
+num_classes: 10
+dropout: 0.2
+dataset:
+  name: cifar10
+  root: data/raw
+  split_path: data/splits/cifar10_split_v1.npz
+  normalization_path: data/splits/normalization.json
+  split_sha256: null
+  normalization_sha256: null
+  split_seed: 494
+  train_size: 45000
+  val_size: 5000
+  test_size: 10000
+seeds: [42, 123, 2026]
+training:
+  epochs: 40
+  batch_size: 128
+  optimizer: AdamW
+  lr: 0.001
+  weight_decay: 0.0001
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  loss: cross_entropy
+  scheduler: cosine
+  t_max: 40
+  eta_min: 0.0
+  early_stopping: false
+  amp: false
+  gradient_clip: null
+  selection: clean_val_accuracy_then_loss_then_earliest
+  crop_size: 32
+  crop_padding: 4
+  crop_padding_mode: constant
+  horizontal_flip_p: 0.5
+augmentation:
+  enabled: true
+  # Event order: identity, gaussian_noise, gaussian_blur, brightness (darkening).
+  probabilities: [0.50, 0.17, 0.17, 0.16]
+  train_severities: [1, 2, 3]
+corruptions:
+  noise_sigma: [0.02, 0.05, 0.08, 0.12, 0.18]
+  blur_sigma: [0.3, 0.7, 1.1, 1.5, 2.0]
+  blur_kernel_rule: 2*ceil(3*sigma)+1
+  blur_padding: reflect
+  brightness_factor: [0.90, 0.80, 0.70, 0.55, 0.40]
+evaluation:
+  severities: [1, 2, 3, 4, 5]
+  batch_size: 256
+  seed: 100494
+runtime:
+  device: auto
+  num_workers: 0
+  pin_memory: auto
+  deterministic: true
+  persistent_workers: false
+output:
+  root: outputs/runs
+  checkpoint_root: outputs/checkpoints
+  metrics_root: outputs/metrics
+  predictions_root: outputs/predictions
+  figures_root: outputs/figures
