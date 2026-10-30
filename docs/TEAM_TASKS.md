@@ -1,6 +1,10 @@
 # Работа шести участников
 
-Person 1..6 — placeholders до TEAM-001, реальные имена и availability неизвестны. Это распределение будущей работы; агенты и дополнительные чаты в ходе планирования не создавались. [Roadmap](IMPLEMENTATION_ROADMAP.md) содержит primary owners каждого task.
+Person 1..6 — placeholders до TEAM-001. Имена найдены в локальном candidate
+proposal S2b, но submitted roster, mapping к ролям и availability не подтверждены.
+TEAM-001 **PARTIAL**: проверен role/file plan; согласие участников/backup/reviewers
+pending. [SETUP_DECISIONS](SETUP_DECISIONS.md) фиксирует evidence без назначения
+ролей по порядку имён. [Roadmap](IMPLEMENTATION_ROADMAP.md) содержит role owners.
 
 ## Ответственность, файлы и результаты
 

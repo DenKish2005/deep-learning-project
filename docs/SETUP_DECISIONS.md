@@ -1,0 +1,46 @@
+# Проверка готовности foundation
+
+30.10.2026. Это техническая self-review агента, не review/approval команды.
+Источники: [реестр](../report/course_materials/README.md).
+
+## PROTO-001 — PARTIAL
+
+Сверены architecture и protocol: split494/45k/5k/10k, seeds42/123/2026,
+40epochs×352steps=14080, same compact_cnn_v1/288746 params, train-only stats,
+pixel-space corruption before Normalize, clean-val selection, eval100494 и
+clean+3×5 conditions согласованы. Test data не читались.
+
+Уточнения перед config implementation:
+
+1. Architecture разрешала paths/identity exceptions слишком широко. Для пары
+   configs разрешены model_name, augmentation.enabled/probabilities и output
+   paths. Dataset paths, runtime и остальные scientific settings пары равны:
+   иначе можно незаметно сравнить разные split/stats/backend. Machine relocation
+   допустима симметрично для обоих configs. Произвольные metadata keys запрещены.
+2. Blur table даёт kernels3/7/9/11/13; правило 2*ceil(3*sigma)+1 с ней согласовано.
+   Храним правило и sigma table, kernels выводятся в CORR-002; новая таблица не нужна.
+3. Planning prose требовала stats hash в config, но schema table не имела hash
+   fields, а artifacts ещё нет. Добавляем dataset.split_sha256 и
+   normalization_sha256: null в подготовительном YAML, строка64 lowercase hex
+   после DATA-002/003. null означает **unresolved**, не verified artifact. Config
+   loader не создаёт и не проверяет существование dataset; training gate позже
+   обязан проверить artifacts/hashes и отвергнуть unresolved provenance.
+4. v1 schema проверяет типы/диапазоны и замороженные scientific constants из
+   protocol. Изменение core design требует обновить protocol/schema/tests вместе.
+
+RQs, scope и технические defaults переведены в reviewable configs по запросу
+пользователя. Team acceptance, независимые reviewers Persons2/5, protocol freeze
+и разрешение source conflicts **PENDING**. Это не разрешение на core runs.
+
+## TEAM-001 — PARTIAL
+
+Есть role/file/review plan в TEAM_TASKS. В candidate S2b перечислены Daniyar
+Kshibekov, Alisher Zhumadelov, Alisher Abeuov, Amangeldi Uldakhanov, Gulnur
+Meirimkhanova, Darkhan Shagambayev. Это сведения документа, не независимо
+подтверждённый roster. Role mapping Person1..6, availability, primary/backup и
+согласие reviewers неизвестны. Не присваиваем роли по порядку имён.
+
+## Границы
+
+REPRO-001 (identity, seeds, atomic writes, artifact manifests/backups) остаётся TODO.
+На этом этапе из utils реализуются только config functions и validation CLI.

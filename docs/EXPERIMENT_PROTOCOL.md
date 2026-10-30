@@ -2,6 +2,10 @@
 
 Дата планирования 30.10.2026. **Proposed freeze:** PROTO-001 до core training. Никаких measured results пока нет. Изменения после freeze записывать с причиной, датой и protocol_version; test set не используется для выбора решений. Конфигурация: [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md).
 
+PROTO-001 **PARTIAL**: выполнена техническая сверка architecture/protocol,
+уточнены controlled fields и unresolved artifact hashes в [SETUP_DECISIONS](SETUP_DECISIONS.md).
+Team review/acceptance и freeze pending; self-review агента ими не считается.
+
 ## 1. Estimand и controlled comparison
 
 Основной outcome: парная разница mean corrupted accuracy Robust − Clean по трём run seeds. Дополнительные: clean accuracy difference, family-wise robustness, per-class failures, clean/mCA trade-off. Model B отличается только corruption policy при training; architecture, initialization per paired seed, split, normalization, geometry, sample order, optimizer, LR schedule, batch size, epochs, validation и selection совпадают.
