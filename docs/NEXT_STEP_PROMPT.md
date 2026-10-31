@@ -1,7 +1,7 @@
 # Промпт следующего этапа — DATA-003
 
-Подготовлен31.10.2026 после technical acceptance DATA-002. Скопируйте текст ниже
-в новый чат. Это DATA-003, не повтор split и не запуск training.
+Обновлён31.10.2026 после публикации DATA-002 и повторной проверки clean main.
+Скопируйте текст ниже в новый чат. Это DATA-003, не повтор split и не запуск training.
 
 ```text
 Продолжи проект CSCI 494 — Robustness to Noise.
@@ -35,7 +35,8 @@ normalization и deterministic typed data loaders поверх frozen DATA-002 s
 - Оба YAML с verified NPZ file hash; normalization_sha256 null.
 - Default282PASS/5actual opt-in SKIP; отдельно5actual PASS/0SKIP.
 - Existing .venv/lock/backend unchanged, NumPy2.5.4. Training не запускался.
-- Published4044d0c/fd0a272/f4d7b42/cf8e684 плюс final docs commit в истории.
+- DATA-002 published4044d0c/fd0a272/f4d7b42/cf8e684; acceptance/docs797f33a.
+  Актуальный HEAD и origin/main всё равно проверь перед началом.
 
 CORR-001 prerequisite DATA-003 ещё TODO. Не объявляй prerequisite/full robust
 integration закрытыми. Сделай независимые stats, keyed geometry/order, clean
@@ -123,18 +124,38 @@ technical work и не позволяют объявить course compliance.
 
 GIT — ПОСТОЯННОЕ ПРАВИЛО
 
-Работай, коммить и пушь ВСЕГДА ТОЛЬКО main. Не создавай codex/* или feature
-branches. Старые branch/PR рекомендации planning docs не действуют.
-Перед изменениями status/fetch/history. После КАЖДОГО небольшого рабочего блока:
-полный diff, relevant tests, точный staged list/staged diff, git diff --check
-и git diff --cached --check. Stage explicit task paths, без add . / -A.
-Implementation и related tests вместе; отдельный working commit и НЕМЕДЛЕННЫЙ
-обычный git push origin main. Не копи commits до конца; push failure сначала
-исследуй. Без force/amend/reset/history rewrite. Чужие remote commits прочитай;
-safe fast-forward допустим, divergence/conflict не затирай/не merge автоматически.
-Не захватывай чужие changes; raw/.venv/caches/credentials/diagnostic partials не
-коммить. Блоки: stats/contracts+tests; transforms/loaders+tests; CLI+tests;
-actual stats/configs/evidence; docs. Перед каждым commit checks, сразу push.
+Пользователь явно разрешает самостоятельные commits и обычный push origin main
+для этого этапа. Не запрашивай повторное разрешение на каждый commit/push.
+Работай, коммить и пушь ВСЕГДА ТОЛЬКО в ветку с точным именем main. Не создавай
+и не используй codex/*, worktree feature branches или другие ветки. Старые branch/
+PR рекомендации planning docs не действуют; PR для публикации не требуется.
+
+1. Перед изменениями проверь branch, status, staged files, fetch/history и
+   origin/main. Если текущая ветка не main, не редактируй её; переход допустим
+   только без потери или переноса чужой работы. Чужие changes не захватывай.
+2. Разделяй работу на небольшие ЗАВЕРШЁННЫЕ логические блоки: stats/contracts
+   вместе с tests; keyed transforms/loaders вместе с tests; CLI вместе с tests;
+   verified actual artifacts/configs/evidence; документация. При необходимости
+   дели крупный блок на более мелкие рабочие части, без искусственного дробления.
+3. После каждого блока останови редактирование и проверь полный git diff,
+   relevant tests, git diff --check. Failed checks исправь до commit;
+   implementation и относящиеся к нему tests публикуй вместе.
+4. Stage только явные task paths. Не используй git add . или git add -A.
+   Проверь ТОЧНЫЙ список через git diff --cached --name-only, полный staged diff
+   через git diff --cached и git diff --cached --check. Посторонних files нет.
+5. Сделай отдельный рабочий commit в main с описанием этого блока. СРАЗУ выполни
+   обычный git push origin main. Не накапливай локальные commits и не откладывай
+   весь этап в один финальный commit. Проверь результат push перед следующим блоком.
+6. Если push не прошёл, выясни причину до продолжения; локальный commit не называй
+   опубликованным. Чужие remote commits сначала прочитай; safe fast-forward
+   допустим. Divergence/conflict не затирай и не merge автоматически. Без force
+   push, amend, reset или переписывания истории.
+7. После успешного push кратко сообщи block/checks/commit/push result и продолжай
+   следующий блок самостоятельно. Не завершай задачу после промежуточного commit.
+8. Не коммить raw images/archives, .venv, caches, credentials, absolute local paths
+   и diagnostic partials. Компактные verified stats/evidence сохраняй в Git.
+9. В конце проверь clean status, пустой staged list и main=origin/main. Перечисли
+   каждый commit и результат его push; если есть блокировка, укажи её точно.
 
 В финале по-русски: PASS/FAIL/SKIP, actual stats/loader evidence/hashes, unchanged
 split identity, commits/push каждого блока, clean status/staged files/main=origin/main,
