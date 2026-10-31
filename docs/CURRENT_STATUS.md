@@ -36,8 +36,9 @@ train50k→45k/5k,4500/500 per class, disjoint/exhaustive indices, manifests/has
 и push только в `main`. Foundation commits перенесены в локальную `main`
 fast-forward без переписывания истории. Snapshot этапа ниже описывает предыдущее
 состояние до публикации; актуальную синхронизацию проверять через Git.
-[DATA-001 prompt](NEXT_STEP_PROMPT.md) сохранён как scope этого этапа;
-следующая реализация — DATA-002.
+[Промпт следующего этапа DATA-002](NEXT_STEP_PROMPT.md) обновлён31.10.2026:
+persisted split494, actual verification и маленькие проверенные commit/push только
+в main. DATA-001 scope сохранён в истории Git; DATA-002 здесь ещё не выполнялся.
 
 ## Историческое состояние после foundation — 30.10.2026
 

@@ -1,126 +1,195 @@
-# Промпт следующего этапа — DATA-001
+# Промпт следующего этапа — DATA-002
 
-Скопируйте текст ниже в новый чат этого проекта.
+Подготовлен 31.10.2026 после DATA-001 и Graphify. Скопируйте текст ниже в новый
+чат проекта. Это задание на реализацию DATA-002, а не на повтор DATA-001.
 
 ```text
 Продолжи проект CSCI 494 — Robustness to Noise.
 
-Поставь цель: выполнить DATA-001 — получение CIFAR-10, проверку целостности и
-offline loading. Выполни работу до проверяемого результата, а не составляй общий план.
+Поставь цель: выполнить DATA-002 — создать, сохранить и проверить единственный
+stratified train/validation split CIFAR-10. Выполни этап до проверяемого результата:
+actual artifacts, tests, документация, маленькие commits и push в main.
+Не останавливайся на плане. Работай самостоятельно в указанном объёме.
 
-Сначала прочитай AGENTS.md, если он существует, README.md и документы:
+СНАЧАЛА ПРОВЕРЬ РЕАЛЬНОЕ СОСТОЯНИЕ
+
+Прочитай AGENTS.md, если он существует, README.md и документы:
 - docs/MASTER_PROJECT_PLAN.md
 - docs/START_HERE.md
 - docs/CURRENT_STATUS.md
 - docs/REQUIREMENTS.md
-- docs/TECHNICAL_ARCHITECTURE.md
-- docs/EXPERIMENT_PROTOCOL.md
-- docs/IMPLEMENTATION_ROADMAP.md — особенно DATA-001 и его зависимости
+- docs/TECHNICAL_ARCHITECTURE.md — create_split/load_split и artifact contracts
+- docs/EXPERIMENT_PROTOCOL.md — exact split algorithm, test isolation, provenance
+- docs/IMPLEMENTATION_ROADMAP.md — DATA-002, DATA-001, SETUP-003 и REPRO-001
 - docs/REPRODUCIBILITY.md
-- docs/TESTING_PLAN.md
+- docs/TESTING_PLAN.md — TEST-D02 и существующие DATA-001 tests
 - docs/SETUP_DECISIONS.md
 - report/course_materials/README.md
 - report/ai_usage.md
 - report/reproduction.md
 
-Проверь текущую ветку, git status, последние commits и состояние origin/main.
-Учитывай реальные изменения после foundation, не полагайся только на этот промпт.
-Foundation уже содержит отдельную .venv, exact dependency lock, CPU/CUDA smoke,
-два полных YAML и strict config validation. На момент подготовки этого промпта
-текущая suite имела 116 passing tests; data pipeline ещё не реализован.
+Проверь branch, git status, последние commits, fetch/remote history и origin/main.
+Не захватывай чужие изменения. Graphify в graphify-out/ помогает навигации, но
+является snapshot: сверяй его сведения с текущими файлами и source revision.
 
-ОБЪЁМ
+На момент подготовки промпта:
+- DATA-001 technical acceptance PASS; full DoD PARTIAL до independent human review.
+- Реализованы load_cifar10(root: Path, train: bool, download=False), official
+  acquisition, read-only --verify-only и ignored integrity manifest schema1.
+- CIFAR-10 реально получен: original train50000/test10000, RGB32x32,10classes,
+  5000/1000per class, archive/seven-file checksums проверены.
+- Default suite:180PASS/3actual opt-in SKIP; отдельно actual checks:3PASS/0SKIP.
+- Есть отдельная .venv, exact dependency lock, strict config validation и два YAML.
+- Split ещё не создан; split_sha256 и normalization_sha256 в обоих YAML null.
+- Все предыдущие блоки опубликованы в main. Этот snapshot не заменяет fetch
+  и фактические checks текущих tests/data. Не обновляй versions и scientific settings.
 
-1. Используй существующую .venv и проверенные dependencies. Не меняй глобальное
-   окружение и не обновляй versions без обоснованной необходимости. Проверь pip
-   check и текущие tests перед изменениями. Повторный CUDA smoke нужен при
-   изменении environment/backend, а не для каждого изменения loader.
+ОБЪЁМ DATA-002
 
-2. Реализуй DATA-001 в src/data.py, scripts/download_data.py и
-   tests/test_data_pipeline.py. Сохрани согласованный контракт:
-   load_cifar10(root: Path, train: bool, download=False).
-   По умолчанию loader работает offline: не делает скрытого download, а при
-   отсутствии/повреждении данных выдаёт понятную ошибку с действием для исправления.
-
-3. Разрешаю скачать официальный CIFAR-10 в ignored data/raw/. Перед скачиванием
-   проверь, нет ли уже корректных данных. Проверь official source, archive/file
-   checksums и соответствие установленной torchvision по официальным источникам.
-   Не используй непроверенные зеркала. Не перезаписывай и не удаляй повреждённые
-   или чужие artifacts молча; покажи точную причину и безопасный способ восстановления.
-
-4. Реализуй работающий CLI из root:
-   .\.venv\Scripts\python.exe -m scripts.download_data --root data/raw
+1. Используй существующую .venv. Перед изменениями выполни:
+   .\.venv\Scripts\python.exe -m pip check
+   .\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-data002-baseline
    .\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-only
-   Первый режим явно получает отсутствующие данные и проверяет их; verify-only
-   не скачивает и не создаёт/изменяет dataset artifacts. Invalid arguments/errors
-   должны давать ненулевой exit code. Не объявляй будущий --prepare-split работающим.
+   Default pytest должен оставаться offline. Не переустанавливай dependencies,
+   не меняй global environment/backend. CUDA smoke повторяй только при их изменении.
+   Если raw data недоступны, не выдавай skip за PASS; при необходимости используй
+   существующий explicit acquisition CLI. Сохрани diagnostic partial artifacts.
 
-5. Проверь actual dataset: original train 50000, test 10000, RGB 32x32, 10 classes,
-   labels и class mapping, counts 5000/class train и 1000/class test, checksums.
-   Integrity inspection test partition разрешена; не используй test images или
-   labels для model/hyperparameter/preprocessing/augmentation decisions.
-   Сохрани компактный versioned integrity manifest с source/checksum/counts и
-   фактическим provenance в ignored data directory. Повторная успешная проверка
-   должна быть идемпотентной и не выдавать ранее не проверенные данные за verified.
+2. Реализуй в src/data.py согласованные API:
+   create_split(targets: Sequence[int], split_seed: int, out_dir: Path) -> dict
+   load_split(path: Path, targets) -> tuple[np.ndarray, np.ndarray]
+   Return schema, validation errors, integer dtype и manifest fields зафиксируй
+   в docs/tests. Сохрани работающий DATA-001 API и его offline default.
 
-6. Добавь содержательные offline tests: missing/corrupt data, integrity failures,
-   оба partition, class/count/shape contract, download=False без network,
-   явный download mode, повторная проверка и CLI success/failure.
-   Default pytest не должен скачивать CIFAR-10 или зависеть от его наличия.
-   Actual local CIFAR checks запускай отдельно с explicit opt-in и зафиксируй
-   результат; отсутствие данных/skip не выдавай за PASS.
+3. Используй exact algorithm из EXPERIMENT_PROTOCOL, не выбирай новый:
+   - вход: ТОЛЬКО original CIFAR-10 train targets длины50000, классы0..9;
+   - один local np.random.default_rng(494), class order0..9;
+   - для каждого класса sorted candidate indices -> permutation тем же RNG;
+   - первые500 indices класса -> validation, остальные4500 -> train;
+   - final indices каждой partition сортируются;
+   - результат45000/5000, ровно4500/500 per class, indices0..49999;
+   - uniqueness, disjointness, exhaustive union и label/index alignment обязательны.
+   Seed494 общий для model seeds42/123/2026. Global NumPy/Python/torch RNG state
+   не меняется. Сохранённые indices после freeze являются canonical source.
+   Не используй test images/targets, model seed или качество моделей для split.
+   Original test10000 не включается в train/validation split.
 
-7. Обнови README, CURRENT_STATUS, roadmap, TESTING_PLAN, REPRODUCIBILITY и
-   reproduction/AI usage records по фактам. Отдели working commands от будущих
-   интерфейсов. Не приписывай собственную проверку команде. Полный task DoD оставь
-   PARTIAL, если остаётся обязательный independent human review, и перечисли остаток.
+4. Сохрани actual artifacts:
+   data/splits/cifar10_split_v1.npz
+   data/splits/split_manifest.json
+   Manifest: schema/algorithm version, seed, dataset/source/archive checksum,
+   original-train partition namespace, counts/per-class counts, identity исходного
+   train и порядка labels, arrays SHA-256, NPZ file SHA-256, creation code identity.
+   Различай file-byte hash и semantic array identity. Проверяй provenance, а не
+   доверяй произвольному JSON. Без absolute local paths, credentials и test labels.
+
+5. Existing artifacts сначала полностью проверяй и переиспользуй. Успешный повтор
+   create/load/verify сохраняет indices, hashes и existing file mtimes.
+   Wrong seed/dataset/label order, malformed arrays/manifest, tampering или partial
+   pair -> actionable error; не пересоздавай/не перезаписывай молча. Продумай safe
+   writes и восстановление после interrupted write: incomplete state не verified.
+   Из REPRO-001 добавляй только необходимые hash/write helpers с relevant tests;
+   не закрывай general identity/checkpoint/RNG/backup infrastructure этим этапом.
+   Учти ZIP metadata/timestamps NPZ: не обещай byte-identical regeneration без проверки.
+
+6. Расширь scripts/download_data.py рабочим split CLI. Целевой prepare command:
+   .\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --prepare-split --split-seed 494
+   Добавь явный read-only способ проверить existing split; документируй точную
+   команду и defaults. Existing --verify-only без split flags по-прежнему проверяет
+   только raw data, не создаёт artifacts и не требует split. Новые flags должны
+   иметь --help, понятные errors и nonzero exit при invalid arguments.
+   --prepare-split готовит только split, не normalization/loaders.
+
+7. Добавь meaningful offline tests в tests/test_data_pipeline.py и при необходимости
+   соответствующий CLI/actual test module:
+   - balanced synthetic50000 targets, exact4500/500 counts, dtype/range;
+   - uniqueness/disjointness/exhaustiveness и label alignment;
+   - exact protocol algorithm, determinism в fresh process и global RNG isolation;
+   - round trip, stable existing artifacts/mtime и корректные hashes;
+   - wrong seed/length/types/classes, duplicates/overlap/out-of-range/missing IDs;
+   - altered/reordered targets, tampered NPZ/manifest, missing/partial artifact pair;
+   - failure/recovery safety, CLI prepare/verify success и nonzero failures;
+   - сохранение DATA-001 offline/default и read-only contracts.
+   Default suite не скачивает CIFAR-10 и не зависит от actual split/data.
+
+8. Отдельно с explicit opt-in проверь actual original train50000, создание actual
+   split, обе partition counts, все invariants/provenance, повторное чтение и CLI.
+   Сравни hashes/mtimes до и после повторного run. Missing/corrupt actual data —
+   честный FAIL, не synthetic PASS/skip. Не запускай обучение.
+   Не перезаписывай ignored raw integrity manifest: это historical acquisition
+   record; новые split provenance и evidence сохраняются отдельно.
+
+9. После actual verification запиши фактический NPZ SHA-256 симметрично в
+   dataset.split_sha256 ОБОИХ YAML. normalization_sha256 оставь null.
+   Другие scientific settings не меняй. Уточнения artifact identity в schema/tests/
+   docs вноси согласованно, не ослабляя validation. Сохрани компактные split NPZ
+   и manifest в Git (это indices, не raw CIFAR images), проверь ignore rules и
+   portable paths. Наличие split ещё не означает training readiness.
+
+10. Обнови README, CURRENT_STATUS, roadmap, TESTING_PLAN, REPRODUCIBILITY,
+    architecture при изменении contracts, report/reproduction.md и report/ai_usage.md.
+    Запиши actual commands, PASS/FAIL/SKIP, hashes/provenance и ограничения.
+    Не приписывай agent checks команде. Full DATA-002 DoD оставь PARTIAL, если
+    independent human reviewer approval отсутствует. После завершения подготовь
+    NEXT_STEP_PROMPT для DATA-003 по фактам, сохранив main-only workflow.
 
 ГРАНИЦЫ
 
-Не реализуй split, normalization, transforms/loaders для training, corruptions,
-CNN, training, evaluation, metrics или plotting. Не запускай обучение и не меняй
-scientific configs. Split/stats hashes остаются null до DATA-002/003.
-Из REPRO-001 добавляй только минимальные необходимые helpers для integrity
-manifest и их tests; не закрывай весь REPRO-001 по наличию одного helper.
-Не добавляй frameworks, сервисы и экспериментальные результаты.
-Source/policy/team uncertainties остаются явно pending и не блокируют независимую
-техническую работу. Не объявляй course compliance или submitted proposal verified.
+Не реализуй normalization/statistics, transforms/training loaders, corruptions,
+CNN, training, evaluation, metrics, plotting или EDA. Не запускай scientific runs.
+Не меняй protocol/augmentation/model budget. Из configs меняется только verified
+split identity, симметрично для обеих моделей; normalization hash unresolved.
+Не добавляй frameworks/services. Policy/LMS/submitted proposal/team uncertainties
+остаются pending и не блокируют независимую техническую работу. Не объявляй course
+compliance, human review или независимое воспроизведение подтверждёнными.
 
-GIT — НОВОЕ ЯВНОЕ ПРАВИЛО ПОЛЬЗОВАТЕЛЯ
+GIT — ЯВНОЕ И ПОСТОЯННОЕ ПРАВИЛО ПОЛЬЗОВАТЕЛЯ
 
-Работай, коммить и пушь только в main. Ветки codex/* и другие feature branches
-не создавай и не используй. Это правило заменяет старые branch/PR рекомендации
-planning docs. Разрешаю небольшие локальные commits и обычный push в origin main.
+Работай, коммить и пушь ВСЕГДА ТОЛЬКО в main. Не создавай и не используй codex/*
+или любые другие feature branches. Старые branch/PR рекомендации planning docs
+не действуют. Пользователь разрешает маленькие commits и обычный push в origin main.
 
-- Перед изменениями проверь status и remote history; не захватывай чужую работу.
-- После каждого небольшого завершённого логического блока делай отдельный
-  работающий commit. Реализацию и относящиеся к ней tests коммить вместе.
-- Перед каждым commit проверь diff, конкретные staged files, git diff --check
-  и relevant checks. Не используй git add . или git add -A.
-- После каждого прошедшего проверки commit пушь main в origin/main.
-- Не используй force push, amend, reset или переписывание истории. Не создавай
-  заведомо неработающие промежуточные commits и не откладывай всё в один commit.
-- Если remote изменился, сначала проверь чужие commits. Безопасный fast-forward
-  допустим; при несовместимом расхождении не перезаписывай remote и не применяй
-  конфликтный merge автоматически: сохрани работу и сообщи точную блокировку.
-- Не коммить .venv, CIFAR archives/images, caches, credentials, локальные
-  абсолютные пути и временные outputs. Integrity manifest с raw data оставь ignored;
-  в Git сохраняй код, tests и компактное документальное evidence без самих данных.
+- Перед изменениями проверь status и fetch/remote history. Если текущая ветка не
+  main, не редактируй её; переходи в main только без потери/переноса чужой работы.
+- После КАЖДОГО небольшого завершённого логического блока проверь полный diff,
+  relevant tests/checks, staged diff и ТОЧНЫЙ список staged files; выполни
+  git diff --check и git diff --cached --check. Stage только явные task paths,
+  не используй git add . или git add -A.
+- Реализацию и относящиеся к ней tests коммить вместе. Каждый commit должен быть
+  рабочим. Не коммить заведомо broken промежуточное состояние и не откладывай весь
+  этап в один большой финальный commit.
+- Сразу после каждого прошедшего проверки commit выполняй git push origin main.
+  Не копи commits до конца этапа. При ошибке push выясни причину до следующего блока;
+  не объявляй локальный commit опубликованным.
+- Не используй force push, amend, reset или переписывание истории. Если remote
+  изменился, сначала прочитай чужие commits. Safe fast-forward допустим; при
+  несовместимом divergence/конфликте сохрани работу и сообщи точную блокировку,
+  не перезаписывай remote и не делай конфликтный merge автоматически.
+- Не коммить raw CIFAR archives/images, .venv, caches, credentials, absolute local
+  paths, temporary outputs и diagnostic partials. Versioned split indices/manifest
+  и компактное evidence должны быть reviewable и связаны с проверенными inputs.
 
-Возможные границы commits: offline loader/integrity checks + tests; download/CLI
-и manifest + tests; проверенные инструкции и статусы. Это примеры, не квота:
-выбирай границы по завершённости и работоспособности каждого блока.
+Пример границ commits (не обязательная квота):
+1) split construction/invariant validation + offline tests;
+2) persistence/manifest/hash/reuse/tamper safety + tests;
+3) working CLI + tests;
+4) verified actual split artifacts + config identities + relevant checks;
+5) проверенные docs/evidence и prompt следующего этапа.
+Выбирай границы по завершённости; не дроби код искусственно ради числа commits.
+Показывай короткие progress updates с checks и commit/push status.
 
 КРИТЕРИИ ГОТОВНОСТИ
 
-Offline loader и оба CLI режима работают; official CIFAR-10 реально получен и
-проверен; default tests offline и проходят; actual integrity check зафиксирован;
-повторный запуск не портит данные; foundation tests сохранены. Каждый завершённый
-блок закоммичен и запушен в main. Рабочее дерево clean, либо точно перечислены
-чужие/неразрешённые изменения. Не имитируй успех при network/source failures.
+create_split/load_split и оба split CLI режима работают; actual45k/5k artifacts
+созданы и verified; seed494,4500/500 per class, disjoint/exhaustive indices,
+hashes/provenance подтверждены; повторный run ничего не портит; tampering/partial
+state отвергаются; default tests offline и foundation/DATA-001 tests сохранены.
+Оба YAML ссылаются на один verified split hash; normalization hash null.
+Все завершённые блоки отдельно committed и pushed только в main. В конце проверь
+clean status, staged files и main=origin/main либо точно перечисли блокировки.
 
-В конце по-русски сообщи: что реализовано; какие проверки PASS/FAIL/SKIP;
-что реально проверено на CIFAR-10; commits и результат push; pending сведения
-и следующий конкретный этап DATA-002. Продолжай самостоятельно до завершения
-этого объёма; вопросы задавай только при действительно блокирующей неопределённости.
+В финале по-русски сообщи: что реализовано, PASS/FAIL/SKIP, actual split evidence,
+paths/hashes, commits и результат каждого push, pending human/source/team сведения
+и следующий конкретный DATA-003. Вопросы задавай только при действительно блокирующей
+неопределённости. Продолжай самостоятельно до завершения этого объёма.
 ```
