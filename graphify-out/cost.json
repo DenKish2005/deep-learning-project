@@ -1,0 +1,24 @@
+{
+  "runs": [
+    {
+      "date": "2026-10-31T07:58:53.520726+00:00",
+      "client_date": "2026-10-31",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "token_usage_available": false,
+      "token_usage_note": "Host-agent token usage is not exposed by the collaboration tool. Zeros are placeholders, not measured zero-token work.",
+      "files": 45,
+      "code_files": 20,
+      "semantic_files": 25,
+      "nodes": 609,
+      "relationship_records": 1133,
+      "source_commit": "e7f6ed9f1fb47d60cb2de85554b2282049c2e500",
+      "semantic_backend": "host_agents",
+      "mode": "normal"
+    }
+  ],
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "totals_complete": false,
+  "totals_note": "Unknown host-agent usage is not included in numeric totals."
+}

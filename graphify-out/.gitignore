@@ -1,0 +1,7 @@
+# Share graph outputs; keep interpreter paths, caches and extraction sidecars local.
+*
+!.gitignore
+!graph.json
+!graph.html
+!GRAPH_REPORT.md
+!cost.json
