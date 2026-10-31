@@ -9,6 +9,7 @@ import socket
 import subprocess
 import sys
 import tarfile
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -367,7 +368,7 @@ def test_cli_missing_verify_does_not_create_root(tmp_path, capsys):
     assert not root.exists()
 
 
-@pytest.mark.parametrize('flags,code', [(['--help'], 0), (['--prepare-split'], 2),
+@pytest.mark.parametrize('flags,code', [(['--help'], 0), (['--prepare-split', '--verify-only'], 2),
                                      (['--root'], 2), (['--unknown'], 2)])
 def test_cli_argument_contract(flags, code):
     with pytest.raises(SystemExit) as result:
@@ -702,3 +703,104 @@ def test_split_publication_is_exclusive_and_lock_protected(tmp_path, split_targe
         data.create_split(split_targets, 494, tmp_path)
     assert (tmp_path / data.SPLIT_NAME).read_bytes() == b'foreign concurrent file'
     assert (tmp_path / '.split-write.lock').exists()
+
+
+@pytest.fixture
+def split_cli_source(monkeypatch, split_targets):
+    calls = []
+    def load(root, train, download=False):
+        assert train is True and download is False
+        calls.append(root)
+        return SimpleNamespace(targets=split_targets.tolist())
+    monkeypatch.setattr(download_data, 'load_cifar10', load)
+    def forbidden(*args, **kwargs):
+        pytest.fail('Split mode must not acquire data, inspect test targets, or write raw manifest')
+    for name in ('ensure_cifar10', 'inspect_cifar10', '_write_manifest'):
+        monkeypatch.setattr(download_data, name, forbidden)
+    return calls
+
+
+def test_split_cli_prepare_verify_and_idempotence(tmp_path, split_cli_source, capsys):
+    out_dir = tmp_path / 'splits'
+    flags = ['--root', str(tmp_path / 'raw'), '--split-dir', str(out_dir)]
+    assert download_data.main([*flags, '--prepare-split', '--split-seed', '494']) == 0
+    prepared = json.loads(capsys.readouterr().out)
+    assert prepared['train'] == 45000 and prepared['validation'] == 5000
+    assert prepared['seed'] == 494 and prepared['status'] == 'verified'
+    before = snapshot(tmp_path)
+    for mode in ('--verify-split', '--prepare-split'):
+        assert download_data.main([*flags, mode]) == 0
+        result = json.loads(capsys.readouterr().out)
+        assert result['split_sha256'] == prepared['split_sha256']
+        assert snapshot(tmp_path) == before
+    assert len(split_cli_source) == 3
+    assert not (tmp_path / 'raw').exists()
+
+
+def test_split_cli_defaults_are_explicit(tmp_path, split_cli_source, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    assert download_data.main(['--prepare-split']) == 0
+    assert json.loads(capsys.readouterr().out)['seed'] == 494
+    assert (tmp_path / 'data/splits' / data.SPLIT_NAME).is_file()
+    assert not (tmp_path / 'data/raw').exists()
+
+
+@pytest.mark.parametrize('mode', ['--prepare-split', '--verify-split'])
+def test_split_cli_missing_raw_fails_without_writes(tmp_path, mode, capsys):
+    root, out_dir = tmp_path / 'raw', tmp_path / 'split'
+    assert download_data.main(['--root', str(root), '--split-dir', str(out_dir), mode]) == 1
+    assert json.loads(capsys.readouterr().err)['status'] == 'failed'
+    assert not root.exists() and not out_dir.exists()
+
+
+def test_split_cli_missing_and_tampered_pair_fail(tmp_path, split_cli_source, capsys):
+    out_dir = tmp_path / 'split'
+    flags = ['--split-dir', str(out_dir)]
+    assert download_data.main([*flags, '--verify-split']) == 1
+    capsys.readouterr()
+    assert not out_dir.exists()
+    assert download_data.main([*flags, '--prepare-split']) == 0
+    capsys.readouterr()
+    (out_dir / data.SPLIT_MANIFEST).write_text('{}')
+    before = snapshot(out_dir)
+    for mode in ('--verify-split', '--prepare-split'):
+        assert download_data.main([*flags, mode]) == 1
+        assert json.loads(capsys.readouterr().err)['status'] == 'failed'
+        assert snapshot(out_dir) == before
+
+
+def test_raw_verify_does_not_require_or_touch_split(raw, tmp_path, monkeypatch, capsys):
+    # A broken split next to the chosen cwd must not affect the raw-only mode.
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / 'data/splits').mkdir(parents=True)
+    (tmp_path / 'data/splits' / data.SPLIT_MANIFEST).write_text('broken')
+    before = snapshot(tmp_path)
+    assert download_data.main(['--root', str(raw), '--verify-only']) == 0
+    assert json.loads(capsys.readouterr().out)['mode'] == 'verify-only'
+    assert snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize('flags', [
+    ['--split-seed', '494'], ['--split-dir', 'other'], ['--verify-only', '--split-seed', '494'],
+    ['--prepare-split', '--verify-split'], ['--verify-only', '--verify-split'],
+    ['--prepare-split', '--split-seed', '42'], ['--prepare-split', '--split-seed', '494.0'],
+    ['--verify-split', '--split-seed', 'true'], ['--prepare-split', '--split-dir'],
+])
+def test_split_cli_invalid_arguments(flags):
+    with pytest.raises(SystemExit) as result:
+        download_data.main(flags)
+    assert result.value.code == 2
+
+
+def test_split_cli_module_help_and_invalid_seed(tmp_path):
+    result = subprocess.run([sys.executable, '-m', 'scripts.download_data', '--help'],
+                            capture_output=True, text=True, timeout=60)
+    assert result.returncode == 0
+    for option in ('--prepare-split', '--verify-split', '--split-dir', '--split-seed'):
+        assert option in result.stdout
+    result = subprocess.run([sys.executable, '-m', 'scripts.download_data', '--prepare-split',
+                             '--root', str(tmp_path), '--split-seed', '42'],
+                            capture_output=True, text=True, timeout=60)
+    assert result.returncode == 2
+    assert 'invalid choice' in result.stderr
+    assert snapshot(tmp_path) == {}

@@ -1,4 +1,4 @@
-"""Explicit CIFAR-10 acquisition or read-only verification; run from repo root."""
+"""CIFAR-10 acquisition, raw verification, or offline split prepare/verify."""
 
 import argparse
 from datetime import datetime, timezone
@@ -11,7 +11,9 @@ import sys
 
 import torchvision
 
-from src.data import DataIntegrityError, _allowed_url, ensure_cifar10, inspect_cifar10
+from src.data import (DataIntegrityError, SPLIT_NAME, _allowed_url, _hash,
+                      create_split, ensure_cifar10, inspect_cifar10,
+                      load_cifar10, load_split)
 
 
 MANIFEST = 'cifar10_integrity_v1.json'
@@ -90,10 +92,35 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=Path('data/raw'),
                         help='Raw dataset directory (default: data/raw)')
-    parser.add_argument('--verify-only', action='store_true',
-                        help='Fresh offline inspection; never create/change dataset or manifest')
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--verify-only', action='store_true',
+                       help='Read-only raw integrity inspection; no split required or created')
+    modes.add_argument('--prepare-split', action='store_true',
+                       help='Offline: verify original train, create or reuse split only (no stats/loaders)')
+    modes.add_argument('--verify-split', action='store_true',
+                       help='Offline, read-only: verify original train and existing NPZ/manifest')
+    parser.add_argument('--split-seed', type=int, choices=[494],
+                        help='Split modes only: shared protocol seed (default: 494)')
+    parser.add_argument('--split-dir', type=Path,
+                        help='Split modes only: artifact directory (default: data/splits)')
     args = parser.parse_args(argv)
+    split_mode = args.prepare_split or args.verify_split
+    if not split_mode and (args.split_seed is not None or args.split_dir is not None):
+        parser.error('--split-seed/--split-dir require --prepare-split or --verify-split')
     try:
+        if split_mode:
+            # Offline existing raw data only; never decode test images/targets.
+            dataset = load_cifar10(args.root, train=True, download=False)
+            out_dir = args.split_dir if args.split_dir is not None else Path('data/splits')
+            seed = args.split_seed if args.split_seed is not None else 494
+            if args.prepare_split:
+                create_split(dataset.targets, seed, out_dir)
+            train, val = load_split(out_dir / SPLIT_NAME, dataset.targets)
+            print(json.dumps({'status': 'verified', 'mode': 'prepare-split' if args.prepare_split else 'verify-split',
+                              'seed': seed, 'namespace': 'cifar10-python/original-train',
+                              'train': len(train), 'validation': len(val),
+                              'split_sha256': _hash(out_dir / SPLIT_NAME, 'sha256')}, sort_keys=True))
+            return 0
         provenance = None
         if not args.verify_only:
             provenance = ensure_cifar10(args.root)

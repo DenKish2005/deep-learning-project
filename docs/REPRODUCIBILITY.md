@@ -125,14 +125,34 @@ root с сохранением старого. Failed acquisition оставля
 Test partition здесь инспектируется только ради integrity, без scientific decisions.
 Split/stats hashes остаются null; training готовность не заявлена.
 
+## Работающие команды DATA-002
+
+Existing `.venv`, из repo root. Split modes offline: требуют предварительно
+полученный и verified original train; не вызывают acquisition и не декодируют
+test images/targets. Отсутствие/повреждение данных — exit1. Raw acquisition остаётся
+отдельной явной командой DATA-001 выше; historical raw manifest не переписывается.
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --prepare-split --split-seed 494
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-split
+```
+
+Defaults: `--root data/raw`, `--split-dir data/splits`, split seed494.
+`--split-dir` позволяет явно выбрать новый empty directory после сохранения failed
+directory. `--prepare-split` создаёт только NPZ/manifest или полностью проверяет
+existing pair; normalization/loaders не создаёт. `--verify-split` не создаёт root,
+split directory или files, не меняет hashes/file mtimes. Original
+`--verify-only` проверяет только raw data, не требует split и не читает его.
+Три modes взаимоисключающие; `--split-dir`/`--split-seed` допустимы только в split
+modes; любой seed кроме494 — exit2. `--help` описывает flags; success JSON/exit0,
+data/artifact failure JSON stderr/exit1, invalid arguments argparse stderr/exit2.
+Подробная [schema/hash/write/recovery спецификация](TECHNICAL_ARCHITECTURE.md#split-artifact-contract-v1).
+
 ## Плановые команды pipeline
 
 В примерах `python` обозначает interpreter проверенного env; на Windows можно заменить на `.\.venv\Scripts\python.exe`. Команды из root. Device cpu — рабочий fallback после реализации; cuda допустим только после validation. Parameters subset/profile относятся только к smoke/debug и запрещены для core profile.
 
 ```powershell
-# FUTURE DATA-002/003: flags not implemented, currently rejected
-python -m scripts.download_data --root data/raw --prepare-split --split-seed 494
-
 # TEST-001: offline synthetic unit/integration tests после написания
 python -m pytest tests -q
 
