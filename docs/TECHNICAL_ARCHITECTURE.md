@@ -196,6 +196,34 @@ preserved. Recovery: inspect/preserve them and explicitly select a new stats pat
 no automatic repair. This readiness protocol is not a power-loss transaction.
 General REPRO-001/checkpoint/backup work and CORR-001 integration remain pending.
 
+#### DATA-003 keyed loaders (implemented)
+
+`IndexedCIFAR10` takes numeric `record['statistics']`; base must be raw and its
+original partition must agree with mode. Indices are unique partition-relative
+IDs; dataset.namespace distinguishes original train and original test. Geometry
+uses a CPU torch.Generator: zero pad4, two randint(0,9) crop offsets, rand()<.5
+horizontal flip, then float32 CHW/255. An optional train-only callable has
+`policy(x, generator=local_generator) -> (Tensor, dict)`. Mutation, wrong dtype,
+shape/device/nonfinite/range output fail; labels/IDs are always obtained from base.
+Policy is injected by the caller; actual corruptions are still CORR-001/002 TODO.
+
+`EpochOrderSampler` creates a fresh local generator per iteration from
+stable_seed(run_seed, epoch, 'order'); dataset.set_epoch updates order/geometry.
+Call set_epoch before iterator creation, and finish/discard existing iterators
+before changing epoch. `_make_loader` gives float32 NCHW, int64 labels/IDs,
+drop_last=False, sequential val/test, workers0 reference, persistent_workers=False,
+spawn workers with top-level seed_worker, dedicated worker generator. pin_memory
+can only be enabled for CUDA; explicit False is respected. Workers2 is tested
+with actual spawned processes across epochs, not inferred from workers0.
+
+`make_loaders(config, run_seed, epoch, *, policy=None,
+partitions=('train','val','test'))` verifies config and both declared FILE hashes,
+raw original train, persisted split and fresh stats before building loaders. It
+creates no artifacts. Augmentation-enabled config requires a supplied callable;
+clean config requires None. No training-ready success is implied. A future trainer
+must request `partitions=('train','val')`; this path never decodes original test.
+Only explicit test requests load test images for the fixed loader contract.
+
 ### `src/models.py`
 
 - `CompactCNN(num_classes=10, dropout=0.2)`; `forward(x: Tensor[N,3,32,32]) -> Tensor[N,10]` logits; `initialize_weights()` либо internal init helper.

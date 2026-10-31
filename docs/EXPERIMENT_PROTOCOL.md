@@ -65,6 +65,14 @@ Input tensor RGB CHW float32 `[0,1]`, размеры 3×32×32; output тако�
 
 Для test noise level не включён в seed намеренно: общий ε масштабируется разными σ. Не тянуть RNG в порядке inference, иначе batch/worker count меняют images. Nonstochastic blur/darkening не требуют RNG. Hash condition включает dataset identity, original index order, implementation/version, severity params, eval seed, normalization hash; контрольная выборка corrupted tensors сохраняется с SHA для regression.
 
+DATA-003 operational seed encoding v1: only Python int (excluding bool) and str
+parts; prefix `csci494-stable-seed-v1` plus LF, then compact JSON list in supplied
+order (`ensure_ascii=False`, separators comma/colon), UTF-8 SHA-256. Interpret the
+digest big-endian and retain low63 bits. Int42 and string"42" remain distinct;
+JSON boundaries prevent concatenation ambiguity. No global Python/NumPy/torch RNG
+is used for geometry/order/policy. This specifies encoding, not new scientific
+settings. Test-noise implementation remains CORR-001 pending.
+
 ## 5. Training policy и процедура
 
 Policy — **одно событие на image**, не на batch, не композиция трёх corruptions:

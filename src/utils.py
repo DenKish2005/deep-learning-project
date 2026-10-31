@@ -2,15 +2,40 @@
 
 Paths are repository-relative declarations. Null provenance hashes are allowed
 for preparation only; future training must verify actual split/stats artifacts.
-Identity, RNG and checkpoint utilities belong to REPRO-001 and are not provided.
+DATA-003 adds only stable_seed/seed_worker; general REPRO-001/checkpoints remain pending.
 """
 
 import argparse
+import hashlib
+import json
 import math
 from pathlib import Path, PurePosixPath, PureWindowsPath
 import re
 
 import yaml
+
+
+def stable_seed(*parts) -> int:
+    """v1: SHA256(prefix + compact UTF8 JSON list), low 63 bits, big endian.
+
+    Only Python int (not bool) and str parts: no repr/hash/platform ambiguity.
+    This local seed primitive does not change any global RNG state.
+    """
+    if any(type(part) not in (int, str) for part in parts):
+        raise TypeError('stable_seed parts must be Python int or str (not bool)')
+    payload = 'csci494-stable-seed-v1\n' + json.dumps(
+        list(parts), ensure_ascii=False, separators=(',', ':'))
+    return int.from_bytes(hashlib.sha256(payload.encode('utf-8')).digest(), 'big') & ((1 << 63) - 1)
+
+
+def seed_worker(worker_id: int) -> None:
+    """Top-level Windows-spawn worker hook; torch has already seeded its worker."""
+    import random
+    import numpy as np
+    import torch
+    seed = torch.initial_seed() % (2 ** 32)
+    random.seed(seed)
+    np.random.seed(seed)
 
 
 class ConfigError(ValueError):

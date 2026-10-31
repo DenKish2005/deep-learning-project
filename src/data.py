@@ -1,4 +1,4 @@
-"""Verified raw CIFAR-10 and fixed original-train split; no transforms/training.
+"""Verified CIFAR-10, frozen split, train-only stats and deterministic loaders.
 
 MD5 references come from the official dataset page and torchvision v0.24.0.
 Files are checked before torchvision unpickles them. MD5 is an upstream
@@ -18,7 +18,12 @@ from urllib.parse import urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 import numpy as np
+import torch
+from torch.nn import functional as F
+from torch.utils.data import DataLoader, Dataset, Sampler
 from torchvision.datasets import CIFAR10
+
+from src.utils import seed_worker, stable_seed, validate_config
 
 
 SOURCE_PAGE = 'https://cave.cs.toronto.edu/kriz/cifar.html'
@@ -698,3 +703,162 @@ def prepare_normalization(raw_data, targets, split_path: Path, path: Path) -> di
     except (OSError, ValueError, DataIntegrityError) as exc:
         raise _stats_error(f'creation interrupted; diagnostic artifacts retained: {exc}') from exc
 # END DATA-003 normalization v1
+
+
+def _nonnegative_integer(value, name: str) -> None:
+    if type(value) is not int or value < 0:
+        raise ValueError(f'{name} must be a nonnegative Python integer')
+
+
+class IndexedCIFAR10(Dataset):
+    """Raw indexed partition → keyed geometry → pixel policy → normalization.
+
+    `normalization` is the statistics dict, not the outer artifact record. Raw
+    base transforms must be absent. Original IDs are relative to `namespace`.
+    Call set_epoch BEFORE creating an iterator; finish/discard that iterator
+    before changing epoch. Nonpersistent spawn workers receive that epoch.
+    """
+
+    def __init__(self, base, indices, mode, normalization, run_seed, epoch=0, policy=None):
+        if mode not in ('train', 'val', 'test'):
+            raise ValueError('mode must be train, val or test')
+        if type(getattr(base, 'train', None)) is not bool or base.train != (mode != 'test'):
+            raise ValueError('base partition does not match train/val/test namespace')
+        if getattr(base, 'transform', None) is not None or getattr(base, 'target_transform', None) is not None:
+            raise ValueError('base must contain raw pixels/labels without transforms')
+        _validate_pixels(base.data)
+        self.indices = _validate_indices(indices, len(base.data))
+        labels = np.asarray(base.targets)
+        if (labels.shape != (len(base.data),) or labels.dtype.kind not in 'iu'
+                or np.any(labels < 0) or np.any(labels > 9)):
+            raise ValueError('base labels must be aligned integer classes 0..9')
+        validate_normalization(normalization)
+        _nonnegative_integer(run_seed, 'run_seed')
+        if policy is not None and (mode != 'train' or not callable(policy)):
+            raise ValueError('optional callable policy is train-only')
+        self.base, self.labels, self.mode = base, labels, mode
+        self.namespace = 'cifar10-python/original-' + ('test' if mode == 'test' else 'train')
+        self.run_seed, self.policy = run_seed, policy
+        self.mean = torch.tensor(normalization['mean'], dtype=torch.float32)[:, None, None]
+        self.std = torch.tensor(normalization['std'], dtype=torch.float32)[:, None, None]
+        if not torch.isfinite(self.std).all() or not (self.std > 0).all():
+            raise ValueError('std must remain positive finite in float32')
+        self.set_epoch(epoch)
+
+    def set_epoch(self, epoch):
+        _nonnegative_integer(epoch, 'epoch')
+        self.epoch = epoch
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, position):
+        original_index = int(self.indices[position])
+        image = torch.from_numpy(self.base.data[original_index].copy()).permute(2, 0, 1)
+        if self.mode == 'train':
+            geometry = torch.Generator().manual_seed(stable_seed(
+                self.run_seed, self.epoch, original_index, 'geometry'))
+            image = F.pad(image, (4, 4, 4, 4), mode='constant', value=0)
+            top, left = torch.randint(0, 9, (2,), generator=geometry).tolist()
+            image = image[:, top:top + 32, left:left + 32]
+            if torch.rand((), generator=geometry).item() < 0.5:
+                image = image.flip(-1)
+        image = image.to(dtype=torch.float32).div(255.0).contiguous()
+        if self.policy is not None:
+            generator = torch.Generator().manual_seed(stable_seed(
+                self.run_seed, self.epoch, original_index, 'train_corruption'))
+            before = image.clone()
+            result = self.policy(image, generator=generator)
+            if not torch.equal(image, before):
+                raise ValueError('policy must not mutate its pixel input')
+            if not isinstance(result, tuple) or len(result) != 2 or not isinstance(result[1], dict):
+                raise ValueError('policy must return (pixel Tensor, metadata dict)')
+            image = result[0]
+            if (not isinstance(image, torch.Tensor) or image.shape != (3, 32, 32)
+                    or image.dtype != torch.float32 or image.device.type != 'cpu'
+                    or not torch.isfinite(image).all() or not ((image >= 0) & (image <= 1)).all()):
+                raise ValueError('policy output must be CPU float32 [3,32,32] in [0,1]')
+        image = ((image - self.mean) / self.std).contiguous()
+        if not torch.isfinite(image).all():
+            raise ValueError('normalized image must be finite')
+        return image, int(self.labels[original_index]), original_index
+
+
+class EpochOrderSampler(Sampler):
+    """A fresh local generator on each iteration; dataset.set_epoch controls order."""
+
+    def __init__(self, dataset: IndexedCIFAR10):
+        self.dataset = dataset
+
+    def __iter__(self):
+        generator = torch.Generator().manual_seed(stable_seed(
+            self.dataset.run_seed, self.dataset.epoch, 'order'))
+        return iter(torch.randperm(len(self.dataset), generator=generator).tolist())
+
+    def __len__(self):
+        return len(self.dataset)
+
+
+def _make_loader(dataset, batch_size, num_workers=0, device='cpu', pin_memory='auto') -> DataLoader:
+    _nonnegative_integer(num_workers, 'num_workers')
+    if type(batch_size) is not int or batch_size <= 0:
+        raise ValueError('batch_size must be a positive Python integer')
+    generator = torch.Generator().manual_seed(stable_seed(
+        dataset.run_seed, dataset.epoch, dataset.mode, 'loader_workers'))
+    return DataLoader(dataset, batch_size=batch_size,
+                      sampler=EpochOrderSampler(dataset) if dataset.mode == 'train' else None,
+                      shuffle=False, drop_last=False, num_workers=num_workers,
+                      pin_memory=torch.device(device).type == 'cuda' and pin_memory is not False,
+                      persistent_workers=False, worker_init_fn=seed_worker,
+                      generator=generator,
+                      multiprocessing_context='spawn' if num_workers else None)
+
+
+def make_loaders(config, run_seed, epoch, *, policy=None,
+                 partitions=('train', 'val', 'test')) -> dict[str, DataLoader]:
+    """Verify config/file identities, frozen split/stats, then construct loaders.
+
+    Explicit policy injection is required for augmentation.enabled; no implicit
+    corruption implementation or training-ready claim. A future trainer MUST
+    request partitions=('train','val') so it never decodes test samples.
+    No artifact is created and no data is downloaded by this function.
+    """
+    validate_config(config)
+    _nonnegative_integer(run_seed, 'run_seed')
+    _nonnegative_integer(epoch, 'epoch')
+    if config['runtime']['persistent_workers']:
+        raise ValueError('DATA-003 requires persistent_workers=False for epoch propagation')
+    if (not isinstance(partitions, tuple) or not partitions
+            or len(set(partitions)) != len(partitions)
+            or any(p not in ('train', 'val', 'test') for p in partitions)):
+        raise ValueError('partitions must be a nonempty unique tuple of train/val/test')
+    enabled = config['augmentation']['enabled']
+    if enabled != (policy is not None) or (policy is not None and not callable(policy)):
+        raise ValueError('augmentation requires an explicitly injected callable policy; clean requires None')
+    paths = config['dataset']
+    for field, identity in (('split_path', 'split_sha256'), ('normalization_path', 'normalization_sha256')):
+        path = Path(paths[field])
+        if (paths[identity] is None or path.is_symlink() or not path.is_file()
+                or _hash(path, 'sha256') != paths[identity]):
+            raise DataIntegrityError(f'Unresolved or mismatched dataset.{identity}: {path}')
+    train_base = load_cifar10(Path(paths['root']), train=True, download=False)
+    split_path = Path(paths['split_path'])
+    train, val = load_split(split_path, train_base.targets)
+    record = load_normalization(train_base.data, train_base.targets, split_path,
+                                Path(paths['normalization_path']))
+    stats = record['statistics']
+    if stats['train_indices_sha256'] != _array_sha256(train):
+        raise DataIntegrityError('Normalization train array identity mismatch')
+    result = {}
+    device = config['runtime']['device']
+    if device == 'auto':
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    for mode in partitions:
+        base = load_cifar10(Path(paths['root']), train=False, download=False) if mode == 'test' else train_base
+        ids = np.arange(len(base.data), dtype='<i8') if mode == 'test' else (train if mode == 'train' else val)
+        dataset = IndexedCIFAR10(base, ids, mode, stats, run_seed, epoch,
+                                 policy=policy if mode == 'train' else None)
+        batch_size = config['training' if mode == 'train' else 'evaluation']['batch_size']
+        result[mode] = _make_loader(dataset, batch_size, config['runtime']['num_workers'],
+                                   device, config['runtime']['pin_memory'])
+    return result
