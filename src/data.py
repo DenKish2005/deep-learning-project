@@ -507,3 +507,194 @@ def create_split(targets: Sequence[int], split_seed: int, out_dir: Path) -> dict
     except (OSError, ValueError, DataIntegrityError) as exc:
         raise _split_error(f'creation interrupted in {out_dir}; diagnostic artifacts retained: {exc}') from exc
 # END DATA-002 v1
+
+
+# BEGIN DATA-003 normalization v1
+NORMALIZATION_NAME = 'normalization.json'
+
+
+def _stats_error(detail: str) -> DataIntegrityError:
+    return DataIntegrityError(f'Normalization verification failed: {detail}. Preserve '
+                              'existing stats/diagnostics; no automatic replacement. '
+                              'Inspect the mismatch or choose a new stats path.')
+
+
+def _validate_pixels(raw_data: np.ndarray) -> None:
+    if (not isinstance(raw_data, np.ndarray) or raw_data.dtype != np.uint8
+            or raw_data.ndim != 4 or raw_data.shape[1:] != (32, 32, 3)
+            or len(raw_data) == 0):
+        raise _stats_error('pixels must be nonempty uint8 [N,32,32,3] RGB')
+
+
+def _validate_indices(indices, size: int) -> np.ndarray:
+    try:
+        values = np.asarray(indices)
+    except (ValueError, TypeError) as exc:
+        raise _stats_error('indices must be a flat integer sequence') from exc
+    if (values.ndim != 1 or not values.size or values.dtype.kind not in 'iu'
+            or (not isinstance(indices, np.ndarray)
+                and any(isinstance(i, (bool, np.bool_)) for i in indices))
+            or np.any(values < 0) or np.any(values >= size)
+            or np.unique(values).size != values.size):
+        raise _stats_error('indices must be nonempty unique integers within the partition')
+    return values.astype('<i8', copy=True)
+
+
+def validate_normalization(stats: dict) -> None:
+    """Validate the complete numeric contract returned by compute_normalization."""
+    keys = {'mean', 'std', 'channels', 'scale', 'ddof', 'samples',
+            'pixels_per_channel', 'train_indices_sha256', 'algorithm'}
+    if not isinstance(stats, dict) or set(stats) != keys:
+        raise _stats_error('invalid statistics schema')
+    if (stats['channels'] != ['R', 'G', 'B'] or type(stats['scale']) is not float
+            or stats['scale'] != 1.0 / 255 or type(stats['ddof']) is not int
+            or stats['ddof'] != 0 or type(stats['samples']) is not int
+            or stats['samples'] <= 0 or type(stats['pixels_per_channel']) is not int
+            or stats['pixels_per_channel'] != stats['samples'] * 1024
+            or stats['algorithm'] != 'float64-two-pass-chunks256-v1'):
+        raise _stats_error('invalid channel/scale/count/algorithm contract')
+    checksum = stats['train_indices_sha256']
+    if (not isinstance(checksum, str) or len(checksum) != 64
+            or any(c not in '0123456789abcdef' for c in checksum)):
+        raise _stats_error('invalid train array semantic hash')
+    for key in ('mean', 'std'):
+        values = stats[key]
+        if (not isinstance(values, list) or len(values) != 3
+                or any(type(x) is not float or not np.isfinite(x) for x in values)
+                or any(x < 0 or x > 1 for x in values)
+                or (key == 'std' and any(x <= 0 for x in values))):
+            raise _stats_error(f'invalid finite {key}; std must be positive')
+
+
+def compute_normalization(raw_data: np.ndarray, train_indices) -> dict:
+    """Train-only raw uint8/255 population moments, fixed float64 two-pass order.
+
+    This numerical primitive accepts tiny offline fixtures. Official provenance
+    and the persisted 45000 train IDs are enforced by prepare/load_normalization.
+    No augmented, validation or test pixels enter the accumulation.
+    """
+    _validate_pixels(raw_data)
+    indices = _validate_indices(train_indices, len(raw_data))
+    total = np.zeros(3, dtype=np.float64)
+    for start in range(0, len(indices), 256):
+        pixels = raw_data[indices[start:start + 256]].astype(np.float64) / 255.0
+        total += pixels.sum(axis=(0, 1, 2), dtype=np.float64)
+    count = len(indices) * 1024
+    mean = total / count
+    squared = np.zeros(3, dtype=np.float64)
+    for start in range(0, len(indices), 256):
+        pixels = raw_data[indices[start:start + 256]].astype(np.float64) / 255.0
+        squared += ((pixels - mean) ** 2).sum(axis=(0, 1, 2), dtype=np.float64)
+    stats = {'mean': mean.tolist(), 'std': np.sqrt(squared / count).tolist(),
+             'channels': ['R', 'G', 'B'], 'scale': 1.0 / 255, 'ddof': 0,
+             'samples': len(indices), 'pixels_per_channel': count,
+             'train_indices_sha256': _array_sha256(indices),
+             'algorithm': 'float64-two-pass-chunks256-v1'}
+    validate_normalization(stats)
+    return stats
+
+
+def _normalization_code_sha256() -> str:
+    source = Path(__file__).read_text(encoding='utf-8')
+    region = source.split('\n# BEGIN DATA-003 normalization v1\n', 1)[1].split(
+        '\n# END DATA-003 normalization v1', 1)[0]
+    return hashlib.sha256(region.encode('utf-8')).hexdigest()
+
+
+def _json_canonical(value) -> str:
+    return json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False)
+
+
+def _normalization_record(raw_data, targets, split_path: Path) -> dict:
+    _validate_pixels(raw_data)
+    if len(raw_data) != len(targets):
+        raise _stats_error('raw pixels/targets length mismatch')
+    train, _ = load_split(split_path, targets)  # Returns persisted IDs, read-only.
+    manifest = json.loads((split_path.parent / SPLIT_MANIFEST).read_text(encoding='utf-8'))
+    stats = compute_normalization(raw_data, train)
+    # Semantic identity of the selected raw pixels, without a full 138MB copy.
+    header = _json_canonical({'dtype': '|u1', 'shape': [len(train), 32, 32, 3]})
+    digest = hashlib.sha256(header.encode('ascii') + b'\n')
+    for start in range(0, len(train), 256):
+        digest.update(raw_data[train[start:start + 256]].tobytes(order='C'))
+    return {'schema_version': 1, 'statistics': stats,
+            'statistics_sha256': hashlib.sha256(_json_canonical(stats).encode('ascii')).hexdigest(),
+            'provenance': {'dataset': manifest['dataset'],
+                           'original_train': manifest['original_train'],
+                           'split_file_sha256': _hash(split_path, 'sha256'),
+                           'split_manifest_sha256': _hash(split_path.parent / SPLIT_MANIFEST, 'sha256'),
+                           'train_pixels_sha256': digest.hexdigest()},
+            'creator': {'source_region': 'src/data.py:DATA-003-normalization-v1',
+                        'sha256_lf': _normalization_code_sha256(), 'numpy': np.__version__}}
+
+
+def _stats_paths(path: Path) -> tuple[Path, Path]:
+    if path.parent.is_symlink() or (path.parent.exists() and not path.parent.is_dir()):
+        raise _stats_error('non-directory/symlink stats parent')
+    return (path.with_name(f'.{path.name}.write.lock'),
+            path.with_name(f'.{path.name}.stage'))
+
+
+def _read_normalization(path: Path, expected: dict) -> dict:
+    if path.is_symlink() or not path.is_file() or path.stat().st_size > 16384:
+        raise _stats_error(f'missing/non-regular/oversized stats: {path}')
+    try:
+        record = json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=_unique_json_pairs)
+        if _json_canonical(record) != _json_canonical(expected):
+            raise ValueError('strict schema/numeric/provenance/code identity mismatch')
+        return record
+    except (ValueError, TypeError, OSError) as exc:
+        raise _stats_error(f'invalid stats {path}: {exc}') from exc
+
+
+def _normalization_state(path: Path) -> bool:
+    lock, stage = _stats_paths(path)
+    if any(p.exists() or p.is_symlink() for p in (lock, stage)):
+        raise _stats_error('active/interrupted lock or stage')
+    return path.exists() or path.is_symlink()
+
+
+def load_normalization(raw_data, targets, split_path: Path, path: Path) -> dict:
+    """Read-only fresh numeric/provenance verification; never trusts saved hashes alone.
+
+    Caller must obtain raw_data/targets from the verified original train loader.
+    No original test partition is decoded or needed by this API.
+    """
+    path, split_path = Path(path), Path(split_path)
+    if not _normalization_state(path):
+        raise _stats_error(f'missing stats: {path}; prepare explicitly')
+    return _read_normalization(path, _normalization_record(raw_data, targets, split_path))
+
+
+def prepare_normalization(raw_data, targets, split_path: Path, path: Path) -> dict:
+    """Create exclusively, or verify/reuse with byte/mtime preservation.
+
+    Lock is removed last. Failures retain stage/partials/lock; no repair/overwrite.
+    This is a readiness protocol, not a power-loss filesystem transaction.
+    """
+    path, split_path = Path(path), Path(split_path)
+    exists = _normalization_state(path)
+    expected = _normalization_record(raw_data, targets, split_path)
+    if exists:
+        return _read_normalization(path, expected)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock, stage = _stats_paths(path)
+    try:
+        with lock.open('xb') as stream:
+            stream.write(b'DATA-003 incomplete until successful verification and lock removal\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        with stage.open('x', encoding='utf-8', newline='\n') as stream:
+            stream.write(json.dumps(expected, indent=2, sort_keys=True, allow_nan=False) + '\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        _read_normalization(stage, expected)
+        # Exclusive copy, including a final flush/fsync; no os.replace overwrite.
+        _publish_split_file(stage, path)
+        result = _read_normalization(path, expected)
+        stage.unlink()
+        lock.unlink()
+        return result
+    except (OSError, ValueError, DataIntegrityError) as exc:
+        raise _stats_error(f'creation interrupted; diagnostic artifacts retained: {exc}') from exc
+# END DATA-003 normalization v1

@@ -163,6 +163,39 @@ pair переиспользуется без изменения bytes/hashes/fil
 проверяются отдельно; cross-version/platform byte-identical regeneration не обещана.
 General checkpoint/RNG/backup infrastructure REPRO-001 остаётся TODO.
 
+#### DATA-003 normalization artifact v1 (implemented)
+
+`compute_normalization(raw_data, train_indices)` returns strict numeric statistics;
+tiny synthetic arrays are allowed for offline oracles. `prepare_normalization` /
+`load_normalization(raw_data, targets, split_path, path)` require a verified frozen
+split via `load_split`; callers first use `load_cifar10(..., train=True)`. Neither
+API reads the original test partition. The actual split supplies exactly45000 IDs.
+
+Schema1 contains exactly `schema_version`, `statistics`, `statistics_sha256`,
+`provenance`, `creator`. Statistics: RGB channels, scale1/255, ddof0, samples,
+pixels_per_channel, mean/std (full float64 JSON precision), train_indices_sha256,
+algorithm `float64-two-pass-chunks256-v1`. First pass sums uint8/255 in float64
+over fixed256-image chunks; second sums squared deviations from that mean.
+Population std uses N×1024. Finite positive std is mandatory. No augmentation.
+
+Provenance includes verified split dataset/original-label identities, split NPZ
+and manifest FILE hashes, and selected train pixel SEMANTIC hash (compact sorted
+JSON dtype/shape + LF + C-order uint8 bytes, as with split array identities).
+Statistics semantic hash is SHA-256 of ASCII compact sorted statistics JSON;
+normalization FILE hash separately hashes complete saved bytes. Creator hashes
+the LF-normalized DATA-003 normalization v1 source region and records NumPy.
+No timestamps or machine paths are necessary in this deterministic record.
+
+Read/reuse recalculates all numbers and identities from supplied verified train
+pixels and persisted IDs, compares strict canonical JSON (including scalar types),
+rejects duplicate/unknown/missing keys and leaves bytes/mtimes intact. Creation
+uses sibling `.normalization.json.write.lock` and `.normalization.json.stage`,
+exclusive fsynced publication and verification, then stage deletion and lock last.
+Missing/tampered/partial/foreign stats or interrupted diagnostics fail and remain
+preserved. Recovery: inspect/preserve them and explicitly select a new stats path;
+no automatic repair. This readiness protocol is not a power-loss transaction.
+General REPRO-001/checkpoint/backup work and CORR-001 integration remain pending.
+
 ### `src/models.py`
 
 - `CompactCNN(num_classes=10, dropout=0.2)`; `forward(x: Tensor[N,3,32,32]) -> Tensor[N,10]` logits; `initialize_weights()` либо internal init helper.
