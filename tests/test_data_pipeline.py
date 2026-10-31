@@ -4,6 +4,7 @@ import hashlib
 import io
 import json
 import pickle
+import random
 import socket
 import subprocess
 import sys
@@ -11,6 +12,7 @@ import tarfile
 
 import numpy as np
 import pytest
+import torch
 from torchvision.datasets import CIFAR10
 
 from src import data
@@ -414,3 +416,80 @@ def test_bounded_official_download(tmp_path, monkeypatch, failure):
         assert data._download_archive(path) == data.SOURCE_URL
         assert path.read_bytes() == payload
         assert requests == [f'bytes=0-{1024 * 1024 - 1}', f'bytes={1024 * 1024}-{len(payload) - 1}']
+
+
+@pytest.fixture
+def split_targets():
+    # Interleaved labels make original-index/label alignment observable.
+    return np.tile(np.arange(10, dtype=np.int64), 5000)
+
+
+def test_exact_stratified_algorithm_and_invariants(split_targets):
+    labels = data._validate_split_targets(split_targets)
+    train, val = data._stratified_indices(labels, 494)
+    oracle = np.random.default_rng(494)
+    expected_val = np.sort(np.concatenate([
+        oracle.permutation(np.arange(k, 50000, 10))[:500] for k in range(10)]))
+    np.testing.assert_array_equal(val, expected_val)
+    np.testing.assert_array_equal(train, np.setdiff1d(np.arange(50000), expected_val))
+    data._validate_split_indices(train, val, labels)
+    assert train.dtype == val.dtype == np.dtype('<i8')
+    assert np.bincount(labels[train]).tolist() == [4500] * 10
+    assert np.bincount(labels[val]).tolist() == [500] * 10
+    assert not np.intersect1d(train, val).size
+    assert np.unique(np.concatenate((train, val))).size == 50000
+
+
+@pytest.mark.parametrize('seed', [42, 123, 2026, 495, -1, True, 494.0, '494', np.int64(494), None])
+def test_split_wrong_seed(split_targets, seed):
+    with pytest.raises(data.DataIntegrityError, match='integer 494'):
+        data._stratified_indices(split_targets, seed)
+
+
+@pytest.mark.parametrize('kind', ['short', 'test', 'matrix', 'float', 'bool', 'object',
+                                 'mixed_bool', 'negative', 'eleven', 'unbalanced', 'generator'])
+def test_split_invalid_targets(split_targets, kind):
+    targets = split_targets.copy()
+    if kind == 'short': targets = targets[:-1]
+    elif kind == 'test': targets = targets[:10000]
+    elif kind == 'matrix': targets = targets.reshape(5000, 10)
+    elif kind in ('float', 'bool', 'object'): targets = targets.astype(kind)
+    elif kind == 'mixed_bool': targets = targets.tolist(); targets[0] = False
+    elif kind == 'negative': targets[0] = -1
+    elif kind == 'eleven': targets[0] = 10
+    elif kind == 'unbalanced': targets[0] = 1
+    elif kind == 'generator': targets = iter(targets)
+    with pytest.raises(data.DataIntegrityError):
+        data._validate_split_targets(targets)
+
+
+@pytest.mark.parametrize('kind', ['duplicate', 'overlap', 'negative', 'range', 'missing',
+                                 'dtype', 'shape', 'unsorted', 'alignment'])
+def test_split_rejects_invalid_indices(split_targets, kind):
+    train, val = data._stratified_indices(split_targets, 494)
+    if kind == 'duplicate': train[1] = train[0]
+    elif kind == 'overlap': val[0] = train[0]; val.sort()
+    elif kind == 'negative': train[0] = -1
+    elif kind == 'range': val[-1] = 50000
+    elif kind == 'missing': train = train[:-1]
+    elif kind == 'dtype': train = train.astype(np.int32)
+    elif kind == 'shape': val = val.reshape(500, 10)
+    elif kind == 'unsorted': val = val[::-1]
+    elif kind == 'alignment':
+        a = np.flatnonzero(split_targets[train] == 0)[0]
+        b = np.flatnonzero(split_targets[val] == 1)[0]
+        train[a], val[b] = val[b], train[a]
+        train.sort(); val.sort()
+    with pytest.raises(data.DataIntegrityError):
+        data._validate_split_indices(train, val, split_targets)
+
+
+def test_split_global_rng_isolation(split_targets):
+    python_state, numpy_state, torch_state = random.getstate(), np.random.get_state(), torch.get_rng_state()
+    labels = data._validate_split_targets(split_targets)
+    data._validate_split_indices(*data._stratified_indices(labels, 494), labels)
+    assert random.getstate() == python_state
+    after = np.random.get_state()
+    assert numpy_state[0] == after[0] and numpy_state[2:] == after[2:]
+    np.testing.assert_array_equal(numpy_state[1], after[1])
+    assert torch.equal(torch.get_rng_state(), torch_state)

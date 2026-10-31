@@ -1,4 +1,4 @@
-"""Verified raw CIFAR-10 only; no splits, transforms or training decisions.
+"""Verified raw CIFAR-10 and fixed original-train split; no transforms/training.
 
 MD5 references come from the official dataset page and torchvision v0.24.0.
 Files are checked before torchvision unpickles them. MD5 is an upstream
@@ -6,6 +6,7 @@ integrity reference, not a cryptographic authenticity guarantee.
 """
 
 import hashlib
+from collections.abc import Sequence
 from pathlib import Path
 import shutil
 import tarfile
@@ -263,3 +264,67 @@ def ensure_cifar10(root: Path) -> dict:
         raise _error(f'Unsafe staging cleanup target: {stage}')
     shutil.rmtree(stage)  # Only the uniquely created, owned staging directory.
     return provenance
+
+
+# BEGIN DATA-002 v1 (LF-normalized source identity; keep DATA-003 outside this region)
+SPLIT_NAME = 'cifar10_split_v1.npz'
+SPLIT_MANIFEST = 'split_manifest.json'
+SPLIT_SEED = 494
+
+
+def _split_error(detail: str) -> DataIntegrityError:
+    return DataIntegrityError(
+        f'Split verification failed: {detail}. Preserve existing split/diagnostic '
+        'artifacts; inspect the mismatch or use a new empty split directory. '
+        'No automatic repair or replacement is performed.'
+    )
+
+
+def _validate_split_targets(targets: Sequence[int]) -> np.ndarray:
+    """Only original-train-shaped labels; actual source is verified by the CLI."""
+    if not isinstance(targets, (Sequence, np.ndarray)):
+        raise _split_error('targets must be a sequence of 50000 integer labels')
+    try:
+        labels = np.asarray(targets)
+    except (TypeError, ValueError) as exc:
+        raise _split_error('targets must be a flat integer sequence') from exc
+    if (labels.shape != (50000,) or labels.dtype.kind not in 'iu'
+            or (not isinstance(targets, np.ndarray)
+                and any(isinstance(x, (bool, np.bool_)) for x in targets))):
+        raise _split_error('targets must be 50000 integer labels (no bool/float/object)')
+    if np.any(labels > 9) or np.any(labels < 0):
+        raise _split_error('targets must contain only classes 0..9')
+    labels = labels.astype('<i8', copy=True)
+    if not np.array_equal(np.bincount(labels, minlength=10), np.full(10, 5000)):
+        raise _split_error('original train requires exactly 5000 targets per class')
+    return labels
+
+
+def _stratified_indices(labels: np.ndarray, split_seed: int) -> tuple[np.ndarray, np.ndarray]:
+    """Protocol v1: one local RNG, classes 0..9, first 500/class to validation."""
+    if type(split_seed) is not int or split_seed != SPLIT_SEED:
+        raise _split_error('split_seed must be the Python integer 494, independent of model seed')
+    rng = np.random.default_rng(split_seed)
+    train, val = [], []
+    for label in range(10):
+        candidates = np.flatnonzero(labels == label)  # Ascending original indices.
+        permuted = rng.permutation(candidates)
+        val.append(permuted[:500])
+        train.append(permuted[500:])
+    return (np.sort(np.concatenate(train)).astype('<i8'),
+            np.sort(np.concatenate(val)).astype('<i8'))
+
+
+def _validate_split_indices(train: np.ndarray, val: np.ndarray, labels: np.ndarray) -> None:
+    for name, indices, n, per_class in (('train', train, 45000, 4500), ('val', val, 5000, 500)):
+        if indices.dtype != np.dtype('<i8') or indices.shape != (n,):
+            raise _split_error(f'{name} indices must be little-endian int64 [{n}]')
+        if np.any(indices < 0) or np.any(indices >= 50000):
+            raise _split_error(f'{name} indices outside original-train namespace 0..49999')
+        if np.any(np.diff(indices) <= 0):
+            raise _split_error(f'{name} indices must be sorted and unique')
+        if not np.array_equal(np.bincount(labels[indices], minlength=10), np.full(10, per_class)):
+            raise _split_error(f'{name} label/index alignment requires {per_class} per class')
+    if not np.array_equal(np.sort(np.concatenate((train, val))), np.arange(50000)):
+        raise _split_error('train/val must be disjoint and exhaustive; overlap or missing IDs')
+# END DATA-002 v1
