@@ -1,0 +1,4 @@
+# Keep versioned split/evidence bytes portable across Windows checkouts.
+data/splits/*.npz binary
+data/splits/*.json text eol=lf
+report/data002_evidence.json text eol=lf

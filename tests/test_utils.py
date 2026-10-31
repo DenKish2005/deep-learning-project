@@ -33,7 +33,9 @@ def test_config_schema_and_controlled_fields(pair):
     assert clean['seeds'] == [42, 123, 2026]
     assert clean['augmentation']['probabilities'] == [1, 0, 0, 0]
     assert robust['augmentation']['probabilities'] == [0.5, 0.17, 0.17, 0.16]
-    assert clean['dataset']['split_sha256'] is None
+    # Schema tests read configs only; actual NPZ identity is checked separately opt-in.
+    assert clean['dataset']['split_sha256'] == robust['dataset']['split_sha256']
+    assert len(clean['dataset']['split_sha256']) == 64
     assert clean['dataset']['normalization_sha256'] is None
     assert clean['corruptions']['blur_sigma'] == [0.3, 0.7, 1.1, 1.5, 2.0]
 

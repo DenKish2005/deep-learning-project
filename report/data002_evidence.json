@@ -1,0 +1,203 @@
+{
+  "checks": {
+    "actual_opt_in": {
+      "command": ".venv/Scripts/python.exe -m pytest tests/test_cifar10_local.py tests/test_split_local.py -q --basetemp=.venv/pytest-data002-actual",
+      "environment": {
+        "RUN_CIFAR_INTEGRATION": "1",
+        "RUN_CIFAR_SPLIT": "1"
+      },
+      "fail": 0,
+      "pass": 5,
+      "seconds": 67.61,
+      "skip": 0
+    },
+    "baseline": {
+      "command": ".venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-data002-baseline",
+      "fail": 0,
+      "pass": 180,
+      "seconds": 50.45,
+      "skip": 3
+    },
+    "controlled_config_cli": "PASS: 2 configs; controlled settings equal (schema only)",
+    "cuda_smoke": "SKIP: dependencies/backend unchanged; not rerun",
+    "default_final": {
+      "command": ".venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-data002-final",
+      "fail": 0,
+      "pass": 282,
+      "seconds": 104.69,
+      "skip": 5
+    },
+    "direct_prepare_verify_raw_verify": "PASS: exit0 for all three modes",
+    "pip_check": "PASS: No broken requirements found",
+    "training": "SKIP: outside DATA-002 scope"
+  },
+  "date_local": "2026-10-31",
+  "implementation_revision": "f4d7b42f07b64ac3faff458b6212aa081d2e7724",
+  "limitations": [
+    "No training readiness: normalization unresolved; loaders/corruptions/models absent",
+    "No independent human review, second-machine replay or course/team sign-off",
+    "Hashes are integrity identities, not signed external authentication",
+    "Fresh-process byte determinism observed only in locked local NumPy; cross-version/platform not promised",
+    "Readiness lock is not a multi-file atomic filesystem or power-loss guarantee"
+  ],
+  "reuse": {
+    "all_raw_hashes_and_mtimes_unchanged": true,
+    "commands": [
+      "create_split/load_split",
+      "--prepare-split --split-seed 494",
+      "--verify-split",
+      "--verify-only"
+    ],
+    "historical_raw_manifest_after": {
+      "mtime_ns": 1793347198064308700,
+      "sha256": "62cd6967926f0546a09cba8ec6424a0f14f954a5841afa9c419c95e5332d68b7"
+    },
+    "historical_raw_manifest_before": {
+      "mtime_ns": 1793347198064308700,
+      "sha256": "62cd6967926f0546a09cba8ec6424a0f14f954a5841afa9c419c95e5332d68b7"
+    },
+    "raw_file_count_including_preserved_diagnostics": 11,
+    "split_after": {
+      "cifar10_split_v1.npz": {
+        "mtime_ns": 1793435023883509900,
+        "sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284"
+      },
+      "split_manifest.json": {
+        "mtime_ns": 1793435023887559000,
+        "sha256": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21"
+      }
+    },
+    "split_before": {
+      "cifar10_split_v1.npz": {
+        "mtime_ns": 1793435023883509900,
+        "sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284"
+      },
+      "split_manifest.json": {
+        "mtime_ns": 1793435023887559000,
+        "sha256": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21"
+      }
+    }
+  },
+  "runtime": {
+    "numpy": "2.5.4",
+    "python": "3.12.10"
+  },
+  "schema_version": 1,
+  "source": {
+    "archive": {
+      "bytes": 170498071,
+      "md5": "c58f30108f718f92721af3b95e74349a",
+      "sha256": "6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce"
+    },
+    "archive_name": "cifar-10-python.tar.gz",
+    "count": 50000,
+    "namespace": "cifar10-python/original-train",
+    "original_train_files": {
+      "batches.meta": {
+        "bytes": 158,
+        "md5": "5ff9c542aee3614f3951f8cda6e48888",
+        "sha256": "f962466ef690d46b226450fb9aadc74ba4bc64a76aa526b5827fe4bc5c7125cb"
+      },
+      "data_batch_1": {
+        "bytes": 31035704,
+        "md5": "c99cafc152244af753f735de768cd75f",
+        "sha256": "54636561a3ce25bd3e19253c6b0d8538147b0ae398331ac4a2d86c6d987368cd"
+      },
+      "data_batch_2": {
+        "bytes": 31035320,
+        "md5": "d4bba439e000b95fd0a9bffe97cbabec",
+        "sha256": "766b2cef9fbc745cf056b3152224f7cf77163b330ea9a15f9392beb8b89bc5a8"
+      },
+      "data_batch_3": {
+        "bytes": 31035999,
+        "md5": "54ebc095f3ab1f0389bbae665268c751",
+        "sha256": "0f00d98ebfb30b3ec0ad19f9756dc2630b89003e10525f5e148445e82aa6a1f9"
+      },
+      "data_batch_4": {
+        "bytes": 31035696,
+        "md5": "634d18415352ddfa80567beed471001a",
+        "sha256": "3f7bb240661948b8f4d53e36ec720d8306f5668bd0071dcb4e6c947f78e9682b"
+      },
+      "data_batch_5": {
+        "bytes": 31035623,
+        "md5": "482c414d41f54cd18b22e5b47cb7c3cb",
+        "sha256": "d91802434d8376bbaeeadf58a737e3a1b12ac839077e931237e0dcd43adcb154"
+      }
+    },
+    "targets_sha256": "bba2873f62cbf0374dffec49080d49cdf34353988e10b1410f20e65059eb7535"
+  },
+  "split": {
+    "arrays": {
+      "train_indices": {
+        "class_counts": [
+          4500,
+          4500,
+          4500,
+          4500,
+          4500,
+          4500,
+          4500,
+          4500,
+          4500,
+          4500
+        ],
+        "dtype": "<i8",
+        "sha256": "7d59b48de10d46620a62bdc85d9d3dd62a8c2a2b902617c6807569f4a0a2ee41",
+        "shape": [
+          45000
+        ]
+      },
+      "val_indices": {
+        "class_counts": [
+          500,
+          500,
+          500,
+          500,
+          500,
+          500,
+          500,
+          500,
+          500,
+          500
+        ],
+        "dtype": "<i8",
+        "sha256": "40ddd3d462690ac2f02790e1bacc3365bc83936fa48c74462e90a55552b93f13",
+        "shape": [
+          5000
+        ]
+      }
+    },
+    "creator": {
+      "numpy": "2.5.4",
+      "sha256_lf": "4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96",
+      "source_region": "src/data.py:DATA-002-v1"
+    },
+    "invariants": {
+      "disjoint": true,
+      "exact_protocol_replay": true,
+      "exhaustive_original_train": true,
+      "little_endian_int64": true,
+      "range_0_49999": true,
+      "sorted_unique": true,
+      "train_per_class_4500": true,
+      "val_per_class_500": true
+    },
+    "manifest_path": "data/splits/split_manifest.json",
+    "manifest_sha256": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21",
+    "npz": {
+      "bytes": 76550,
+      "filename": "cifar10_split_v1.npz",
+      "sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284"
+    },
+    "npz_path": "data/splits/cifar10_split_v1.npz"
+  },
+  "task": "DATA-002",
+  "timezone": "Asia/Qyzylorda",
+  "verification": "Codex agent; independent human review pending",
+  "verification_tests_sha256_lf": {
+    "tests/test_cifar10_local.py": "32f29bbfacba409dd9bd688cc66c495ab490e9065fa5a4bc033c681a24b8ef9c",
+    "tests/test_data_pipeline.py": "1232dedc67bd0d191b08ee92b1b8a8ac9021b21b49cf66443a7d6c6aa6ef3247",
+    "tests/test_split_local.py": "33ddbf1a1f6a99e2cc46bd9238833a511a0ce29d2816c572c5405136a908ec09",
+    "tests/test_utils.py": "f10a8655f700f1457854b11425a21a6df4d613ab081e5c7ee9e098d561bc28ff"
+  }
+}

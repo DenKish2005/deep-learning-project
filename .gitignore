@@ -17,6 +17,8 @@ data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+data/splits/.split-write.lock
+data/splits/.split-stage-*/
 
 # Outputs / checkpoints
 outputs/checkpoints/*

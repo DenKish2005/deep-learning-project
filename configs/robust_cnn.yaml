@@ -9,7 +9,7 @@ dataset:
   root: data/raw
   split_path: data/splits/cifar10_split_v1.npz
   normalization_path: data/splits/normalization.json
-  split_sha256: null
+  split_sha256: 1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284
   normalization_sha256: null
   split_seed: 494
   train_size: 45000
