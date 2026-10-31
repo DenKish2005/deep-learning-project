@@ -1,0 +1,81 @@
+{
+  "creator": {
+    "numpy": "2.5.4",
+    "sha256_lf": "1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c",
+    "source_region": "src/data.py:DATA-003-normalization-v1"
+  },
+  "provenance": {
+    "dataset": {
+      "archive_md5_reference": "c58f30108f718f92721af3b95e74349a",
+      "archive_name": "cifar-10-python.tar.gz",
+      "classes": [
+        "airplane",
+        "automobile",
+        "bird",
+        "cat",
+        "deer",
+        "dog",
+        "frog",
+        "horse",
+        "ship",
+        "truck"
+      ],
+      "name": "cifar10-python",
+      "source_page": "https://cave.cs.toronto.edu/kriz/cifar.html",
+      "source_url": "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz",
+      "train_files_md5_reference": {
+        "batches.meta": "5ff9c542aee3614f3951f8cda6e48888",
+        "data_batch_1": "c99cafc152244af753f735de768cd75f",
+        "data_batch_2": "d4bba439e000b95fd0a9bffe97cbabec",
+        "data_batch_3": "54ebc095f3ab1f0389bbae665268c751",
+        "data_batch_4": "634d18415352ddfa80567beed471001a",
+        "data_batch_5": "482c414d41f54cd18b22e5b47cb7c3cb"
+      }
+    },
+    "original_train": {
+      "class_counts": [
+        5000,
+        5000,
+        5000,
+        5000,
+        5000,
+        5000,
+        5000,
+        5000,
+        5000,
+        5000
+      ],
+      "count": 50000,
+      "namespace": "cifar10-python/original-train",
+      "targets_sha256": "bba2873f62cbf0374dffec49080d49cdf34353988e10b1410f20e65059eb7535"
+    },
+    "split_file_sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284",
+    "split_manifest_sha256": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21",
+    "train_pixels_sha256": "f421843aa7eddc42d869105fb764b6d533b1d6e4d533458a30ebdbf6b70d26a6"
+  },
+  "schema_version": 1,
+  "statistics": {
+    "algorithm": "float64-two-pass-chunks256-v1",
+    "channels": [
+      "R",
+      "G",
+      "B"
+    ],
+    "ddof": 0,
+    "mean": [
+      0.4913397271582242,
+      0.48209963252314836,
+      0.44655201729302807
+    ],
+    "pixels_per_channel": 46080000,
+    "samples": 45000,
+    "scale": 0.00392156862745098,
+    "std": [
+      0.2469009494849942,
+      0.24334132835714897,
+      0.2615066322799661
+    ],
+    "train_indices_sha256": "7d59b48de10d46620a62bdc85d9d3dd62a8c2a2b902617c6807569f4a0a2ee41"
+  },
+  "statistics_sha256": "4450836de3384df4286535985ed0b56b9a411f3033a60ecf57bbfe5edcb01877"
+}

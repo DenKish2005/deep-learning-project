@@ -69,7 +69,8 @@ def test_actual_persisted_split_contract_and_config_identity():
     observed = hashlib.sha256((SPLITS / data.SPLIT_NAME).read_bytes()).hexdigest()
     for config in configs:
         assert config['dataset']['split_sha256'] == observed
-        assert config['dataset']['normalization_sha256'] is None
+        # DATA-003 resolves stats symmetrically; this split-only test does not read it.
+        assert config['dataset']['normalization_sha256'] == configs[0]['dataset']['normalization_sha256']
 
 
 def test_actual_api_cli_reuse_preserves_hashes_and_mtimes():

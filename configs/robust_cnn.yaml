@@ -1,4 +1,4 @@
-# Preparation config: split/stats artifacts are unresolved.
+# Verified split/stats identities; training readiness remains a separate gate.
 schema_version: 1
 model_name: robust_cnn
 architecture: compact_cnn_v1
@@ -10,7 +10,7 @@ dataset:
   split_path: data/splits/cifar10_split_v1.npz
   normalization_path: data/splits/normalization.json
   split_sha256: 1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284
-  normalization_sha256: null
+  normalization_sha256: 332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688
   split_seed: 494
   train_size: 45000
   val_size: 5000

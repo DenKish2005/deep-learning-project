@@ -2,3 +2,4 @@
 data/splits/*.npz binary
 data/splits/*.json text eol=lf
 report/data002_evidence.json text eol=lf
+report/data003_evidence.json text eol=lf
