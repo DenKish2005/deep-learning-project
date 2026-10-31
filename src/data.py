@@ -7,10 +7,13 @@ integrity reference, not a cryptographic authenticity guarantee.
 
 import hashlib
 from collections.abc import Sequence
+import json
+import os
 from pathlib import Path
 import shutil
 import tarfile
 import tempfile
+import zipfile
 from urllib.parse import urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
@@ -327,4 +330,180 @@ def _validate_split_indices(train: np.ndarray, val: np.ndarray, labels: np.ndarr
             raise _split_error(f'{name} label/index alignment requires {per_class} per class')
     if not np.array_equal(np.sort(np.concatenate((train, val))), np.arange(50000)):
         raise _split_error('train/val must be disjoint and exhaustive; overlap or missing IDs')
+
+
+def _array_sha256(array: np.ndarray) -> str:
+    """Semantic identity: compact sorted JSON dtype/shape, LF, C-order bytes."""
+    header = json.dumps({'dtype': array.dtype.str, 'shape': list(array.shape)},
+                        sort_keys=True, separators=(',', ':')).encode('ascii')
+    return hashlib.sha256(header + b'\n' + array.tobytes(order='C')).hexdigest()
+
+
+def _split_code_sha256() -> str:
+    # Scope the creation identity to this versioned implementation, so adding
+    # unrelated DATA-003 functions outside the region does not invalidate v1.
+    source = Path(__file__).read_text(encoding='utf-8')
+    region = source.split('\n# BEGIN DATA-002 v1 ', 1)[1].split('\n# END DATA-002 v1', 1)[0]
+    return hashlib.sha256(region.encode('utf-8')).hexdigest()
+
+
+def _split_record(labels: np.ndarray, train: np.ndarray, val: np.ndarray, path: Path) -> dict:
+    return {
+        'schema_version': 1,
+        'algorithm': {'name': 'cifar10-stratified-default_rng', 'version': 1,
+                      'seed': SPLIT_SEED, 'class_order': list(range(10)),
+                      'validation_per_class': 500, 'final_order': 'ascending'},
+        'dataset': {'name': 'cifar10-python', 'source_page': SOURCE_PAGE,
+                    'source_url': SOURCE_URL, 'archive_name': ARCHIVE,
+                    'archive_md5_reference': ARCHIVE_MD5,
+                    'train_files_md5_reference': {k: v for k, v in FILE_MD5.items()
+                                                if k.startswith('data_batch_') or k == 'batches.meta'},
+                    'classes': list(CLASSES)},
+        'original_train': {'namespace': 'cifar10-python/original-train', 'count': 50000,
+                           'class_counts': [5000] * 10,
+                           'targets_sha256': _array_sha256(labels)},
+        'arrays': {name: {'dtype': '<i8', 'shape': [len(indices)],
+                          'sha256': _array_sha256(indices),
+                          'class_counts': np.bincount(labels[indices], minlength=10).tolist()}
+                   for name, indices in (('train_indices', train), ('val_indices', val))},
+        'npz': {'filename': SPLIT_NAME, 'sha256': _hash(path, 'sha256'),
+                'bytes': path.stat().st_size},
+        'creator': {'source_region': 'src/data.py:DATA-002-v1',
+                    'sha256_lf': _split_code_sha256(), 'numpy': np.__version__},
+    }
+
+
+def _split_state(out_dir: Path) -> bool:
+    """Return whether the complete pair exists; never regard diagnostics as ready."""
+    if out_dir.is_symlink() or (out_dir.exists() and not out_dir.is_dir()):
+        raise _split_error(f'non-directory/symlink split directory: {out_dir}')
+    if (out_dir / '.split-write.lock').exists() or (out_dir / '.split-write.lock').is_symlink():
+        raise _split_error(f'interrupted or active write lock in {out_dir}')
+    if list(out_dir.glob('.split-stage-*')):
+        raise _split_error(f'interrupted diagnostic staging in {out_dir}')
+    paths = [out_dir / SPLIT_NAME, out_dir / SPLIT_MANIFEST]
+    present = [p.exists() or p.is_symlink() for p in paths]
+    if any(present) and not all(present):
+        raise _split_error(f'partial artifact pair in {out_dir}')
+    for path, exists in zip(paths, present):
+        if exists and (path.is_symlink() or not path.is_file()):
+            raise _split_error(f'non-regular split artifact: {path}')
+    return all(present)
+
+
+def _unique_json_pairs(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f'duplicate manifest key: {key}')
+        result[key] = value
+    return result
+
+
+def _read_split_pair(path: Path, labels: np.ndarray) -> tuple[np.ndarray, np.ndarray, dict]:
+    """Fresh verification, including a protocol replay oracle; never replace arrays."""
+    try:
+        # Bound decoding and reject duplicate/extra ZIP members before NumPy.
+        if path.stat().st_size > 1000000:
+            raise ValueError('NPZ exceeds fixed split size limit')
+        with zipfile.ZipFile(path) as bundle:
+            members = bundle.infolist()
+            if (sorted(m.filename for m in members) != ['train_indices.npy', 'val_indices.npy']
+                    or any(m.file_size > 400000 for m in members)):
+                raise ValueError('unexpected NPZ members or uncompressed size')
+        with np.load(path, allow_pickle=False) as bundle:
+            train, val = bundle['train_indices'], bundle['val_indices']
+        _validate_split_indices(train, val, labels)
+        expected = _stratified_indices(labels, SPLIT_SEED)
+        if any(not np.array_equal(a, b) for a, b in zip((train, val), expected)):
+            raise ValueError('indices differ from exact seed494 protocol algorithm')
+        manifest_path = path.parent / SPLIT_MANIFEST
+        if manifest_path.stat().st_size > 65536:
+            raise ValueError('manifest exceeds schema size limit')
+        record = json.loads(manifest_path.read_text(encoding='utf-8'),
+                            object_pairs_hook=_unique_json_pairs)
+        expected_record = _split_record(labels, train, val, path)
+        # Canonical JSON comparison distinguishes bool/int/float, unknown keys,
+        # altered source/seed/label order, hashes and creation implementation.
+        if json.dumps(record, sort_keys=True, allow_nan=False) != json.dumps(expected_record, sort_keys=True):
+            raise ValueError('manifest schema/provenance/hash mismatch against verified inputs and code')
+        return train, val, record
+    except DataIntegrityError:
+        raise
+    except (OSError, ValueError, TypeError, KeyError, EOFError, zipfile.BadZipFile) as exc:
+        raise _split_error(f'invalid split pair at {path}: {exc}') from exc
+
+
+def load_split(path: Path, targets: Sequence[int]) -> tuple[np.ndarray, np.ndarray]:
+    """Read-only v1 NPZ+manifest verification against supplied original-train labels.
+
+    Returns sorted little-endian int64 train/val arrays, not labels or test IDs.
+    Source images must first be verified by load_cifar10; arbitrary balanced
+    synthetic labels are accepted for offline unit tests, not certified as CIFAR.
+    """
+    path = Path(path)
+    labels = _validate_split_targets(targets)
+    if path.name != SPLIT_NAME:
+        raise _split_error(f'expected canonical NPZ filename {SPLIT_NAME}')
+    if not _split_state(path.parent):
+        raise _split_error(f'missing split pair in {path.parent}; prepare it explicitly')
+    train, val, _ = _read_split_pair(path, labels)
+    return train, val
+
+
+def _publish_split_file(source: Path, destination: Path) -> None:
+    """Exclusive publication; a failed copy remains partial and lock-protected."""
+    with source.open('rb') as src, destination.open('xb') as dst:
+        shutil.copyfileobj(src, dst)
+        dst.flush()
+        os.fsync(dst.fileno())
+
+
+def create_split(targets: Sequence[int], split_seed: int, out_dir: Path) -> dict:
+    """Create once or fully verify/reuse; return the exact schema-v1 manifest dict.
+
+    The write lock is the readiness guard for this two-file transaction. Failure
+    retains lock/staging/partials for diagnosis; recovery requires preserving
+    that directory and explicitly preparing a new empty one. No silent repair.
+    """
+    labels = _validate_split_targets(targets)
+    train, val = _stratified_indices(labels, split_seed)
+    _validate_split_indices(train, val, labels)
+    out_dir = Path(out_dir)
+    if _split_state(out_dir):
+        return _read_split_pair(out_dir / SPLIT_NAME, labels)[2]
+    out_dir.mkdir(parents=True, exist_ok=True)
+    lock = out_dir / '.split-write.lock'
+    try:
+        with lock.open('xb') as stream:
+            stream.write(b'DATA-002 incomplete until this lock is removed by successful creation\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        stage = Path(tempfile.mkdtemp(prefix='.split-stage-', dir=out_dir))
+        # A second creator may have won before lock acquisition. Never replace it.
+        if any((out_dir / name).exists() or (out_dir / name).is_symlink()
+               for name in (SPLIT_NAME, SPLIT_MANIFEST)):
+            raise _split_error('destination appeared during creation')
+        staged_npz = stage / SPLIT_NAME
+        with staged_npz.open('xb') as stream:
+            np.savez_compressed(stream, train_indices=train, val_indices=val)
+            stream.flush()
+            os.fsync(stream.fileno())
+        record = _split_record(labels, train, val, staged_npz)
+        with (stage / SPLIT_MANIFEST).open('x', encoding='utf-8', newline='\n') as stream:
+            stream.write(json.dumps(record, indent=2, sort_keys=True, allow_nan=False) + '\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        _read_split_pair(staged_npz, labels)
+        for name in (SPLIT_NAME, SPLIT_MANIFEST):
+            _publish_split_file(stage / name, out_dir / name)
+        _read_split_pair(out_dir / SPLIT_NAME, labels)
+        # Remove only our own known files and empty staging directory.
+        for name in (SPLIT_NAME, SPLIT_MANIFEST):
+            (stage / name).unlink()
+        stage.rmdir()
+        lock.unlink()  # Last action: pair is now ready for read-only verification.
+        return record
+    except (OSError, ValueError, DataIntegrityError) as exc:
+        raise _split_error(f'creation interrupted in {out_dir}; diagnostic artifacts retained: {exc}') from exc
 # END DATA-002 v1

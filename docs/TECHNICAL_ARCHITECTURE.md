@@ -120,14 +120,47 @@ format можно выбрать командой. Дополнительные 
 ### `src/data.py`
 
 - `load_cifar10(root: Path, train: bool, download=False) -> torchvision.datasets.CIFAR10`: raw RGB/PIL + labels, dataset integrity через torchvision; offline missing data → actionable error, не silent network call.
-- **DATA-001 implemented:** explicit official-HTTPS acquisition, archive/seven-file checksum verification before unpickle, requested partition semantic contract; `inspect_cifar10(root)` проверяет оба original partitions только для integrity. CLI supports only `--root`/`--verify-only`, schema-v1 local manifest ignored. Split/stats/transforms APIs ниже остаются future.
-- `create_split(targets: Sequence[int], split_seed: int, out_dir: Path) -> dict`: stratified indices train/val, save manifest; при существующем manifest сначала verify, не перезаписывать.
-- `load_split(path: Path, targets) -> tuple[np.ndarray, np.ndarray]`: uniqueness/disjointness/exhaustiveness/hash checks.
+- **DATA-001 implemented:** explicit official-HTTPS acquisition, archive/seven-file checksum verification before unpickle, requested partition semantic contract; `inspect_cifar10(root)` проверяет оба original partitions только для integrity. Raw CLI: `--root`/`--verify-only`, schema-v1 local manifest ignored. Stats/transforms APIs ниже остаются future.
+- **DATA-002 implemented:** `create_split(targets: Sequence[int], split_seed: int, out_dir: Path) -> dict` создаёт пару или полностью проверяет existing pair; возвращает точный schema-v1 manifest (без runtime status/path fields). Только Python int494; targets — integer sequence/array `[50000]`, classes0..9, ровно5000/class, без bool/float/object. Ошибки split contract — `DataIntegrityError`, без silent overwrite.
+- `load_split(path: Path, targets) -> tuple[np.ndarray, np.ndarray]`: read-only; path — NPZ с canonical filename `cifar10_split_v1.npz`, manifest — sibling `split_manifest.json`. Возвращает sorted little-endian int64 (`<i8`) arrays `[45000]`, `[5000]`. Проверяет dtype/range/uniqueness/disjointness/exhaustiveness/class alignment, exact protocol replay и full manifest equality с независимо вычисленным expected record. Replay служит oracle проверки; возвращаются persisted arrays.
 - `compute_normalization(raw_data: np.ndarray, train_indices) -> dict`: channel mean/std float64 accumulation по uint8/255, save full precision; только 45k.
 - `IndexedCIFAR10(base, indices, mode, normalization, run_seed, epoch=0, policy=None)`: `__getitem__ -> (Tensor[3,32,32], int label, int original_index)`; `set_epoch(epoch)` до loader iteration. Train crop/flip и robust policy; val/test deterministic.
 - `CorruptedDataset(base, condition, normalization, eval_seed)`: одинаковые test original_index и per-image noise для всех моделей.
 - `make_loaders(config, run_seed, epoch) -> dict[str, DataLoader]`: отдельный epoch sampler generator, `drop_last=False`; zero workers reference. Target dtype collate int64 `[N]`; batch images `[N,3,32,32]` float32.
 - Dependencies: torchvision, torch, numpy, corruptions, utils. Ошибка class counts, corrupted stats/std=0 или split mismatch → fail before training. Tests TEST-D01..05; DoD: 45k/5k/10k, 4500/500/1000 per class, same split hashes, clean eval deterministic.
+
+#### Split artifact contract v1
+
+NPZ содержит ровно `train_indices` и `val_indices`, без pickle. Manifest strict:
+`schema_version`, `algorithm` (name/version/seed/class_order/validation_per_class/final_order),
+`dataset` (name/source_page/source_url/archive_name/archive_md5_reference/
+train_files_md5_reference/classes), `original_train` (namespace/count/class_counts/
+targets_sha256), `arrays` (для каждого name: dtype/shape/sha256/class_counts),
+`npz` (filename/sha256/bytes), `creator` (source_region/sha256_lf/numpy).
+Unknown/missing/duplicate keys, wrong scalar types, altered source/seed/namespace/
+labels/hashes/creator отвергаются. Source references сверяются с DATA-001 constants;
+NPZ/semantic hashes пересчитываются. API проверяет связь с supplied targets;
+сертификация actual images требует сначала `load_cifar10(root, train=True)`.
+Synthetic labels в offline tests не являются official-data evidence.
+
+Semantic SHA-256: ASCII compact sorted JSON `{"dtype":"<i8","shape":[N]}`,
+один LF byte, затем C-order little-endian int64 bytes. Это identity массива с
+dtype/shape, отдельно от SHA-256 NPZ bytes. Creator SHA-256 — UTF-8/LF source region
+между маркерами DATA-002 v1 в `src/data.py` (после префикса BEGIN, до END); это
+creation implementation identity, не подпись и не full repository Git identity.
+Region и NumPy version при чтении должны совпасть. DATA-003 добавлять вне region;
+изменение split implementation требует явной compatibility/migration проверки.
+
+Creation: exclusive `.split-write.lock`, uniquely named `.split-stage-*`, flush/fsync,
+проверка staged pair, exclusive copy обоих files, повторная verification, удаление
+собственных stage files/empty directory и lock последним. Это readiness protocol
+для пары, не atomic filesystem transaction/power-loss guarantee. Active/stale lock,
+orphan staging или partial pair всегда FAIL, включая complete pair с lock.
+Interrupted diagnostics сохраняются. Recovery: сохранить failed directory и явно
+выбрать новый empty out_dir; автоматического repair/delete нет. Existing verified
+pair переиспользуется без изменения bytes/hashes/file mtimes. NPZ ZIP bytes
+проверяются отдельно; cross-version/platform byte-identical regeneration не обещана.
+General checkpoint/RNG/backup infrastructure REPRO-001 остаётся TODO.
 
 ### `src/models.py`
 

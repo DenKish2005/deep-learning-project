@@ -493,3 +493,212 @@ def test_split_global_rng_isolation(split_targets):
     assert numpy_state[0] == after[0] and numpy_state[2:] == after[2:]
     np.testing.assert_array_equal(numpy_state[1], after[1])
     assert torch.equal(torch.get_rng_state(), torch_state)
+
+
+def test_split_persistence_hashes_reuse_and_rng(tmp_path, split_targets):
+    python_state, numpy_state, torch_state = random.getstate(), np.random.get_state(), torch.get_rng_state()
+    record = data.create_split(split_targets.tolist(), 494, tmp_path)
+    before = snapshot(tmp_path)
+    train, val = data.load_split(tmp_path / data.SPLIT_NAME, split_targets)
+    assert data.create_split(split_targets, 494, tmp_path) == record
+    assert snapshot(tmp_path) == before
+    assert set(before) == {data.SPLIT_NAME, data.SPLIT_MANIFEST}
+    assert record == json.loads((tmp_path / data.SPLIT_MANIFEST).read_text())
+    assert record['npz']['sha256'] == hashlib.sha256(before[data.SPLIT_NAME][0]).hexdigest()
+    for name, array in [('train_indices', train), ('val_indices', val), ('targets', split_targets)]:
+        header = json.dumps({'dtype': '<i8', 'shape': [len(array)]}, sort_keys=True, separators=(',', ':'))
+        expected_hash = hashlib.sha256(header.encode() + b'\n' + array.astype('<i8').tobytes()).hexdigest()
+        observed = (record['original_train']['targets_sha256'] if name == 'targets'
+                    else record['arrays'][name]['sha256'])
+        assert observed == expected_hash
+    assert record['original_train']['namespace'] == 'cifar10-python/original-train'
+    assert 'test_batch' not in record['dataset']['train_files_md5_reference']
+    assert random.getstate() == python_state
+    after = np.random.get_state()
+    np.testing.assert_array_equal(after[1], numpy_state[1])
+    assert after[0] == numpy_state[0] and after[2:] == numpy_state[2:]
+    assert torch.equal(torch.get_rng_state(), torch_state)
+
+
+def test_split_fresh_process_determinism(tmp_path, split_targets):
+    first = data.create_split(split_targets, 494, tmp_path / 'first')
+    code = '''
+import json, sys
+from pathlib import Path
+import numpy as np
+from src.data import create_split
+print(json.dumps(create_split(np.tile(np.arange(10), 5000), 494, Path(sys.argv[1]))))
+'''
+    result = subprocess.run([sys.executable, '-c', code, str(tmp_path / 'fresh')],
+                            capture_output=True, text=True, timeout=60, check=True)
+    second = json.loads(result.stdout)
+    assert first['arrays'] == second['arrays']
+    assert first['original_train'] == second['original_train']
+    # Observed byte determinism in the locked NumPy/ZIP implementation only.
+    assert first['npz'] == second['npz']
+
+
+@pytest.mark.parametrize('field,value', [
+    ('schema_version', True), ('schema_version', 1.0), ('schema_version', 2),
+    ('algorithm.seed', 42), ('algorithm.version', 2), ('algorithm.class_order', list(range(9, -1, -1))),
+    ('dataset.name', 'other'), ('dataset.archive_md5_reference', '0' * 32),
+    ('dataset.source_url', 'https://example.com'), ('dataset.classes', list(reversed(data.CLASSES))),
+    ('original_train.namespace', 'cifar10-python/original-test'),
+    ('original_train.targets_sha256', '0' * 64), ('original_train.count', 10000),
+    ('arrays.train_indices.sha256', '0' * 64), ('arrays.val_indices.class_counts', [5000]),
+    ('npz.sha256', '0' * 64), ('npz.filename', '../other.npz'),
+    ('creator.sha256_lf', '0' * 64), ('creator.numpy', 'unknown'), ('extra', 1),
+])
+def test_split_manifest_tampering_rejected(tmp_path, split_targets, field, value):
+    record = data.create_split(split_targets, 494, tmp_path)
+    current = record
+    parts = field.split('.')
+    for key in parts[:-1]:
+        current = current[key]
+    current[parts[-1]] = value
+    (tmp_path / data.SPLIT_MANIFEST).write_text(json.dumps(record), encoding='utf-8')
+    before = snapshot(tmp_path)
+    for operation in (lambda: data.load_split(tmp_path / data.SPLIT_NAME, split_targets),
+                      lambda: data.create_split(split_targets, 494, tmp_path)):
+        with pytest.raises(data.DataIntegrityError, match='manifest'):
+            operation()
+        assert snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize('contents', ['{', '[]', 'null', '{"schema_version":1,"schema_version":1}',
+                                     '{"x":NaN}', '{}'])
+def test_split_malformed_manifest(tmp_path, split_targets, contents):
+    data.create_split(split_targets, 494, tmp_path)
+    (tmp_path / data.SPLIT_MANIFEST).write_text(contents, encoding='utf-8')
+    with pytest.raises(data.DataIntegrityError):
+        data.load_split(tmp_path / data.SPLIT_NAME, split_targets)
+
+
+@pytest.mark.parametrize('kind', ['bytes', 'duplicate', 'overlap', 'negative', 'range', 'missing',
+                                 'dtype', 'object', 'unsorted', 'extra', 'same_class_swap'])
+def test_split_npz_tampering_rejected_even_with_updated_file_hash(tmp_path, split_targets, kind):
+    record = data.create_split(split_targets, 494, tmp_path)
+    path = tmp_path / data.SPLIT_NAME
+    train, val = data.load_split(path, split_targets)
+    if kind == 'bytes':
+        path.write_bytes(b'not a zip')
+    else:
+        if kind == 'duplicate': train[1] = train[0]
+        elif kind == 'overlap': val[0] = train[0]; val.sort()
+        elif kind == 'negative': train[0] = -1
+        elif kind == 'range': val[-1] = 50000
+        elif kind == 'missing': train = train[:-1]
+        elif kind == 'dtype': val = val.astype(np.int32)
+        elif kind == 'object': val = val.astype(object)
+        elif kind == 'unsorted': train = train[::-1]
+        elif kind == 'same_class_swap':
+            a = np.flatnonzero(split_targets[train] == 0)[0]
+            b = np.flatnonzero(split_targets[val] == 0)[0]
+            train[a], val[b] = val[b], train[a]
+            train.sort(); val.sort()
+            # Even self-consistent semantic hashes cannot bypass protocol verification.
+            record['arrays']['train_indices']['sha256'] = data._array_sha256(train)
+            record['arrays']['val_indices']['sha256'] = data._array_sha256(val)
+        extra = {'unexpected': np.zeros(1)} if kind == 'extra' else {}
+        np.savez_compressed(path, train_indices=train, val_indices=val, **extra)
+    record['npz']['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+    record['npz']['bytes'] = path.stat().st_size
+    (tmp_path / data.SPLIT_MANIFEST).write_text(json.dumps(record), encoding='utf-8')
+    before = snapshot(tmp_path)
+    with pytest.raises(data.DataIntegrityError):
+        data.load_split(path, split_targets)
+    with pytest.raises(data.DataIntegrityError):
+        data.create_split(split_targets, 494, tmp_path)
+    assert snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize('kind', ['reorder', 'alter'])
+def test_split_rejects_changed_target_order(tmp_path, split_targets, kind):
+    data.create_split(split_targets, 494, tmp_path)
+    labels = split_targets.copy()
+    if kind == 'reorder': labels = labels[::-1]
+    else: labels[0], labels[1] = labels[1], labels[0]
+    before = snapshot(tmp_path)
+    with pytest.raises(data.DataIntegrityError):
+        data.load_split(tmp_path / data.SPLIT_NAME, labels)
+    with pytest.raises(data.DataIntegrityError):
+        data.create_split(labels, 494, tmp_path)
+    assert snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize('kind', ['absent', 'npz_only', 'manifest_only', 'directory', 'lock', 'stage'])
+def test_split_missing_partial_and_interrupted_states(tmp_path, split_targets, kind):
+    root = tmp_path / 'split'
+    if kind != 'absent':
+        data.create_split(split_targets, 494, root)
+        if kind == 'npz_only': (root / data.SPLIT_MANIFEST).unlink()
+        elif kind == 'manifest_only': (root / data.SPLIT_NAME).unlink()
+        elif kind == 'directory': (root / data.SPLIT_NAME).unlink(); (root / data.SPLIT_NAME).mkdir()
+        elif kind == 'lock': (root / '.split-write.lock').write_text('interrupted')
+        elif kind == 'stage': (root / '.split-stage-orphan').mkdir()
+    before = snapshot(tmp_path)
+    with pytest.raises(data.DataIntegrityError):
+        data.load_split(root / data.SPLIT_NAME, split_targets)
+    if kind != 'absent':
+        with pytest.raises(data.DataIntegrityError):
+            data.create_split(split_targets, 494, root)
+    assert snapshot(tmp_path) == before
+    assert root.exists() is (kind != 'absent')
+
+
+@pytest.mark.parametrize('failure', ['npz', 'first_publish', 'second_publish', 'partial_publish', 'fsync'])
+def test_split_write_failure_preserved_and_explicit_recovery(tmp_path, split_targets, monkeypatch, failure):
+    broken = tmp_path / 'broken'
+    original_publish = data._publish_split_file
+    calls = []
+    def fail(*args, **kwargs):
+        raise OSError('injected write failure')
+    def publish(source, destination):
+        calls.append(destination.name)
+        if failure == 'partial_publish':
+            destination.write_bytes(b'partial')
+            fail()
+        if len(calls) == (1 if failure == 'first_publish' else 2):
+            fail()
+        original_publish(source, destination)
+    with monkeypatch.context() as patch:
+        if failure == 'npz': patch.setattr(np, 'savez_compressed', fail)
+        elif failure == 'fsync': patch.setattr(data.os, 'fsync', fail)
+        else: patch.setattr(data, '_publish_split_file', publish)
+        with pytest.raises(data.DataIntegrityError, match='diagnostic artifacts retained'):
+            data.create_split(split_targets, 494, broken)
+    assert (broken / '.split-write.lock').is_file()
+    before = snapshot(broken)
+    with pytest.raises(data.DataIntegrityError, match='lock'):
+        data.load_split(broken / data.SPLIT_NAME, split_targets)
+    with pytest.raises(data.DataIntegrityError, match='lock'):
+        data.create_split(split_targets, 494, broken)
+    assert snapshot(broken) == before
+    recovered = tmp_path / 'recovered'
+    data.create_split(split_targets, 494, recovered)
+    assert len(data.load_split(recovered / data.SPLIT_NAME, split_targets)[0]) == 45000
+    assert snapshot(broken) == before
+
+
+def test_split_bad_api_arguments_do_not_write(tmp_path, split_targets):
+    missing = tmp_path / 'missing'
+    for targets, seed in [(split_targets, 42), (split_targets[:10000], 494), ([[1], 2], 494)]:
+        with pytest.raises(data.DataIntegrityError):
+            data.create_split(targets, seed, missing)
+        assert not missing.exists()
+    with pytest.raises(data.DataIntegrityError, match='filename'):
+        data.load_split(tmp_path / 'wrong.npz', split_targets)
+
+
+def test_split_publication_is_exclusive_and_lock_protected(tmp_path, split_targets, monkeypatch):
+    original = data._publish_split_file
+    def collision(source, destination):
+        with pytest.raises(data.DataIntegrityError, match='lock'):
+            data.load_split(tmp_path / data.SPLIT_NAME, split_targets)
+        destination.write_bytes(b'foreign concurrent file')
+        original(source, destination)
+    monkeypatch.setattr(data, '_publish_split_file', collision)
+    with pytest.raises(data.DataIntegrityError, match='diagnostic artifacts retained'):
+        data.create_split(split_targets, 494, tmp_path)
+    assert (tmp_path / data.SPLIT_NAME).read_bytes() == b'foreign concurrent file'
+    assert (tmp_path / '.split-write.lock').exists()
