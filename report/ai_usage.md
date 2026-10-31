@@ -1,5 +1,28 @@
 # AI assistance record
 
+## DATA-003 — 31.10.2026
+
+По прямому запросу пользователя Codex проверил main/status/fetch/docs, existing
+env, baseline282PASS/5SKIP и actual raw/frozen split, затем реализовал train-only
+normalization/provenance/read-only reuse/failure safety, keyed geometry/order,
+typed loaders, SHA-256 stable_seed/worker hook и отдельный stats CLI с75offline
+cases. Actual stats сохранены по persisted45k; оба YAML получили FILE hash.
+Default357PASS/8SKIP; separately8actual PASS/0SKIP. Independent uint64 stats oracle,
+full45k/5k/10k coverage/labels, synthetic-policy pairing и spawn2/0 на129actual
+train IDs across epochs/batch sizes PASS. Test access — fixed loader/integrity
+contract only, без scientific tuning. Frozen split/raw bytes и mtimes сохранены.
+
+Блоки cdffe3d/df6745b/60464bd/de303d0 проверены и каждый сразу push origin main
+PASS. Final documentation/handoff — отдельный commit. Dependency/backend/protocol
+settings и excluded modules сохранены; corruptions/model/training/eval/plots/EDA
+не реализованы и не запускались. Policy boundary использует только synthetic
+callables; CORR-001 prerequisite/CORR-002 integration/dependent acceptance pending.
+General REPRO-001 не закрыта. Graphify historical snapshot сверен с current source,
+rebuild не выполнялся. [Evidence](data003_evidence.json), [record](reproduction.md).
+Все checks выполнил агент; independent human understanding/review, team freeze,
+second-machine reproduction, course policy/LMS/submitted proposal confirmations
+pending. Independent DATA-003 technical PASS, full DoD PARTIAL.
+
 ## DATA-002 — 31.10.2026
 
 По прямому запросу пользователя Codex прочитал сохранённый prompt/docs и проверил

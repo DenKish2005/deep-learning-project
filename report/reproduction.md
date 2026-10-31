@@ -1,6 +1,92 @@
-# Verification record — foundation, DATA-001 and DATA-002
+# Verification record — foundation and DATA-001..003
 
-## DATA-002 technical acceptance — 31.10.2026
+## DATA-003 independent technical acceptance — 31.10.2026
+
+**PASS independent technical scope; PARTIAL full DoD.** CORR-001 prerequisite
+remains TODO, CORR-002/actual robust integration/dependent acceptance and human
+review pending. Agent checks do not replace team/course approval or REPRO-002.
+Initial clean main=origin/main517b64f verified by fetch,0ahead/behind, staged empty;
+no applicable AGENTS.md. Graphify historical navigation checked against source,
+not rebuilt. Existing Python3.12.10/NumPy2.5.4/torch2.9.0+cu126 env unchanged.
+
+### Actual stats and loader evidence
+
+Only frozen45000 original-train IDs enter raw RGB uint8/255 float64 two-pass
+population moments. No val/test pixels enter stats; tests prevent test decoding
+on stats/train-val paths. Mean:
+`[0.4913397271582242,0.48209963252314836,0.44655201729302807]`;
+std:`[0.2469009494849942,0.24334132835714897,0.2615066322799661]`.
+Independent uint64 moment oracle (different chunk137 vs256) at atol1e-12 PASS,
+max mean error2.7755575615628914e-16, std8.326672684688674e-17.
+
+| Artifact / identity | Actual result |
+|---|---|
+| Stats | data/splits/normalization.json, schema1,2429bytes; full precision |
+| Stats FILE SHA-256 | `332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688` |
+| Stats semantic SHA-256 | `4450836de3384df4286535985ed0b56b9a411f3033a60ecf57bbfe5edcb01877` |
+| Train array semantic SHA-256 | `7d59b48de10d46620a62bdc85d9d3dd62a8c2a2b902617c6807569f4a0a2ee41` |
+| Selected uint8 train pixels semantic SHA-256 | `f421843aa7eddc42d869105fb764b6d533b1d6e4d533458a30ebdbf6b70d26a6` |
+| Stats creator LF region SHA-256 | `1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c` |
+| Frozen NPZ FILE SHA-256 | `1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284`, unchanged |
+| Frozen manifest FILE SHA-256 | `8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21`, unchanged |
+| Full typed coverage | train45000/val5000/test10000; float32 NCHW, int64 labels/IDs, unique complete IDs and label alignment; class4500/500/1000 |
+| Batches | train352(last72), val20(last136), test40(last16); no dropped samples |
+| Paired boundary / Windows spawn | synthetic identity policy only; epochs0/1, workers0/2,129actual train IDs, batches64/37 bitwise equal |
+| Preservation | All13initial raw/split files hashes/bytes/mtime_ns identical, including11raw files with historical manifest/diagnostics; stats reuse unchanged |
+
+[Compact actual evidence](data003_evidence.json) contains exact provenance,
+before/after snapshots, source hashes and normalized tensor/order stream SHA-256
+for all three partitions. Image stream hash concatenates batch NCHW little-endian
+float32 bytes in yielded order; ID hash uses split semantic int64 convention.
+This records deterministic data mechanics, not performance metrics. Test images
+were inspected only for the fixed loader/integrity contract, never tuning.
+
+### Commands / PASS, FAIL, SKIP
+
+All commands use `.venv/Scripts/python.exe` from repository root.
+
+| Command / check | Actual result |
+|---|---|
+| `-m pip check` before/after | PASS, No broken requirements found |
+| Baseline `-m pytest tests -q --basetemp=.venv/pytest-data003-baseline` |282PASS/0FAIL/5SKIP,93.07s |
+| `-m scripts.download_data --root data/raw --verify-only` / `--verify-split` before implementation | PASS exit0, official raw50k/10k, frozen45k/5k, correct NPZ hash |
+| `-m scripts.prepare_normalization --root data/raw` and `--verify-only` | PASS: create, repeated prepare/reuse, read-only verification; train only |
+| `-m pytest tests -q --basetemp=.venv/pytest-data003-final` |**357PASS/0FAIL/8SKIP**,137.61s console (137.44s JUnit suite) |
+| RUN_CIFAR_INTEGRATION=1, RUN_CIFAR_SPLIT=1, RUN_CIFAR_NORMALIZATION=1; `-m pytest tests/test_cifar10_local.py tests/test_split_local.py tests/test_normalization_local.py -q -s --basetemp=.venv/pytest-data003-actual` |**8PASS/0FAIL/0SKIP**,163.90s console (163.91s JUnit suite) |
+| `-m src.utils --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --controlled-pair` | PASS,2configs; only stats FILE identity added symmetrically; schema alone does not authenticate artifacts |
+| Scope / staged bytes | PASS, frozen DATA-002 creator/hash/mtime and excluded modules/old CLI/requirements/lock unchanged; staged stats bytes exactly equal evidence FILE hash |
+| Final docs/evidence QA | PASS:13Markdown files,96local links/fences/portable paths;49cards×20fields; prerequisite edges unchanged/acyclic;96unchanged matrix rows; source/artifact hashes/mtimes and config controls verified |
+| CUDA smoke | SKIP: unchanged dependencies/backend |
+| Model/training/eval/EDA/scientific runs | SKIP: outside DATA-003 scope |
+
+Eight default SKIPs are explicit actual opt-ins, not actual PASS claims. Actual
+opt-in missing/corrupt raw/split/stats FAIL. Default tests are independent of those
+artifacts. TEST-C08 here verifies a synthetic callable boundary only; no production
+corruption implementation or actual robust acceptance. Stable seed/worker helpers
+are minimal REPRO-001 contributions; general global seeding/checkpoint/resume/backup
+remains TODO. Readiness lock is not a power-loss transaction. Hashes are integrity
+identities, not signed authenticity. Local locked CPU equality does not promise
+cross-version/platform or model reproducibility. Human/policy/LMS/proposal/team
+and independent fresh-machine reviews remain pending; no training-ready claim.
+
+### Published logical blocks
+
+Every block: full diff/relevant tests, exact staged paths and full staged diff,
+both diff --check checks, separate main commit and immediate ordinary push.
+
+| Commit | Block | Push |
+|---|---|---|
+|cdffe3d | Train-only normalization/schema/provenance/failure safety +48offline tests | PASS origin main |
+|df6745b | Keyed transforms/order/loaders/seed +20offline tests, real spawn2 | PASS origin main |
+|60464bd | Stats prepare/read-only verify CLI +7offline tests | PASS origin main |
+|de303d0 | Actual stats, symmetric configs,3actual tests, evidence;357offline+8actual PASS | PASS origin main |
+
+Documentation/handoff is a separate checked commit; final hash/push/clean sync
+are reported in chat/Git history without a self-referential commit hash. Next
+concrete task: CORR-001 noise/severity using existing stable_seed, then CORR-002;
+preserve DATA-002/003 artifacts and versioned regions.
+
+## Historical DATA-002 technical acceptance — 31.10.2026
 
 **PASS technical acceptance; PARTIAL full DoD.** Исполнитель/reviewer checks —
 Codex agent по прямому запросу пользователя. Independent human review,

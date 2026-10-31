@@ -1,11 +1,13 @@
 # MASTER PROJECT PLAN — CSCI 494 Robustness to Noise
 
 **Главная точка входа для команды.** Дата:30 октября 2026, Asia/Qyzylorda.
-Обновление31.10.2026: DATA-001/002 raw loader/acquisition и persisted split494
-реализованы; actual evidence и ограничения — CURRENT_STATUS/report/reproduction.md.
-Default suite282PASS/5actual opt-in SKIP; отдельно5actual PASS/0SKIP. Split45k/5k,
-4500/500class, hashes/provenance/reuse PASS; full DoD PARTIAL до independent human
-review. Следующий этап DATA-003 normalization/loaders, CORR-001 dependency TODO.
+Обновление31.10.2026: DATA-001/002 raw loader и frozen split494 сохранены;
+DATA-003 independent technical scope PASS: train-only stats, keyed transforms/order,
+typed loaders/CLI, actual45k/5k/10k coverage и spawn2 equality. Default357PASS/8SKIP;
+отдельно8actual PASS/0SKIP. Evidence — CURRENT_STATUS/report/reproduction.md и
+report/data003_evidence.json. Full DATA-003 DoD PARTIAL: CORR-001 prerequisite,
+CORR-002 robust integration и human review pending. Следующий этап CORR-001;
+dependency graph не изменён.
 Работа/commits/push только main по указанию пользователя.
 Local environment/config acceptance PASS; training/measured results отсутствуют.
 

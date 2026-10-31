@@ -4,9 +4,11 @@ Foundation этап выполнен в локальном техническо�
 versions, CPU/CUDA environment smoke, complete YAMLs и strict validation с116
 passing tests. DATA-001 теперь реализует raw loader/acquisition/CLI/manifest;
 DATA-002 добавляет verified persisted split494,45000/5000,4500/500per class и
-prepare/verify CLI. Default suite282PASS/5actual opt-in SKIP; отдельно5actual
-PASS/0SKIP. Evidence — в report/reproduction.md и report/data002_evidence.json.
-Следующая реализация — DATA-003, с CORR-001 dependency TODO; модели не обучены.
+prepare/verify CLI. DATA-003 теперь имеет train-only stats, keyed transforms/order,
+typed loaders/CLI: default357PASS/8opt-in SKIP, отдельно8actual PASS/0SKIP.
+Evidence — report/reproduction.md и report/data003_evidence.json. Independent
+technical scope PASS; full DATA-003 DoD PARTIAL до CORR-001/002 integration и human
+review. Следующая реализация — CORR-001 keyed noise; модели не обучены.
 Найдены guidelines/CSR и proposal candidates; submitted version, policy precedence
 и human approvals pending. Актуальные статусы полного DoD — в CURRENT_STATUS,
 проверенные команды — README, evidence — report/reproduction.md.
@@ -17,8 +19,9 @@ PASS/0SKIP. Evidence — в report/reproduction.md и report/data002_evidence.js
 
 Это reference очередь implementation phase. SETUP-001/PROTO-001/TEAM-001 частично
 закрыты; у SETUP-002/003 local technical acceptance PASS, formal human review
-pending. DATA-001/002 остаются PARTIAL до independent human review; следующая реализация
-— DATA-003 и необходимые REPRO-001 primitives. Независимая
+pending. DATA-001/002 остаются PARTIAL до independent human review. DATA-003 independent
+technical scope выполнен; dependent robust acceptance pending. Следующая реализация
+— CORR-001 с existing stable_seed, затем CORR-002. Независимая
 техническая подготовка не ждёт missing source/team information; full training
 начинается только после policy/protocol и smoke/scientific gates.
 

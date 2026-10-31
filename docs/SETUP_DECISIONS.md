@@ -1,5 +1,13 @@
 # Проверка готовности foundation
 
+Обновление DATA-00331.10.2026: normalization FILE SHA-256 в обоих YAML теперь
+`332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688`.
+Actual45k-only stats/loader evidence — [data003_evidence.json](../report/data003_evidence.json).
+Operational schema/encoding/worker decisions зафиксированы в architecture/protocol;
+scientific constants неизменны. stable_seed/seed_worker — минимальная часть REPRO-001,
+general checkpoint/backup/global seed infrastructure не закрыта. DATA-003 full DoD
+PARTIAL до CORR-001/002 integration и human review. Ниже historical decisions.
+
 Обновление DATA-00231.10.2026: в обоих YAML `dataset.split_sha256` теперь равен
 SHA-256 actual NPZ file bytes
 `1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284`.

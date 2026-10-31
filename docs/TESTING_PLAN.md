@@ -1,6 +1,30 @@
 # План тестирования и QA
 
-## DATA-002 current acceptance — 31.10.2026
+## DATA-003 current acceptance — 31.10.2026
+
+Default **357PASS/0FAIL/8SKIP**; separate actual **8PASS/0FAIL/0SKIP**. DATA-003
+добавил75offline cases:48stats +20loaders/seed +7CLI, и3actual opt-in cases.
+Default suite не зависит от actual raw/split/stats. Opt-in missing/corrupt inputs
+FAIL, без скачивания/подмены. [Evidence](../report/data003_evidence.json).
+
+TEST-D03: known pixels/float64/population oracle, chunk boundary, val outlier
+isolation, invalid pixels/indices/std/schema/provenance, semantic vs FILE hashes,
+read-only reuse/mtimes, tamper/duplicates/partial, lock/staging/fsync/publication
+failure preservation. Actual45k stats independently checked with uint64 moments.
+TEST-D04/D05: exact geometry/policy-before-Normalize oracle, deterministic eval,
+paired order/geometry, epoch changes, nonfull batches, dtype/labels/IDs, namespaces,
+global Python/NumPy/torch RNG isolation, seed encoding/fresh process, real Windows
+spawn2 vs0 across epochs. Actual loaders cover all45000/5000/10000 with correct
+class counts/labels; spawn2 equality on129actual train IDs with batch64vs37.
+TEST-C08 is a synthetic-callable injection boundary check only: actual corruptions,
+generator/device behavior and robust integration remain CORR-001/002 pending.
+
+New tests: test_normalization.py, test_loaders.py, test_normalization_cli.py;
+actual test_normalization_local.py requires `RUN_CIFAR_NORMALIZATION=1`. Existing
+raw/split opt-in guards remain separate. Full DATA-003 DoD PARTIAL; agent checks
+do not replace human review. CUDA smoke SKIP (unchanged env/backend); no training.
+
+## Historical DATA-002 acceptance — 31.10.2026
 
 Default suite: **282 PASS,0FAIL,5SKIP** (116config +166offline data cases).
 DATA-002 добавил102offline cases сверх64 DATA-001; тесты balanced synthetic50k,

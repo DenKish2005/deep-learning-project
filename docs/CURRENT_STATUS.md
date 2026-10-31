@@ -1,6 +1,47 @@
 # CURRENT PROJECT STATUS
 
-## DATA-002 — 31.10.2026
+## DATA-003 — 31.10.2026
+
+Independent technical scope **PASS**; full DoD **PARTIAL**. CORR-001 prerequisite
+ещё TODO; CORR-002/actual robust integration/dependent acceptance и independent
+human review pending. Dependency graph/scientific settings не изменены.
+
+Реализованы compute/prepare/load_normalization, strict schema/provenance и
+read-only reuse; IndexedCIFAR10, keyed geometry/order, typed train/val/test loaders,
+policy injection boundary и stats CLI. Actual stats только persisted45k, RGB/255,
+float64 two-pass, ddof0; independent uint64 moment oracle PASS, max errors2.78e-16
+mean/8.33e-17 std. Original test не участвует в statistics.
+
+Stats2429bytes FILE SHA-256
+`332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688`;
+semantic stats hash `4450836de3384df4286535985ed0b56b9a411f3033a60ecf57bbfe5edcb01877`.
+Оба YAML содержат verified FILE hash. NPZ/manifest hashes, mtimes, DATA-002 source
+identity и11raw files (включая historical diagnostics/manifest) неизменны.
+Full actual batches45k/5k/10k, class counts4500/500/1000 и label/ID coverage PASS;
+train352batches, last72. Paired synthetic-policy geometry/order и workers0/2 spawn
+bitwise equality на129actual train IDs, epochs0/1, batches64/37 PASS.
+
+Default **357PASS/0FAIL/8opt-in SKIP**, separately actual **8PASS/0FAIL/0SKIP**.
+pip/config CLI PASS; existing env/lock/backend сохранены. CUDA smoke SKIP:
+backend неизменён. Training/model/corruptions/evaluation/plots/EDA не реализованы
+и не запускались. Test images читались только для fixed loader/integrity contract.
+[Evidence](../report/data003_evidence.json), [commands](../report/reproduction.md).
+
+| Task | Полный DoD | Результат / остаток |
+|---|---|---|
+| DATA-001/002 | PARTIAL | Technical PASS; independent human review pending |
+| DATA-003 | PARTIAL | Independent technical PASS; CORR-001/002 robust integration, dependent acceptance и human review pending |
+| CORR-001/002 | TODO | Noise/severity/blur/darkening APIs отсутствуют; stable_seed уже реализован |
+| REPRO-001 | TODO | Только data-specific hashes/publication и stable_seed/seed_worker; general checkpoint/RNG/backup pending |
+
+Published main commits:cdffe3d stats/tests; df6745b keyed loaders/tests;
+60464bd stats CLI/tests; de303d0 verified actual artifacts/configs/evidence/tests.
+Каждый блок проверен и сразу push origin main PASS. Docs/handoff публикуются
+отдельно, final hash — в Git history/ответе. Следующий этап —
+[CORR-001 prompt](NEXT_STEP_PROMPT.md). Human/course policy/LMS/submitted proposal,
+team freeze и independent reproduction pending. Graphify остаётся historical snapshot.
+
+## Исторический DATA-002 snapshot — 31.10.2026
 
 Local technical acceptance **PASS**; full DoD **PARTIAL**, independent human
 artifact/code/test review pending. Initial clean main=origin/main7a2b2f3 verified

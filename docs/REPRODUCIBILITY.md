@@ -2,10 +2,12 @@
 
 SETUP-002 выполнен локально 30.10.2026; config validation относится к SETUP-003.
 DATA-001 реализует raw-data loader, acquisition/verification CLI и local manifest;
-DATA-002 — persisted split494 и prepare/verify CLI. Current default282PASS/5SKIP,
-separate actual5PASS/0SKIP; [evidence](../report/data002_evidence.json).
+DATA-002 — persisted split494; DATA-003 — train-only stats/keyed loaders/stats CLI.
+Current default357PASS/8SKIP, separate actual8PASS/0SKIP;
+[evidence](../report/data003_evidence.json). Full DATA-003 DoD PARTIAL:
+CORR-001/002 robust integration и independent human review pending.
 Раздел «Плановые команды pipeline» ниже остаётся будущим интерфейсом для
-stats/train/evaluate/metrics/plots. Успешный empty script не является выполненной задачей.
+train/evaluate/metrics/plots. Успешный empty script не является выполненной задачей.
 
 ## Окружение
 
@@ -78,6 +80,13 @@ cudnn.benchmark=False, cudnn.deterministic=True. TF32 отключён чере�
 PyTorch не обещает одинаковые results между releases/platforms и CPU/GPU; deterministic mode может замедлить вычисления. Reference claims ограничивать locked software/backend. CPU pixel corruption и stable per-image streams обеспечивают общие inputs; model outputs across hardware сравнивать с заранее записанными tolerances, не заявлять bitwise cross-platform.
 
 Worker initialization и Windows spawn требуют top-level worker functions и main guard; seed иных библиотек берётся из torch.initial_seed. Это учитывается в data interfaces. [DataLoader docs](https://docs.pytorch.org/docs/main/data.html). Exact epoch resume проще при workers 0; stateless transforms исключают скрытый worker transform state.
+
+DATA-003 implements stable_seed/seed_worker and local per-image/order/worker
+generators only. Call dataset.set_epoch before iteration; persistent_workers must
+be False. Actual Windows spawn2 equality passed against workers0 on129persisted
+train IDs, two epochs, batch64vs37; full raw45k/5k/10k typed coverage also passed.
+Future training requests only train/val partitions; DATA-003 test access was solely
+the fixed loader/integrity contract. No checkpoint/resume/model determinism claim.
 
 Не использовать global RNG для robust policy: отдельные keyed generators сохраняют одинаковые init, crop/flip и sample order между моделями. Полные seed namespaces: [EXPERIMENT_PROTOCOL §4](EXPERIMENT_PROTOCOL.md).
 

@@ -10,11 +10,13 @@ on clean images and with corruption-aware augmentation on CIFAR-10.
 DATA-001 adds verified raw CIFAR-10 loading, explicit acquisition, a read-only
 integrity CLI and a versioned local manifest. DATA-002 adds the persisted stratified
 45k/5k split, seed494, verified NPZ/manifest and offline prepare/verify CLI.
-Normalization, corruptions, CNN, training, evaluation and plotting remain future work.
+DATA-003 adds train-only normalization, keyed transforms/order and deterministic
+typed loaders. Corruptions, CNN, training, evaluation and plotting remain future
+work; actual robust integration awaits CORR-001/002.
 No training has run.
 Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
 RGB32×32, all archive/file checksums and class counts pass. Current checks:
-282 offline tests pass (5 opt-in tests skipped); separately all 5 actual tests pass.
+357 offline tests pass (8 opt-in tests skipped); separately all 8 actual tests pass.
 
 ## Working installation and checks
 
@@ -62,7 +64,8 @@ may differ. Dataset paths/hashes and runtime controls must match. Scientific
 changes require coordinated protocol/schema/tests updates.
 
 Both configs now contain the verified NPZ file SHA-256 in `split_sha256`;
-`normalization_sha256` remains `null` until DATA-003. Config validation
+`normalization_sha256` contains the verified stats FILE SHA-256 after DATA-003.
+Config validation
 does not create, download, open or authenticate these artifacts, and does not
 assert training readiness. Artifact verification is a future training gate.
 
@@ -133,6 +136,41 @@ Separate semantic array/label hashes, provenance and before/after mtimes:
 The saved indices are canonical; cross-version/platform byte-identical NPZ
 regeneration is not promised. Historical raw acquisition manifest is unchanged.
 
+## Working normalization and loaders (DATA-003)
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.prepare_normalization --root data/raw
+.\.venv\Scripts\python.exe -m scripts.prepare_normalization --root data/raw --verify-only
+$env:RUN_CIFAR_INTEGRATION='1'
+$env:RUN_CIFAR_SPLIT='1'
+$env:RUN_CIFAR_NORMALIZATION='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_cifar10_local.py tests/test_split_local.py tests/test_normalization_local.py -q --basetemp=.venv/pytest-data003-actual
+Remove-Item Env:RUN_CIFAR_INTEGRATION
+Remove-Item Env:RUN_CIFAR_SPLIT
+Remove-Item Env:RUN_CIFAR_NORMALIZATION
+```
+
+The CLI verifies existing raw original train and frozen split offline, then creates
+or fully verifies/reuses [normalization.json](data/splits/normalization.json).
+Verify-only writes nothing; opted-in missing/corrupt inputs fail. Stats use only
+persisted45000 train IDs, raw RGB/255, float64 accumulation and population std.
+Actual mean `[0.4913397271582242,0.48209963252314836,0.44655201729302807]`;
+std `[0.2469009494849942,0.24334132835714897,0.2615066322799661]`.
+FILE SHA-256 `332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688`.
+Both YAMLs declare this identity; frozen NPZ/manifest bytes and mtimes are unchanged.
+
+`make_loaders(config, run_seed, epoch, *, policy=None, partitions=...)` verifies
+declared FILE hashes, raw train, split and stats. Batches are float32 NCHW,
+int64 labels/IDs, drop_last=False. Train uses keyed pad/crop/flip, optional injected
+pixel-space policy, then Normalize; val/test are sequential and deterministic.
+Call `loader.dataset.set_epoch(epoch)` before iterator creation. Future training
+must request `partitions=('train','val')` to avoid decoding test. Augmentation-enabled
+config requires an explicit policy; actual corruptions and training readiness are pending.
+Workers0 reference and Windows spawn2 equality passed on synthetic fixtures and129
+actual train IDs across epochs/batch sizes. Full coverage45k/5k/10k and label
+alignment passed. [Contracts](docs/TECHNICAL_ARCHITECTURE.md),
+[actual evidence](report/data003_evidence.json), [commands/results](report/reproduction.md).
+
 ## Project documents and next work
 
 Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
@@ -141,9 +179,10 @@ Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
 CSR and proposal candidates; submitted version, current rubric/LMS confirmation,
 AI-policy conflict and team approvals remain pending.
 
-Next: DATA-003 train-only normalization/loaders, with the unimplemented CORR-001
-dependency explicit in [next-step prompt](docs/NEXT_STEP_PROMPT.md). Full DATA-001/002
-DoD remains PARTIAL until independent human review; agent checks do not replace it.
+Next: CORR-001 keyed noise using the implemented stable seed encoding;
+[next-step prompt](docs/NEXT_STEP_PROMPT.md). Independent DATA-003 technical scope
+PASS; full DoD PARTIAL until CORR-001/002 robust integration and independent human
+review. Full DATA-001/002 DoD also remains PARTIAL; agent checks do not replace review.
 All commits and ordinary pushes use `main`, per the user's current instruction.
 Commands in the future-pipeline section of [REPRODUCIBILITY](docs/REPRODUCIBILITY.md)
-describe planned interfaces beyond the working raw-data/split commands above.
+describe planned interfaces beyond the working data/split/stats commands above.

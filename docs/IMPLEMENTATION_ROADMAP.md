@@ -7,7 +7,10 @@ loader/acquisition/CLI/manifest и offline tests реализованы; пол�
 до independent human review. DATA-002 также technical acceptance PASS/full DoD
 PARTIAL: actual split494/45k/5k, manifest/hash/reuse verified;282default PASS/5SKIP,
 отдельно5actual PASS/0SKIP. Actual evidence — в reproduction record/data002_evidence.json.
-Остальные tasks TODO. Training/evaluation не запускались. Evidence: [CURRENT_STATUS](CURRENT_STATUS.md),
+DATA-003 independent technical scope PASS: stats/keyed loaders/CLI,357offline
+PASS/8SKIP, separately8actual PASS/0SKIP. Full DoD PARTIAL: CORR-001 prerequisite,
+CORR-002 robust integration/dependent acceptance и human review pending;
+dependency edges сохранены. Остальные tasks TODO. Training/evaluation не запускались. Evidence: [CURRENT_STATUS](CURRENT_STATUS.md),
 [reproduction record](../report/reproduction.md). Канонические interfaces:
 [TECHNICAL_ARCHITECTURE](TECHNICAL_ARCHITECTURE.md); methodology:
 [EXPERIMENT_PROTOCOL](EXPERIMENT_PROTOCOL.md); tests: [TESTING_PLAN](TESTING_PLAN.md).
@@ -238,7 +241,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **10. Functions/classes:** create_split; load_split.
 - **11. Inputs:** original train targets.
 - **12. Outputs:** 45k/5k indices + manifest.
-- **13. Artifacts:** data/splits/cifar10_split_v1.npz (76550bytes, SHA-2561dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284), split_manifest.json; report/data002_evidence.json и report/reproduction.md; оба YAML с тем же file hash, normalization null.
+- **13. Artifacts:** data/splits/cifar10_split_v1.npz (76550bytes, SHA-2561dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284), split_manifest.json; report/data002_evidence.json и report/reproduction.md; оба YAML с тем же NPZ hash; normalization отдельно разрешена DATA-003.
 - **14. Testing:** TEST-D02 implemented; tests/test_data_pipeline.py + tests/test_split_local.py, связанные config tests. Default282PASS/5opt-in SKIP; actual5PASS/0SKIP (вместе с DATA-001). Hashes/file mtimes сохраняются при повторе; invalid/partial/tampered pair FAIL.
 - **15. Acceptance:** 4500/500class; disjoint/exhaustive; rerun identical.
 - **16. DoD:** acceptance выполнен; тестовые результаты и artifacts проверены reviewer; status обновлён. Для OPTIONAL допустимо SKIPPED с причиной, без объявления PASS.
@@ -252,16 +255,16 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** DATA-003.
 - **2. Title:** Normalization и loaders.
 - **3. Purpose:** Правильный deterministic input.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — independent technical acceptance PASS: actual45k-only stats/provenance, keyed transforms/order, typed clean loaders, policy boundary и CLI;357offline PASS/8SKIP +8actual PASS/0SKIP. CORR-001 prerequisite/CORR-002 actual robust integration, dependent acceptance и independent human review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 2 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** DATA-002; CORR-001.
 - **8. Steps:** 1) compute45k-only stats; 2) keyed crop/flip и epoch order; 3) deterministic val/test, drop_lastFalse.
-- **9. Files:** src/data.py; data/splits/normalization.json; tests/test_data_pipeline.py.
+- **9. Files:** src/data.py; src/utils.py; scripts/prepare_normalization.py; data/splits/normalization.json; tests/test_normalization.py; tests/test_loaders.py; tests/test_normalization_cli.py; tests/test_normalization_local.py; configs/*.yaml.
 - **10. Functions/classes:** compute_normalization; IndexedCIFAR10; make_loaders.
 - **11. Inputs:** raw/split/config.
 - **12. Outputs:** stats + typed DataLoaders.
-- **13. Artifacts:** перечисленные outputs в указанных files/dirs + test/review evidence; paths/hash записать в task/PR.
+- **13. Artifacts:** data/splits/normalization.json (FILE SHA-256332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688); report/data003_evidence.json; report/reproduction.md; frozen DATA-002 bytes/mtimes unchanged; human review pending.
 - **14. Testing:** TEST-D03..05; TEST-C08.
 - **15. Acceptance:** N×3×32×32 float32, int64 labels, paired geometry/order equal.
 - **16. DoD:** acceptance выполнен; тестовые результаты и artifacts проверены reviewer; status обновлён. Для OPTIONAL допустимо SKIPPED с причиной, без объявления PASS.
@@ -482,7 +485,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** REPRO-001.
 - **2. Title:** Identity/metadata/backup infrastructure.
 - **3. Purpose:** Связать outputs с inputs/code.
-- **4. Current status:** TODO.
+- **4. Current status:** TODO — DATA-001..003 реализуют только data-specific hashes/publication и stable_seed/seed_worker; general config/environment/run identity, checkpoint/RNG/resume и backup acceptance не закрыты.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 6 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** SETUP-002; SETUP-003.
