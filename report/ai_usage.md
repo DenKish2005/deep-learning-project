@@ -1,5 +1,30 @@
 # AI assistance record
 
+## DATA-002 — 31.10.2026
+
+По прямому запросу пользователя Codex прочитал сохранённый prompt/docs и проверил
+clean main, fetch/origin history, dependencies, baseline tests и actual raw integrity.
+Агент реализовал exact stratified split494 (one local NumPy RNG), create/load API,
+strict manifest/provenance/hash validation, exclusive publication/readiness lock,
+preserved failure diagnostics, split prepare/read-only verify CLI и102additional
+offline cases; добавил2actual opt-in cases и обновил config tests.
+
+Actual original train50000→45000/5000,4500/500per class verified; NPZ/manifest
+versioned, оба YAML содержат один verified NPZ hash, normalization hash null.
+Default282PASS/5SKIP; separately5actual PASS/0SKIP (включая3DATA-001).
+Repeated calls сохраняют split/raw hashes+file mtimes и historical acquisition
+manifest. Split decisions используют original train; test decoding только в
+отдельном DATA-001 integrity check. Training/normalization/corruptions не реализованы.
+
+Commits4044d0c/fd0a272/f4d7b42/cf8e684 опубликованы ordinary push в main после
+каждого checked block; evidence/docs завершаются отдельным commit. Dependencies,
+backend и scientific settings сохранены. Graphify использован как navigation
+snapshot и сверен с current files; rebuild не выполнялся.
+[Commands/hashes/results/limits](reproduction.md), [compact evidence](data002_evidence.json).
+Все checks и review этого этапа выполнил агент; human review, понимание кода
+командой, policy/source/team approval и second-machine reproduction PENDING.
+Full DATA-002 DoD PARTIAL при technical acceptance PASS.
+
 ## DATA-001 — 30–31.10.2026
 
 По прямому запросу пользователя Codex реализовал raw offline CIFAR-10 loader,

@@ -1,5 +1,13 @@
 # Проверка готовности foundation
 
+Обновление DATA-00231.10.2026: в обоих YAML `dataset.split_sha256` теперь равен
+SHA-256 actual NPZ file bytes
+`1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284`.
+Semantic train/val/label-order hashes отдельны в split manifest; normalization hash
+по-прежнему null. Schema/config CLI проверяет declarations, не artifacts или
+training readiness. [Actual evidence](../report/data002_evidence.json).
+Ниже сохранены foundation decisions, включая первоначально unresolved hashes.
+
 30.10.2026. Это техническая self-review агента, не review/approval команды.
 Источники: [реестр](../report/course_materials/README.md).
 

@@ -2,7 +2,8 @@
 
 Это преимущественно проект будущих интерфейсов. SETUP-003 реализует только
 config validation в utils, оба YAML и test_utils; DATA-001 реализует load_cifar10,
-file/partition inspection и acquisition CLI/manifest. Остальные production APIs ниже
+file/partition inspection и acquisition CLI/manifest. DATA-002 реализует persisted
+create_split/load_split, provenance/reuse/failure safety и split CLI. Остальные production APIs ниже
 ещё не реализованы. Состояние: [CURRENT_STATUS.md](CURRENT_STATUS.md), уточнения
 и причины: [SETUP_DECISIONS.md](SETUP_DECISIONS.md). Протокол —
 [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md). Новые frameworks не вводятся.
@@ -252,7 +253,7 @@ overrides: отдельные profiles/validators появятся в TRAIN/TEST
 | dataset.name, dataset.root | cifar10; data/raw |
 | dataset.split_path | data/splits/cifar10_split_v1.npz |
 | dataset.normalization_path | data/splits/normalization.json |
-| dataset.split_sha256, normalization_sha256 | null до DATA-002/003; затем 64 lowercase hex; loader не verifies artifact |
+| dataset.split_sha256, normalization_sha256 | verified NPZ file SHA-256 в обоих YAML после DATA-002; normalization null до DATA-003. Schema допускает null для unresolved preparation; config loader не verifies artifact |
 | dataset.split_seed | 494; общий, не run seed |
 | dataset.train_size, val_size, test_size | 45000; 5000; 10000 |
 | seeds | [42,123,2026] |

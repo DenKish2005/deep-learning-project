@@ -4,7 +4,9 @@
 **PARTIAL** по полному DoD. У SETUP-002/003 вся локальная техническая реализация
 и acceptance выполнены, human reviewer approval ещё pending. DATA-001: raw
 loader/acquisition/CLI/manifest и offline tests реализованы; полный DoD PARTIAL
-до independent human review. Actual data evidence — в reproduction record.
+до independent human review. DATA-002 также technical acceptance PASS/full DoD
+PARTIAL: actual split494/45k/5k, manifest/hash/reuse verified;282default PASS/5SKIP,
+отдельно5actual PASS/0SKIP. Actual evidence — в reproduction record/data002_evidence.json.
 Остальные tasks TODO. Training/evaluation не запускались. Evidence: [CURRENT_STATUS](CURRENT_STATUS.md),
 [reproduction record](../report/reproduction.md). Канонические interfaces:
 [TECHNICAL_ARCHITECTURE](TECHNICAL_ARCHITECTURE.md); methodology:
@@ -227,7 +229,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** DATA-002.
 - **2. Title:** Persist stratified split.
 - **3. Purpose:** Один split для всех seeds.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — local technical acceptance PASS31.10.2026; actual45k/5k seed494,4500/500class, disjoint/exhaustive, provenance/hash/reuse checks PASS; independent human code/artifact/test reviewer approval pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 2 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** DATA-001; SETUP-003.
@@ -236,14 +238,14 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **10. Functions/classes:** create_split; load_split.
 - **11. Inputs:** original train targets.
 - **12. Outputs:** 45k/5k indices + manifest.
-- **13. Artifacts:** перечисленные outputs в указанных files/dirs + test/review evidence; paths/hash записать в task/PR.
-- **14. Testing:** TEST-D02.
+- **13. Artifacts:** data/splits/cifar10_split_v1.npz (76550bytes, SHA-2561dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284), split_manifest.json; report/data002_evidence.json и report/reproduction.md; оба YAML с тем же file hash, normalization null.
+- **14. Testing:** TEST-D02 implemented; tests/test_data_pipeline.py + tests/test_split_local.py, связанные config tests. Default282PASS/5opt-in SKIP; actual5PASS/0SKIP (вместе с DATA-001). Hashes/file mtimes сохраняются при повторе; invalid/partial/tampered pair FAIL.
 - **15. Acceptance:** 4500/500class; disjoint/exhaustive; rerun identical.
 - **16. DoD:** acceptance выполнен; тестовые результаты и artifacts проверены reviewer; status обновлён. Для OPTIONAL допустимо SKIPPED с причиной, без объявления PASS.
 - **17. Effort:** 3-4 person-hours, без full-training wait time.
 - **18. Risks/common mistakes:** Создать split по training seed.
-- **19. Branch:** codex/data-002.
-- **20. Commit/PR scope:** Persist stratified split; только файлы пункта 9, включая relevant tests/docs; один logical PR, owner Person 2.
+- **19. Branch:** main only (explicit persistent user workflow).
+- **20. Commit/PR scope:** Small working algorithm/tests, persistence/tests, CLI/tests, actual artifacts/configs/tests/evidence, docs blocks; diff/staged files/whitespace/relevant checks before each commit, immediately ordinary push origin main. No feature branch/PR required.
 
 ### DATA-003 — Normalization и loaders
 

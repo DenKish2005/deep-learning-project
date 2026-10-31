@@ -1,8 +1,10 @@
 # Воспроизводимость: проверенный setup и будущий pipeline
 
 SETUP-002 выполнен локально 30.10.2026; config validation относится к SETUP-003.
-DATA-001 реализует raw-data loader, acquisition/verification CLI и local manifest.
-Раздел «Плановые команды pipeline» ниже остаётся будущим интерфейсом для split,
+DATA-001 реализует raw-data loader, acquisition/verification CLI и local manifest;
+DATA-002 — persisted split494 и prepare/verify CLI. Current default282PASS/5SKIP,
+separate actual5PASS/0SKIP; [evidence](../report/data002_evidence.json).
+Раздел «Плановые команды pipeline» ниже остаётся будущим интерфейсом для
 stats/train/evaluate/metrics/plots. Успешный empty script не является выполненной задачей.
 
 ## Окружение
@@ -123,7 +125,9 @@ Corrupt data/archive, foreign/incomplete dataset directory или conflicting ma
 root с сохранением старого. Failed acquisition оставляет uniquely named staging.
 Не хранить единственную копию будущих unique artifacts в ignored directories.
 Test partition здесь инспектируется только ради integrity, без scientific decisions.
-Split/stats hashes остаются null; training готовность не заявлена.
+После DATA-002 оба YAML содержат verified NPZ file hash; stats hash остаётся null,
+training готовность не заявлена. Raw acquisition record сохраняет historical code
+hashes DATA-001 и не переписывается при добавлении split API/CLI.
 
 ## Работающие команды DATA-002
 
@@ -147,6 +151,30 @@ split directory или files, не меняет hashes/file mtimes. Original
 modes; любой seed кроме494 — exit2. `--help` описывает flags; success JSON/exit0,
 data/artifact failure JSON stderr/exit1, invalid arguments argparse stderr/exit2.
 Подробная [schema/hash/write/recovery спецификация](TECHNICAL_ARCHITECTURE.md#split-artifact-contract-v1).
+
+Actual NPZ76550 bytes SHA-256
+`1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284`;
+manifest file SHA-256 `8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21`.
+Schema/creator/semantic hashes и before/after mtimes — в
+[manifest](../data/splits/split_manifest.json)/[evidence](../report/data002_evidence.json).
+NPZ binary и JSON LF enforced через `.gitattributes`; diagnostic locks/staging ignored.
+Frozen indices canonical: API читает saved arrays, protocol replay проверяет их.
+Signed source authenticity и bitwise regeneration across versions/platforms не заявлены.
+Versioned DATA-002 source region и NumPy2.5.4 должны совпасть при verification;
+DATA-003 code добавлять вне region, не менять source identity frozen artifacts молча.
+
+```powershell
+$env:RUN_CIFAR_INTEGRATION='1'
+$env:RUN_CIFAR_SPLIT='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_cifar10_local.py tests/test_split_local.py -q --basetemp=.venv/pytest-data002-actual
+Remove-Item Env:RUN_CIFAR_INTEGRATION
+Remove-Item Env:RUN_CIFAR_SPLIT
+```
+
+Defaults actual tests: `CIFAR10_ROOT=data/raw`, `CIFAR10_SPLIT_DIR=data/splits`.
+При opt-in missing/corrupt input — FAIL. 31.10.2026 combined5PASS/0SKIP;
+default suite282PASS/5SKIP не требует actual inputs. CUDA smoke не повторялся:
+dependencies/backend неизменны; training/evaluation не запускались.
 
 ## Плановые команды pipeline
 

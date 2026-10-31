@@ -1,6 +1,98 @@
-# Verification record — foundation and DATA-001
+# Verification record — foundation, DATA-001 and DATA-002
 
-## DATA-001 technical acceptance — 30–31.10.2026
+## DATA-002 technical acceptance — 31.10.2026
+
+**PASS technical acceptance; PARTIAL full DoD.** Исполнитель/reviewer checks —
+Codex agent по прямому запросу пользователя. Independent human review,
+second-machine reproduction, course policy/source/team sign-off pending.
+Работа начата с clean main7a2b2f3; fetch подтвердил main=origin/main,0ahead/0behind.
+Применимого AGENTS.md не обнаружено. Graphify snapshot использован для навигации,
+source contracts сверены по текущим files; graph не перестраивался.
+
+Existing Python3.12.10/NumPy2.5.4 `.venv`, exact lock, backend и scientific settings
+сохранены. Из YAML изменён только dataset.split_sha256 симметрично; normalization
+hash остаётся null. CUDA smoke не повторялся, поскольку env/backend не менялись.
+Training/normalization/loaders/corruptions/model/evaluation/EDA не выполнялись.
+
+### Actual persisted split evidence
+
+Actual source — verified official original train50000, original namespace
+`cifar10-python/original-train`, labels0..9/5000per class. Единственный local
+default_rng494, class order0..9, first500/class validation,4500train, final sort.
+Test10000 не участвует в split; test files могут хешироваться для raw integrity,
+но split CLI не декодирует test images/targets. DATA-001 actual tests отдельно
+декодируют оба original partitions только для integrity.
+
+| Artifact / invariant | Actual result |
+|---|---|
+| NPZ | `data/splits/cifar10_split_v1.npz`,76550bytes; sorted `<i8` train_indices[45000]/val_indices[5000] |
+| NPZ file SHA-256 | `1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284` |
+| Manifest | `data/splits/split_manifest.json`,schema1,2539bytes; file SHA-256 `8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21` |
+| Train semantic SHA-256 | `7d59b48de10d46620a62bdc85d9d3dd62a8c2a2b902617c6807569f4a0a2ee41` |
+| Validation semantic SHA-256 | `40ddd3d462690ac2f02790e1bacc3365bc83936fa48c74462e90a55552b93f13` |
+| Original label-order semantic SHA-256 | `bba2873f62cbf0374dffec49080d49cdf34353988e10b1410f20e65059eb7535` |
+| Creation source identity | LF source region src/data.py:DATA-002-v1, `4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96`; implementation revision f4d7b42 (region unchanged since fd0a272) |
+| Class counts | Exactly4500train/500validation for each0..9 |
+| IDs/invariants | Range0..49999, sorted/unique, disjoint, exhaustive union50000, label alignment and independent protocol replay PASS |
+| Source archive |170498071bytes, MD5 c58f30108f718f92721af3b95e74349a; SHA-2566d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce |
+| Reuse | create/load + CLI prepare/verify + raw verify: split hashes and file mtimes identical;11raw files including preserved acquisition diagnostic unchanged |
+| Historical raw manifest | SHA-25662cd6967926f0546a09cba8ec6424a0f14f954a5841afa9c419c95e5332d68b7 and mtime unchanged; not rewritten |
+
+Source train batch SHA-256/MD5/size, creator, every invariant and exact before/after
+mtime_ns/hash snapshots — [data002_evidence.json](data002_evidence.json). Full
+[schema/hash/write contract](../docs/TECHNICAL_ARCHITECTURE.md#split-artifact-contract-v1).
+Semantic identity hashes compact sorted JSON dtype/shape + LF + C-order bytes;
+NPZ SHA-256 hashes file bytes. `.gitattributes` preserves binary NPZ/LF JSON.
+Fresh-process byte-identical synthetic regeneration observed in this locked env;
+cross-version/platform regeneration not guaranteed. Saved actual indices canonical.
+
+### Commands and actual results
+
+Из repo root, interpreter `.venv/Scripts/python.exe`:
+
+| Command / check | PASS / FAIL / SKIP |
+|---|---|
+| `-m pip check` before/after | PASS, No broken requirements found |
+| `-m pytest tests -q --basetemp=.venv/pytest-data002-baseline` |180PASS/0FAIL/3opt-in SKIP,50.45s |
+| `-m scripts.download_data --root data/raw --verify-only` before/after | PASS exit0, train50000/test10000, archive_verified=true, raw manifest unchanged |
+| `-m scripts.download_data --root data/raw --prepare-split --split-seed 494` | PASS exit0, actual NPZ/manifest created, repeated run reused |
+| `-m scripts.download_data --root data/raw --verify-split` | PASS exit0, read-only; also verified module entry point in fresh process |
+| `-m pytest tests -q --basetemp=.venv/pytest-data002-final` |**282PASS/0FAIL/5SKIP**,104.69s;116config +166offline data, no actual-data/split dependency |
+| `RUN_CIFAR_INTEGRATION=1`, `RUN_CIFAR_SPLIT=1`; `-m pytest tests/test_cifar10_local.py tests/test_split_local.py -q --basetemp=.venv/pytest-data002-actual` |**5PASS/0FAIL/0SKIP**,67.61s (3raw +2split), offline actual inputs |
+| `-m src.utils --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --controlled-pair` | PASS,2configs, shared settings equal; schema check does not authenticate artifacts |
+| Tamper/partial/failure/CLI argument checks | PASS: actionable DataIntegrityError/exit1, invalid flags exit2; preserved failures, explicit recovery to empty directory |
+| Git ignore/attributes/staged bytes | PASS: indices/manifest tracked; raw/env/caches/diagnostics ignored; staged artifact bytes exactly match evidence SHA-256 |
+| Final docs/evidence QA | PASS:13changed Markdown files,84local links/fences/portable paths,49cards x20fields/acyclic dependencies,96unchanged protocol matrix rows; frozen artifact bytes/mtimes/creator and unchanged scientific settings/lock/future modules |
+| CUDA smoke / scientific runs | SKIP, unchanged backend / outside DATA-002 scope |
+
+Default SKIPs — explicit opt-in guards, не actual-data PASS. Opted-in missing/corrupt
+inputs FAIL. Global NumPy/Python/torch RNG states unchanged. API validates supplied
+labels and expected protocol/source references; actual source certification comes
+from verified raw loader. Hashes/MD5 are integrity identities/references, not signed
+external authentication. Readiness lock protects two-file publication but is not a
+multi-file atomic filesystem/power-loss guarantee; interrupted locks/staging/pairs
+are rejected/preserved. General REPRO-001 identity/checkpoint/RNG/backup remains TODO.
+
+### Published logical blocks
+
+Each block had full diff review, exact staged list, git diff --check and cached
+--check, relevant tests; implementation/tests together, immediately ordinary push
+origin main. No feature branch, force push, amend/reset or history rewrite.
+
+| Commit | Block / relevant result | Push |
+|---|---|---|
+|4044d0c | Exact construction/invariants + offline tests;96data PASS, final focused31PASS | PASS main→origin/main |
+|fd0a272 | Persistence/manifest/provenance/failure safety + tests/contracts;149data PASS +1publication PASS | PASS main→origin/main |
+|f4d7b42 | Offline split CLI + tests/command docs;282PASS/3SKIP | PASS main→origin/main |
+|cf8e684 | Actual artifacts/config identity/evidence/actual tests;282PASS/5SKIP +5actual PASS | PASS main→origin/main |
+
+Final docs/evidence consistency checks and DATA-003 prompt are a separate commit;
+its hash/push and final clean main=origin/main status are reported in the chat
+(no self-referential commit hash). Next DATA-003:45k-only normalization and keyed
+transforms/loaders; CORR-001 prerequisite still TODO, so robust integration cannot
+be declared complete. Human/course/source/team gates remain pending.
+
+## Historical DATA-001 technical acceptance — 30–31.10.2026
 
 Исполнитель — Codex по запросу пользователя, на прежнем Windows AMD64 /
 Python3.12.10 environment. Завершение записано31.10.2026 по дате текущего чата;

@@ -1,5 +1,33 @@
 # План тестирования и QA
 
+## DATA-002 current acceptance — 31.10.2026
+
+Default suite: **282 PASS,0FAIL,5SKIP** (116config +166offline data cases).
+DATA-002 добавил102offline cases сверх64 DATA-001; тесты balanced synthetic50k,
+без зависимости от actual raw data или saved actual split. Новые opt-in guards:
+tests/test_split_local.py, `RUN_CIFAR_SPLIT=1`; старые три actual raw cases требуют
+`RUN_CIFAR_INTEGRATION=1`. Combined actual run: **5PASS,0FAIL,0SKIP**.
+Opted-in missing/corrupt data/artifact — FAIL, не skip/download/synthetic substitute.
+
+TEST-D02 покрывает exact one-RNG protocol/class order/final sort,4500/500per class,
+`<i8`/range/uniqueness/disjointness/exhaustiveness и label alignment; fresh-process
+determinism (включая observed local NPZ bytes); Python/NumPy/torch global RNG
+isolation при create/load; schema/semantic/file hashes, round trip и preserved
+file mtimes. Wrong seed/types/length/classes, changed label order, altered source/
+manifest/NPZ, duplicate keys, partial pair, locks/orphan staging отвергаются.
+Injected NPZ/fsync/publication failures сохраняют diagnostics; explicit recovery
+в new empty directory работает. Concurrent foreign destination не перезаписывается.
+
+CLI prepare/verify, defaults/help, train-only source boundary, raw-only read-only
+compatibility и nonzero invalid flags/failures проверены offline. Actual tests
+сверяют verified original train50k, exact split arrays/counts/protocol и оба config
+hashes; API/CLI reuse и separate module invocation сохраняют hashes/mtimes всех
+raw/split files. Config tests по-прежнему не читают actual artifacts.
+[Команды/результаты](../report/reproduction.md), [compact evidence](../report/data002_evidence.json).
+Это agent technical acceptance; independent human review pending.
+
+## Historical foundation / DATA-001 evidence
+
 Статус 30.10.2026 после foundation: TEST-U01 реализован в tests/test_utils.py;
 полная текущая suite **116 passed**, 0failed/0skipped. Проверены schema/types/ranges,
 required/unknown/duplicate keys, probabilities, exact severity maps, controlled
@@ -28,7 +56,7 @@ Default tests не используют local CIFAR и не скачивают �
 | ID / функция теста | Файл и target | Действия / oracle | Acceptance |
 |---|---|---|---|
 | TEST-D01 `test_load_integrity_and_missing_data` | test_data_pipeline.py → load_cifar10 | Monkeypatch missing file/checksum; actual dataset separate opt-in | Ошибка actionable; real counts 50k/10k, targets 0..9 |
-| TEST-D02 `test_stratified_persisted_split` | create_split/load_split | Balanced synthetic 50k labels; generate/load; duplicate/tamper manifest | Train 45k, val5k, 4500/500 per class, disjoint union, saved hashes equal, tamper rejected |
+| TEST-D02 persisted split (implemented) | test_data_pipeline.py → create_split/load_split/CLI; test_split_local.py opt-in | Balanced synthetic50k + separate actual original train; protocol/reuse/hashes/RNG/failure/tamper tests above |45000/5000,4500/500class, disjoint/exhaustive, provenance verified; existing bytes/mtimes unchanged |
 | TEST-D03 `test_stats_train_only` | compute_normalization | Val/test outlier values, known train mean/std; change val values | Stats unchanged; numeric oracle tolerance1e-7, positive finite std |
 | TEST-D04 `test_transform_order_and_eval_determinism` | datasets | Ramp image, known darkening; compare normalize(f*x) vs f*normalize(x); repeat eval | First formula matches; second differs; val/test repeat equal, no geometry |
 | TEST-D05 `test_loader_indices_and_seeds` | make_loaders | Epoch 0/1, seed match, batch sizes, workers0/2 where supported | Paired sample order/geometry equal, epochs differ, labels int64, N×3×32×32, no drops |

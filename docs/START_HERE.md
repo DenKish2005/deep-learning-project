@@ -3,8 +3,10 @@
 Foundation этап выполнен в локальном техническом объёме: отдельная `.venv`, exact
 versions, CPU/CUDA environment smoke, complete YAMLs и strict validation с116
 passing tests. DATA-001 теперь реализует raw loader/acquisition/CLI/manifest;
-default suite180 PASS,3 actual opt-in SKIP; отдельно3actual PASS/0SKIP. Evidence — в
-report/reproduction.md. Следующая реализация — DATA-002, модели не обучены.
+DATA-002 добавляет verified persisted split494,45000/5000,4500/500per class и
+prepare/verify CLI. Default suite282PASS/5actual opt-in SKIP; отдельно5actual
+PASS/0SKIP. Evidence — в report/reproduction.md и report/data002_evidence.json.
+Следующая реализация — DATA-003, с CORR-001 dependency TODO; модели не обучены.
 Найдены guidelines/CSR и proposal candidates; submitted version, policy precedence
 и human approvals pending. Актуальные статусы полного DoD — в CURRENT_STATUS,
 проверенные команды — README, evidence — report/reproduction.md.
@@ -15,8 +17,8 @@ report/reproduction.md. Следующая реализация — DATA-002, м
 
 Это reference очередь implementation phase. SETUP-001/PROTO-001/TEAM-001 частично
 закрыты; у SETUP-002/003 local technical acceptance PASS, formal human review
-pending. DATA-001 остаётся PARTIAL до independent human review; следующая реализация
-— DATA-002/003 и REPRO-001 primitives. Независимая
+pending. DATA-001/002 остаются PARTIAL до independent human review; следующая реализация
+— DATA-003 и необходимые REPRO-001 primitives. Независимая
 техническая подготовка не ждёт missing source/team information; full training
 начинается только после policy/protocol и smoke/scientific gates.
 

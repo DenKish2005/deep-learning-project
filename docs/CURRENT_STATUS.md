@@ -1,6 +1,43 @@
 # CURRENT PROJECT STATUS
 
-## DATA-001 — 30–31.10.2026
+## DATA-002 — 31.10.2026
+
+Local technical acceptance **PASS**; full DoD **PARTIAL**, independent human
+artifact/code/test review pending. Initial clean main=origin/main7a2b2f3 verified
+by fetch. Existing `.venv`, lock/backend/scientific settings сохранены.
+
+`create_split`/`load_split` и CLI `--prepare-split`/read-only `--verify-split`
+реализованы. Actual original train50000→45000/5000, seed494, exactly4500/500 per
+class; sorted `<i8` indices0..49999, unique/disjoint/exhaustive и exact protocol
+replay PASS. Original test10000 не участвует в split. Manifest проверяет source,
+label order, arrays/NPZ hashes и LF creation-code identity; partial/tampered states
+отвергаются, failure diagnostics сохраняются. Reuse hashes/file mtimes PASS;
+11raw files, включая historical acquisition manifest и diagnostics, не изменены.
+
+NPZ76550 bytes: `1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284`.
+Оба YAML содержат этот file-byte hash; normalization_sha256 остаётся null.
+[Manifest](../data/splits/split_manifest.json), [actual evidence](../report/data002_evidence.json),
+[commands/results](../report/reproduction.md). Default282PASS/0FAIL/5opt-in SKIP;
+отдельно actual5PASS/0FAIL/0SKIP; pip/config CLI PASS. CUDA smoke не повторялся,
+dependencies/backend не менялись. Default suite offline и не требует actual data/split.
+
+Published in main:4044d0c algorithm/tests; fd0a272 persistence/provenance/tests;
+f4d7b42 CLI/tests; cf8e684 actual artifacts/configs/evidence/tests. Каждый commit
+проверен и сразу опубликован обычным push. Финальный docs commit — в Git history.
+
+| Task | Полный DoD | Результат / остаток |
+|---|---|---|
+| DATA-001/002 | PARTIAL, technical acceptance PASS | Raw data + frozen split verified; independent human review pending |
+| DATA-003 | TODO | Normalization/transforms/loaders отсутствуют; prerequisite CORR-001 ещё TODO |
+| REPRO-001 | TODO | Только минимальные dataset/split hash/write helpers; general identity/RNG/checkpoint/backup infrastructure не закрыта |
+
+Следующий конкретный этап — [DATA-003 prompt](NEXT_STEP_PROMPT.md): stats только
+по persisted45k train, deterministic keyed transforms/order и loaders в границах
+зависимостей. Training readiness не достигнута; scientific runs не запускались.
+Policy/LMS/submitted proposal/team/independent reproduction остаются pending.
+Graphify — historical snapshot до DATA-002, сверять с current source; rebuild не выполнялся.
+
+## Исторический DATA-001 snapshot — 30–31.10.2026
 
 Работа идёт непосредственно в `main`; initial fetch подтвердил main=origin/main
 на7658894, исходное рабочее дерево clean. AGENTS.md в repository и родительской
