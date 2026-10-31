@@ -176,6 +176,23 @@ Defaults actual tests: `CIFAR10_ROOT=data/raw`, `CIFAR10_SPLIT_DIR=data/splits`.
 default suite282PASS/5SKIP не требует actual inputs. CUDA smoke не повторялся:
 dependencies/backend неизменны; training/evaluation не запускались.
 
+## Работающие команды DATA-003
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.prepare_normalization --root data/raw
+.\.venv\Scripts\python.exe -m scripts.prepare_normalization --root data/raw --verify-only
+```
+
+Offline, original train only. Defaults: `--split-path
+data/splits/cifar10_split_v1.npz`, `--output data/splits/normalization.json`.
+Existing frozen split is verified, never created. Prepare creates stats exclusively
+or fully verifies/reuses; verify-only requires existing stats and writes nothing.
+Success JSON `status=stats_verified`, exit0, records FILE and semantic hashes;
+this does not assert training readiness. Invalid flags exit2; missing/corrupt raw,
+split/stats or interrupted diagnostics exit1 with preservation guidance. Select a
+new output only after preserving/inspecting the failed one. No raw manifests are
+rewritten. Existing download_data modes retain raw-only / split-only semantics.
+
 ## Плановые команды pipeline
 
 В примерах `python` обозначает interpreter проверенного env; на Windows можно заменить на `.\.venv\Scripts\python.exe`. Команды из root. Device cpu — рабочий fallback после реализации; cuda допустим только после validation. Parameters subset/profile относятся только к smoke/debug и запрещены для core profile.

@@ -19,6 +19,8 @@ data/processed/*
 !data/processed/.gitkeep
 data/splits/.split-write.lock
 data/splits/.split-stage-*/
+data/splits/.*.write.lock
+data/splits/.*.stage
 
 # Outputs / checkpoints
 outputs/checkpoints/*
