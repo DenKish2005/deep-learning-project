@@ -16,6 +16,7 @@ import pytest
 import torch
 
 from scripts import make_plots as plots
+from scripts.verify_frozen_corr003 import verify_frozen
 from src import data
 from src.utils import stable_seed
 from tests.test_blur import blur_oracle
@@ -97,14 +98,25 @@ def test_actual_source_and_independent_numeric_replay(actual):
 def test_actual_readonly_exports_rng_and_png_rgb(actual):
     root, split, pixels, source = actual
     python_rng, numpy_rng, torch_rng = random.getstate(), np.random.get_state(), torch.get_rng_state().clone()
-    for verify in (True, False):
-        assert plots.export_audit(root, split, OUTPUT, verify_only=verify)['status'] == 'verified'
+    assert verify_frozen(root, split)['status'] == 'verified'
+    record = json.loads((OUTPUT / plots.OUTPUT_NAMES[2]).read_text())
+    current = plots._source_record(pixels, source)
+    if current['implementation_sha256_lf'] == record['source']['implementation_sha256_lf']:
+        for verify in (True, False):
+            assert plots.export_audit(root, split, OUTPUT, verify_only=verify)['status'] == 'verified'
+    else:
+        # Source evolution intentionally invalidates strict CURRENT-source replay.
+        for verify in (True, False):
+            with pytest.raises(ValueError, match='source/implementation/pixel/output hash mismatch'):
+                plots.export_audit(root, split, OUTPUT, verify_only=verify)
     assert random.getstate() == python_rng
     after = np.random.get_state()
     assert after[0] == numpy_rng[0] and np.array_equal(after[1], numpy_rng[1]) and after[2:] == numpy_rng[2:]
     assert torch.equal(torch.get_rng_state(), torch_rng)
-    record = json.loads((OUTPUT / plots.OUTPUT_NAMES[2]).read_text())
-    assert record['source'] == plots._source_record(pixels, source)
+    # Old implementation hashes were authenticated/replayed above. All current
+    # numeric/source/version fields must still match the historical record exactly.
+    assert {k: v for k, v in record['source'].items() if k != 'implementation_sha256_lf'} == {
+        k: v for k, v in current.items() if k != 'implementation_sha256_lf'}
     figure = plots.plot_corruption_grid(pixels, source['rows'])
     figure.canvas.draw()
     max_rgb_error = 0.
