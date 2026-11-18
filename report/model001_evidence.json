@@ -1,0 +1,467 @@
+{
+  "architecture": {
+    "bn": "eps1e-5/momentum.1/affineTrue/running stats",
+    "buffer_elements": 902,
+    "conv": "3x3/stride1/padding1/biasFalse",
+    "conv_channels": [
+      [
+        3,
+        32
+      ],
+      [
+        32,
+        32
+      ],
+      [
+        32,
+        64
+      ],
+      [
+        64,
+        64
+      ],
+      [
+        64,
+        128
+      ],
+      [
+        128,
+        128
+      ]
+    ],
+    "head": "AdaptiveAvgPool2d(1), flatten, Dropout.2, Linear128->10 biasTrue",
+    "id": "compact_cnn_v1",
+    "outputs": "raw float32 Nx10 logits; N=1,4,128",
+    "pool_stage_shapes": [
+      [
+        32,
+        16,
+        16
+      ],
+      [
+        64,
+        8,
+        8
+      ],
+      [
+        128,
+        4,
+        4
+      ]
+    ],
+    "trainable_parameters": 288746
+  },
+  "checks": {
+    "baseline": {
+      "command": ".venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-model001-baseline",
+      "errors": 0,
+      "fail": 0,
+      "pass": 914,
+      "seconds": 229.883,
+      "skip": 19,
+      "started_at": "2026-11-18T23:09:14.651717+05:00"
+    },
+    "block1": {
+      "command": ".venv/Scripts/python.exe -m pytest tests/test_models.py -q --basetemp=.venv/pytest-model001-block1",
+      "errors": 0,
+      "fail": 0,
+      "pass": 23,
+      "seconds": 4.616,
+      "skip": 0,
+      "started_at": "2026-11-18T23:15:43.602860+05:00"
+    },
+    "block2_model_and_configs": {
+      "command": ".venv/Scripts/python.exe -m pytest tests/test_models.py tests/test_utils.py -q --basetemp=.venv/pytest-model001-block2-final",
+      "errors": 0,
+      "fail": 0,
+      "pass": 151,
+      "seconds": 8.062,
+      "skip": 0,
+      "started_at": "2026-11-18T23:17:38.740418+05:00"
+    },
+    "default_final": {
+      "command": ".venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-model001-final",
+      "errors": 0,
+      "fail": 0,
+      "pass": 950,
+      "seconds": 229.865,
+      "skip": 20,
+      "started_at": "2026-11-18T23:19:38.916790+05:00"
+    },
+    "explicit_cpu_cuda": {
+      "command": "RUN_MODEL_CUDA=1; .venv/Scripts/python.exe -m pytest tests/test_models_devices.py -q -s --basetemp=.venv/pytest-model001-devices",
+      "errors": 0,
+      "fail": 0,
+      "pass": 2,
+      "seconds": 6.507,
+      "skip": 0,
+      "started_at": "2026-11-18T23:19:24.998168+05:00"
+    },
+    "initial_cpu": {
+      "command": ".venv/Scripts/python.exe -m pytest tests/test_models_devices.py -q -s --basetemp=.venv/pytest-model001-cpu",
+      "errors": 0,
+      "fail": 0,
+      "pass": 1,
+      "seconds": 4.518,
+      "skip": 1,
+      "started_at": "2026-11-18T23:19:10.743689+05:00"
+    }
+  },
+  "date_local": "2026-11-18",
+  "executed_devices": [
+    {
+      "ce_loss": 2.271629810333252,
+      "cuda_build": "12.6",
+      "cudnn": 91002,
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": false,
+      "deterministic_algorithms": false,
+      "device": "cpu",
+      "eval_hashes": {
+        "1": "2bfbccee0da16f8da335e9c10636f8c0ee1d7db9cdfa5892d4e8bb46bed4642b",
+        "128": "e3691f63384acd8844ad0a4dc3aa987d90bbd460ff60344f48381a72f15d39bd",
+        "4": "0c629dc6fdef55036498a01cf97397e58e8d43740f8bcb440609ed94b531092c"
+      },
+      "eval_shapes": {
+        "1": [
+          1,
+          10
+        ],
+        "128": [
+          128,
+          10
+        ],
+        "4": [
+          4,
+          10
+        ]
+      },
+      "eval_state_and_rng_unchanged": true,
+      "finite_all_gradients": true,
+      "gpu": null,
+      "initial_state_hashes": {
+        "123": "eae265751c0d13500312385073878bb21c914c015804125c5ea8bfec0d51b42a",
+        "2026": "7bbb0859ed56538661c88aea74e37ecadd7a44ddcdcdb4f6d115161a9b2bfc28",
+        "42": "19bb7743f08acca99f695fcf1a970cee34d13fe45fef506517fba92b806f34d6"
+      },
+      "optimizer_steps": 0,
+      "parameters_unchanged_after_backward": true,
+      "python": "3.12.10",
+      "scope": "synthetic model QA; no CIFAR inference or training",
+      "strict_roundtrip": true,
+      "torch": "2.9.0+cu126"
+    },
+    {
+      "ce_loss": 2.290318489074707,
+      "cuda_build": "12.6",
+      "cudnn": 91002,
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": false,
+      "deterministic_algorithms": false,
+      "device": "cuda:0",
+      "eval_hashes": {
+        "1": "b6af68e0a670ac9ff35b643197ffa3bdada773bda2c33a8d279a2ed431161070",
+        "128": "94710cecb9121ba2c5afdf6daf1507a1c7b1b05fb5e9e1903b6ef2618d83b6fd",
+        "4": "eb1f7eb2cde7d9a5a80c01321a59d628043e0c8be0e6a3108d3d215832ba4009"
+      },
+      "eval_shapes": {
+        "1": [
+          1,
+          10
+        ],
+        "128": [
+          128,
+          10
+        ],
+        "4": [
+          4,
+          10
+        ]
+      },
+      "eval_state_and_rng_unchanged": true,
+      "finite_all_gradients": true,
+      "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "initial_state_hashes": {
+        "123": "eae265751c0d13500312385073878bb21c914c015804125c5ea8bfec0d51b42a",
+        "2026": "7bbb0859ed56538661c88aea74e37ecadd7a44ddcdcdb4f6d115161a9b2bfc28",
+        "42": "19bb7743f08acca99f695fcf1a970cee34d13fe45fef506517fba92b806f34d6"
+      },
+      "optimizer_steps": 0,
+      "parameters_unchanged_after_backward": true,
+      "python": "3.12.10",
+      "scope": "synthetic model QA; no CIFAR inference or training",
+      "strict_roundtrip": true,
+      "torch": "2.9.0+cu126"
+    }
+  ],
+  "full_DoD": "PARTIAL",
+  "hash_encoding": "Test-only state_sha256 in tests/test_models_devices.py: sorted keys, compact sorted ASCII JSON key/dtype/shape header + LF then native little-endian contiguous CPU tensor C bytes; non-tensor identity uses compact sorted key/value JSON + LF.",
+  "implementation_commits": [
+    "489eb04de0e73383ef585f95fbfb92813e50ea4e",
+    "11cffd5535cb3bd6d937eec6c2432b16d9f3ddae"
+  ],
+  "initialization": {
+    "bn": "weight1/bias0/running_mean0/running_var1/num_batches_tracked0",
+    "conv": "Kaiming normal fan_out/relu",
+    "full_state_includes_bn_buffers_and_identity": true,
+    "linear": "normal mean0/std.01, bias0",
+    "paired_seeds": [
+      42,
+      123,
+      2026
+    ],
+    "timing": "Caller sets torch seed, constructs on CPU. Normal layer constructor draws precede one protocol initialize_weights call; move to device afterward. No reseed inside module. Explicit reinitialize consumes caller RNG and resets BN buffers."
+  },
+  "limits": [
+    "All implementation/tests/review performed by agent; human understanding/code/artifact review, PROTO-001 and SETUP-002/003 formal approvals, source/course AI-policy/LMS/proposal/team acceptance and independent reproduction remain pending.",
+    "36 new default CPU cases, one new explicit CUDA opt-in; final950PASS/20SKIP. Separate executed device run2PASS/0SKIP. The19 historical actual DATA/CORR/ROBUST opt-ins were not rerun; retain original evidence dates.",
+    "Model tests use predeclared synthetic linspace inputs only. No CIFAR model inference, dataset quality/accuracy/robustness claims, training runs, optimizer steps, overfit/pilot/core/evaluator/EDA/metrics/figures.",
+    "Backend flags were observed, not changed: deterministic_algorithms=False, cudnn_deterministic=False, cudnn_benchmark=False in device checks. Same-device repeated eval passed; no full deterministic training, gradient replay, CPU/CUDA or cross-platform bitwise claim.",
+    "Paired initialization verified now at model-constructor boundary only. ROBUST-001 historical policy evidence unchanged; optimizer budget/full TEST-S01/scientific readiness remain open.",
+    "Frozen CORR-003 read-only recorded-source replay PASS; current-source strict mismatch remains intentional. No frozen artifact regeneration or relaxed checks.",
+    "General REPRO-001/checkpoint identity/RNG/resume/backup, TRAIN-* and second-machine reproduction remain out of scope."
+  ],
+  "prerequisite_cli_checks": [
+    {
+      "command": ".venv/Scripts/python.exe -m pip check",
+      "exit": 0,
+      "result": "No broken requirements found."
+    },
+    {
+      "archive_verified": true,
+      "command": ".venv/Scripts/python.exe -m scripts.download_data --root data/raw --verify-only",
+      "exit": 0,
+      "manifest": "unchanged",
+      "test": 10000,
+      "train": 50000
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m scripts.download_data --root data/raw --verify-split",
+      "exit": 0,
+      "seed": 494,
+      "train": 45000,
+      "validation": 5000
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m scripts.prepare_normalization --root data/raw --verify-only",
+      "exit": 0,
+      "file_sha256": "332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688",
+      "samples": 45000
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m scripts.verify_frozen_corr003",
+      "exit": 0,
+      "recorded_revision": "21ede652d2d1638ec69e4637f4707bcebf3c8224",
+      "status": "verified"
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m src.utils --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --controlled-pair",
+      "exit": 0,
+      "status": "controlled settings equal; schema only, not training readiness"
+    }
+  ],
+  "prerequisite_review": {
+    "PROTO-001": "PARTIAL: technical consistency checked, team/course/protocol freeze pending",
+    "SETUP-002": "local technical PASS, formal human approval pending",
+    "SETUP-003": "local technical PASS, formal review pending",
+    "bounded_preparation": "explicitly authorized by user; dependent formal acceptance stays gated",
+    "dependency_edges_changed": false,
+    "graphify": "historical snapshot, not rebuilt"
+  },
+  "preservation": {
+    "all_bytes_hashes_mtimes_unchanged": true,
+    "artifacts": {
+      "configs/clean_cnn.yaml": {
+        "bytes": 1741,
+        "mtime_unchanged": true,
+        "sha256": "60fbd56b703d1987d4d50de46dc0b32d7053f7ad81229e956763a51c4cbfd209"
+      },
+      "configs/robust_cnn.yaml": {
+        "bytes": 1745,
+        "mtime_unchanged": true,
+        "sha256": "1b080d66103d4cf5650967fbcd016311917e2cf177e57625246b542568a67371"
+      },
+      "data/raw/cifar-10-batches-py/batches.meta": {
+        "bytes": 158,
+        "mtime_unchanged": true,
+        "sha256": "f962466ef690d46b226450fb9aadc74ba4bc64a76aa526b5827fe4bc5c7125cb"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_1": {
+        "bytes": 31035704,
+        "mtime_unchanged": true,
+        "sha256": "54636561a3ce25bd3e19253c6b0d8538147b0ae398331ac4a2d86c6d987368cd"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_2": {
+        "bytes": 31035320,
+        "mtime_unchanged": true,
+        "sha256": "766b2cef9fbc745cf056b3152224f7cf77163b330ea9a15f9392beb8b89bc5a8"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_3": {
+        "bytes": 31035999,
+        "mtime_unchanged": true,
+        "sha256": "0f00d98ebfb30b3ec0ad19f9756dc2630b89003e10525f5e148445e82aa6a1f9"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_4": {
+        "bytes": 31035696,
+        "mtime_unchanged": true,
+        "sha256": "3f7bb240661948b8f4d53e36ec720d8306f5668bd0071dcb4e6c947f78e9682b"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_5": {
+        "bytes": 31035623,
+        "mtime_unchanged": true,
+        "sha256": "d91802434d8376bbaeeadf58a737e3a1b12ac839077e931237e0dcd43adcb154"
+      },
+      "data/raw/cifar-10-batches-py/test_batch": {
+        "bytes": 31035526,
+        "mtime_unchanged": true,
+        "sha256": "f53d8d457504f7cff4ea9e021afcf0e0ad8e24a91f3fc42091b8adef61157831"
+      },
+      "data/raw/cifar-10-python.tar.gz": {
+        "bytes": 170498071,
+        "mtime_unchanged": true,
+        "sha256": "6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce"
+      },
+      "data/raw/cifar10_integrity_v1.json": {
+        "bytes": 3696,
+        "mtime_unchanged": true,
+        "sha256": "62cd6967926f0546a09cba8ec6424a0f14f954a5841afa9c419c95e5332d68b7"
+      },
+      "data/splits/cifar10_split_v1.npz": {
+        "bytes": 76550,
+        "mtime_unchanged": true,
+        "sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284"
+      },
+      "data/splits/normalization.json": {
+        "bytes": 2429,
+        "mtime_unchanged": true,
+        "sha256": "332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688"
+      },
+      "data/splits/split_manifest.json": {
+        "bytes": 2539,
+        "mtime_unchanged": true,
+        "sha256": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21"
+      },
+      "docs/EXPERIMENT_PROTOCOL.md": {
+        "bytes": 40112,
+        "mtime_unchanged": true,
+        "sha256": "4e8e72d84ad87df27663549ca4494806b983b4b579dc39b82562eb997632c309"
+      },
+      "outputs/figures/corruption_examples.pdf": {
+        "bytes": 738357,
+        "mtime_unchanged": true,
+        "sha256": "0a3fa45fcc4ded82332e0a0aeb04cd75fc528744c6c521005f4750b20962e2fa"
+      },
+      "outputs/figures/corruption_examples.png": {
+        "bytes": 776955,
+        "mtime_unchanged": true,
+        "sha256": "9a056d31a97522ae5089fa1999a6b20f00df4b97a98d041802f3f0b493f776f3"
+      },
+      "outputs/figures/corruption_examples.source.json": {
+        "bytes": 7622,
+        "mtime_unchanged": true,
+        "sha256": "f5f09446078fc53d26f8d0e5df4d057c62042ff0540de409d363f26ae2ae5854"
+      },
+      "report/corr001_evidence.json": {
+        "bytes": 12973,
+        "mtime_unchanged": true,
+        "sha256": "179185ea0313efa7f041382153435a200871d707bbd1ee1673e39dde6ff41491"
+      },
+      "report/corr001_reference.npz": {
+        "bytes": 97580,
+        "mtime_unchanged": true,
+        "sha256": "40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33"
+      },
+      "report/corr002_evidence.json": {
+        "bytes": 24134,
+        "mtime_unchanged": true,
+        "sha256": "5cff5a67a5a7d32335ce232c2a83c2c72a8eea1914500cf29ab798e5f131cb7e"
+      },
+      "report/corr002_reference.npz": {
+        "bytes": 187438,
+        "mtime_unchanged": true,
+        "sha256": "b4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03"
+      },
+      "report/corr003_evidence.json": {
+        "bytes": 12271,
+        "mtime_unchanged": true,
+        "sha256": "b093405cc6f7080e078e34e76c05520876fc52cb6c5067d090451bf0055c6d15"
+      },
+      "report/data002_evidence.json": {
+        "bytes": 6925,
+        "mtime_unchanged": true,
+        "sha256": "3596957ea6bee074e037bf654605e430a4533035d5aa9679821636273a723e68"
+      },
+      "report/data003_evidence.json": {
+        "bytes": 16771,
+        "mtime_unchanged": true,
+        "sha256": "9ddab759288fd01f8d8d0055533339904c1a9e6e1db44a8def36447514b70d5a"
+      },
+      "report/robust001_evidence.json": {
+        "bytes": 23235,
+        "mtime_unchanged": true,
+        "sha256": "f306f13c5b560f6ba870c4b094200945ca56049979761fa47855ab92fffaa6c4"
+      },
+      "report/setup_environment.json": {
+        "bytes": 1357,
+        "mtime_unchanged": true,
+        "sha256": "cede90eed5138cd63d3b93c751302308a54ab31f157059227a163c9d5c89564b"
+      },
+      "requirements-lock.txt": {
+        "bytes": 862,
+        "mtime_unchanged": true,
+        "sha256": "8b0777e634a6c32fae37ddbbb997eba9fa08408dfba3b9c21c3e689fc5c3c412"
+      },
+      "requirements.txt": {
+        "bytes": 354,
+        "mtime_unchanged": true,
+        "sha256": "ca2143d760b887c8a980ec9cf1cdf935a9885c8b23eef3bde67aa651ee62be69"
+      },
+      "scripts/make_plots.py": {
+        "bytes": 15394,
+        "mtime_unchanged": true,
+        "sha256": "8c4def9aa927907a0ebe378de7964b8a6724c9228e640c7263a036268e3a6b0c"
+      },
+      "scripts/verify_frozen_corr003.py": {
+        "bytes": 3291,
+        "mtime_unchanged": true,
+        "sha256": "98c94f2efd67af164cc3d400bed7c5b7c016b6d6cb5eb9b3e9f818af83bc4c39"
+      },
+      "src/corruptions.py": {
+        "bytes": 11589,
+        "mtime_unchanged": true,
+        "sha256": "8112b736a6a2853c350fce3e77e8f35b7bffd4d03e14daf6bf97d322cf4b6e50"
+      },
+      "src/data.py": {
+        "bytes": 43949,
+        "mtime_unchanged": true,
+        "sha256": "f05c198c6e2f6630bc414f038c99ed880deac2d475152d0c6d18621bcbb8e9bc"
+      },
+      "src/utils.py": {
+        "bytes": 12688,
+        "mtime_unchanged": true,
+        "sha256": "48ad055860dddf3482e63112b1369af08edcc608058cf557ef19b358a185b6d9"
+      }
+    },
+    "checked_files": 36,
+    "diagnostic_and_marker_files_omitted_from_record": 2,
+    "entire_data_utils_corruptions_sources_unchanged": true,
+    "frozen_regions": {
+      "DATA-002-v1": "4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96",
+      "DATA-003-normalization-v1": "1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c"
+    }
+  },
+  "production_and_test_sha256_lf": {
+    "src/models.py": "37eb278933b20e538ac19041e2d2c895c119392354356a5d80bbbec59c57c787",
+    "tests/test_models.py": "6374407482297161de7ea0e3b18dd726f3d6d6f67af47fe2b82fe0176ed48f23",
+    "tests/test_models_devices.py": "7bfe970449bab1214d35c93572fc5987839b35bee9e4c8e05ad9dd284aa7ee5f"
+  },
+  "production_revision": "11cffd5535cb3bd6d937eec6c2432b16d9f3ddae",
+  "publication_before_evidence": "Each implementation block immediately ordinary push origin main PASS, fresh fetch clean main=origin/main, staged empty, ahead/behind0/0; final evidence/docs published separately.",
+  "reviewer": "Codex agent, independent synthetic oracles; not human approval",
+  "schema_version": 1,
+  "starting_main": "2e29bdd97a148e2205480e94db6c1adc75d88200",
+  "state_dict": "Standard torch extra_state identity: architecture,num_classes,dropout; strict=True required. weights_only=True and explicit map_location roundtrip. Incompatible identity/keys/shapes fail. Load into fresh instance: standard PyTorch load is not transactional. No optimizer/RNG/resume framework.",
+  "task": "MODEL-001",
+  "technical_acceptance": "PASS",
+  "timezone": "Asia/Qyzylorda"
+}
