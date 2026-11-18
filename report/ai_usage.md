@@ -1,5 +1,36 @@
 # AI assistance record
 
+## MODEL-001 — 18.11.2026
+
+По прямому запросу пользователя Codex прочитал current repo/saved prompt/docs,
+проверил prerequisites и clean main=origin/main2e29bdd после fresh fetch. AGENTS.md
+не найден; Graphify historical, без rebuild. Existing .venv, pip/raw/split/stats/
+frozen replay/config checks PASS; baseline914PASS/19SKIP. Formal PROTO-001 и
+SETUP-002 approvals не объявлены закрытыми; bounded preparation разрешена.
+
+Агент реализовал CompactCNN v1, explicit constructor initialization и стандартную
+model-level state_dict identity,35independent synthetic cases + CPU/CUDA device
+checks. Init timing и caller ownership определены до probes: seed→CPU constructor
+с default layer draws→final protocol init→device; без reseed. Paired full states
+seeds42/123/2026 включают BN buffers/identity. Shapes/raw logits, independent init
+RNG/BN/CE oracles, dropout/modes, finite backward без обновления параметров и strict
+serialized roundtrip PASS. Device inputs — fixed synthetic linspace; no CIFAR
+inference/quality claims. Backend flags unchanged; no cross-device/full training
+reproducibility claim. [Evidence](model001_evidence.json), [record](reproduction.md).
+
+Final950PASS/0FAIL/20SKIP; separately executed CPU/CUDA2PASS/0FAIL/0SKIP. Previous
+19actual opt-ins не повторялись, прежние evidence не передатированы. All36protected
+bytes/hashes/mtimes и DATA regions сохранены. Training/optimizer steps, EDA,
+metrics/evaluator/figures, TRAIN-* и general REPRO-001 не выполнялись.
+
+Blocks489eb04/11cffd5/6dad624: каждый full diff/tests, explicit staged list/full
+diff, оба diff checks, commit exact main и immediate ordinary push origin main
+PASS, fresh-fetch clean0/0/staged empty. Final docs/handoff отдельно. Все code/tests/
+review выполнены агентом; human understanding/code/artifact review, formal
+prerequisites, course AI-policy conflict/LMS/proposal/team/source approvals и
+second-machine reproduction PENDING. Technical PASS/full DoD PARTIAL. Новая model
+init QA не заменяет budget/full scientific gate и не переписывает ROBUST evidence.
+
 ## ROBUST-001 — 18.11.2026
 
 По прямому запросу пользователя Codex проверил fresh main/origin/history/docs,

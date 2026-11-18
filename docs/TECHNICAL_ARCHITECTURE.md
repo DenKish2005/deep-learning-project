@@ -9,7 +9,8 @@ CORR-001 реализует severity mapping, Gaussian noise и keyed CPU epsilo
 CORR-002 adds reflect blur, darkening and dispatch. CORR-003 implements only the
 train-only sanity grid, PNG/PDF/source manifest and bounded CLI.
 ROBUST-001 implements the production policy and verifies the existing explicit
-train-only integration. Human/Person5 visual review and formal acceptance remain pending. Остальные production APIs ниже
+train-only integration. MODEL-001 implements CompactCNN and synthetic model QA.
+Human/Person5 visual review and formal acceptance remain pending. Остальные production APIs ниже
 ещё не реализованы. Состояние: [CURRENT_STATUS.md](CURRENT_STATUS.md), уточнения
 и причины: [SETUP_DECISIONS.md](SETUP_DECISIONS.md). Протокол —
 [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md). Новые frameworks не вводятся.
@@ -323,7 +324,21 @@ clean config requires None. No training-ready success is implied. A future train
 must request `partitions=('train','val')`; this path never decodes original test.
 Only explicit test requests load test images for the fixed loader contract.
 
-### `src/models.py`
+### `src/models.py` — implemented MODEL-00118.11.2026
+
+Technical PASS/full DoD PARTIAL; [evidence](../report/model001_evidence.json).
+Caller torch seed before CPU construction; standard layer constructor draws then
+one initialize_weights call, then caller moves to device. No hidden reseed.
+Explicit reinitialization consumes RNG and resets BN buffers. Class attribute
+architecture='compact_cnn_v1'. Forward rejects empty/wrong NCHW32x32 shapes before
+BN/dropout. Config remains10classes/dropout.2; module accepts positive class counts
+and finite Python dropout[0,1] for QA only. Standard state_dict `_extra_state`
+contains architecture/num_classes/dropout, validated on strict load. Missing keys,
+wrong shapes or incompatible identity fail; load into fresh instance (PyTorch load
+is not transactional). weights_only=True/explicit map_location roundtrip verified;
+general checkpoint/config/data provenance and resume remain future REPRO/TRAIN.
+Default950PASS/20SKIP; separate synthetic CPU/CUDA2PASS/0SKIP, no optimizer steps.
+
 
 - `CompactCNN(num_classes=10, dropout=0.2)`; `forward(x: Tensor[N,3,32,32]) -> Tensor[N,10]` logits; `initialize_weights()` либо internal init helper.
 - Conv2d 3×3 stride 1 padding 1 bias=False; BN default eps=1e-5, momentum=0.1, affine=True; ReLU; pool 2×2 stride 2. AdaptiveAvgPool2d(1) → flatten → Dropout(0.2) → Linear(128,10, bias=True).

@@ -1,5 +1,35 @@
 # Воспроизводимость: проверенный setup и будущий pipeline
 
+## Working MODEL-001 checks — 18.11.2026
+
+Existing .venv only, no installs/updates/backend changes. Heavy checks sequential.
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/test_models.py -q
+.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-model001-replay
+$env:RUN_MODEL_CUDA='1'
+try {
+    .\.venv\Scripts\python.exe -m pytest tests/test_models_devices.py -q -s
+} finally {
+    Remove-Item Env:RUN_MODEL_CUDA
+}
+```
+
+Observed950default PASS/20opt-in SKIP, separate2device PASS/0SKIP (CPU and RTX3060
+Laptop). Omit flag for CPU-only1PASS/1SKIP; that is not CUDA PASS. Explicit CUDA
+unavailable is a failure. Synthetic linspace inputs only, no CIFAR inference or
+optimizer steps. Initial state hashes include BN buffers and architecture/config
+extra state; test-only encoding in [evidence](../report/model001_evidence.json).
+
+Caller torch.manual_seed(run_seed), then CompactCNN on CPU, then move to device.
+Constructor layer draws precede final explicit protocol initialization; no reseed
+inside model. Record initial hash before any checks. Strict load into a fresh
+compatible model; state_dict `_extra_state` carries architecture/classes/dropout.
+weights_only=True, explicit map_location; no general checkpoint/resume API added.
+Device checks leave backend flags unchanged, observed determinism flags false;
+repeat eval passed on each device, no deterministic-training/cross-device claim.
+Historical ROBUST/DATA/CORR opt-ins not rerun. [Record](../report/reproduction.md).
+
 ## Работающие ROBUST-001 проверки — 18.11.2026
 
 Use the existing .venv, without install/update/backend changes. Run heavy pytest

@@ -1,5 +1,18 @@
 # MASTER PROJECT PLAN — CSCI 494 Robustness to Noise
 
+MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
+full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired
+initial states42/123/2026, BN/dropout/modes/backward/strict state_dict verified.
+Default950PASS/0FAIL/20opt-in SKIP; separate executed CPU/CUDA2PASS/0SKIP.
+All36protected files retain bytes/SHA-256/mtime; historical DATA/CORR/ROBUST actual
+opt-ins not rerun. No training/optimizer steps, CIFAR model inference or EDA.
+Human understanding/review, PROTO-001/SETUP-002/003 formal approvals, course/source/
+team gates and independent reproduction pending. Paired-init constructor QA does
+not establish optimizer budget/full TEST-S01 or training readiness.
+[Evidence](../report/model001_evidence.json), [current status](CURRENT_STATUS.md).
+Next bounded candidate: [METRIC-001 after prerequisite review](NEXT_STEP_PROMPT.md).
+Earlier updates below are historical snapshots.
+
 Обновление ROBUST-00118.11.2026: independent technical PASS/full DoD PARTIAL.
 Production policy и existing explicit train-only integration verified;
 914default PASS/19opt-in SKIP, отдельно6actual PASS/0SKIP. No training/EDA.

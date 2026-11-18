@@ -1,5 +1,78 @@
 # Verification record — foundation, DATA, CORR and ROBUST-001
 
+## MODEL-001 synthetic technical acceptance — 18.11.2026
+
+**PASS technical scope; PARTIAL full DoD.** Direct user authorization; agent read
+current repository/docs/prerequisites, initial fresh fetch clean exact main=
+origin/main2e29bdd. No applicable AGENTS.md. Historical Graphify not rebuilt.
+Existing .venv only, no install/update/global/backend/config/protocol changes.
+PROTO-001/SETUP-002 formal prerequisites remain pending; bounded preparation allowed.
+
+CompactCNN v1 implements6Conv+BN+ReLU,3MaxPool2,GAP,flatten,Dropout.2,Linear128->10:
+288746trainable params and902BN buffer elements. Raw logits; no softmax. Caller
+seed before CPU construction, normal layer constructor RNG draws then one explicit
+protocol initialize_weights. Conv Kaiming normal fan_out/relu; BN1/0 plus fresh
+buffers; Linear normal std.01/bias0. No hidden seed. Initialize before QA and before
+any future optimizer; explicit reinitialization resets buffers/consumes RNG.
+
+| Check | Result |
+|---|---|
+| Prerequisite pip check | PASS: no broken requirements |
+| Fresh raw / split / stats / controlled configs CLIs | PASS; verify-only, no repair; test decode solely raw integrity |
+| Frozen CORR-003 authenticated replay at21ede65 | PASS, historical strict current-source mismatch preserved |
+| Baseline default suite |914PASS/0FAIL/19SKIP,229.883s JUnit |
+| Block1 architecture/shapes/init |23PASS,4.616s |
+| Block2 model + existing config tests |151PASS,8.062s;35model cases |
+| Initial CPU device check without CUDA opt-in |1PASS/1SKIP,4.518s |
+| Explicit CPU/CUDA model device checks |2PASS/0FAIL/0SKIP,6.507s |
+| Final default suite |950PASS/0FAIL/20SKIP,229.865s JUnit (console229.93s) |
+| Frozen preservation |36files bytes/SHA-256/mtime_ns unchanged, entire data/utils/corruptions source preserved |
+
+[Commands](../docs/REPRODUCIBILITY.md), [evidence](model001_evidence.json).
+Default adds36CPU cases and1CUDA opt-in. The19historical actual DATA/CORR/ROBUST
+opt-ins not rerun; previous evidence dates unchanged. Actual device execution uses
+predeclared synthetic linspace inputs only; no CIFAR inference or accuracy result.
+CPU and RTX3060Laptop, Python3.12.10/torch2.9.0+cu126/CUDA12.6/cuDNN91002.
+Backend flags observed unchanged: deterministic_algorithmsFalse,
+cudnn.deterministicFalse, benchmarkFalse. Same-device repeated eval/state/RNG PASS;
+no gradient replay/full deterministic training or CPU/CUDA equality claim.
+
+TEST-M01..03: independent literal layer/parameter/stage/shape/raw-logit oracles;
+normal RNG init replay; caller-seeded paired states42/123/2026 (including buffers
+and identity), distinct states for differing seeds/consumed stream. Independent
+float64 BN running mean/unbiased variance, counters, inverted dropout mask/scale,
+eval identity, CE vs logsumexp, finite all parameter/input gradients and unchanged
+parameters. Standard strict state_dict serialized weights_only=True/map_location
+roundtrip includes updated BN and `_extra_state` architecture/classes/dropout.
+Wrong architecture/config/keys/shapes fail. Use fresh instance: standard PyTorch
+load has no transactional rollback; no general checkpoint/RNG/resume API added.
+
+| Identity | SHA-256 |
+|---|---|
+| Evidence,17819bytes |f658440c8c34425cae6c9e9831dd822c345e7f04a5e1bae39c1e3471677ee362 |
+| src/models.py UTF-8/LF |37eb278933b20e538ac19041e2d2c895c119392354356a5d80bbbec59c57c787 |
+| Seed42 initial full model state |19bb7743f08acca99f695fcf1a970cee34d13fe45fef506517fba92b806f34d6 |
+| Seed123 initial full model state |eae265751c0d13500312385073878bb21c914c015804125c5ea8bfec0d51b42a |
+| Seed2026 initial full model state |7bbb0859ed56538661c88aea74e37ecadd7a44ddcdcdb4f6d115161a9b2bfc28 |
+
+Test-only sorted-key tensor-header/C-byte hash encoding, all test/source/artifact
+identities and per-device eval hashes in evidence. Initial models constructed on
+CPU for both devices; hashes are local locked-runtime observations, not universal
+regeneration promises. Paired init now verified at constructor boundary; ROBUST-001
+historical evidence unchanged, budget/full TEST-S01/scientific readiness still open.
+
+Published blocks489eb04 API/tests,11cffd5 modes/strict model identity,6dad624 devices/
+evidence. Each full diff/relevant tests, exact staged paths/full staged diff, both
+diff checks, main commit, immediate ordinary push origin main PASS; fresh fetch
+clean main=origin/main0/0 and empty staged list. Final docs/handoff published
+separately; final hash/sync in Git/chat. No branches/worktrees/history rewrite.
+
+Human understanding/code/artifact review, PROTO-001/SETUP-002/003 formal approvals,
+course/source-policy/LMS/proposal/team freeze and independent reproduction remain
+pending. No training/optimizer updates, overfit/pilot/core/evaluator/metrics/EDA/
+new figures. General REPRO-001 and TRAIN-* untouched. Next bounded technical
+candidate [METRIC-001 after prerequisite review](../docs/NEXT_STEP_PROMPT.md).
+
 ## ROBUST-001 independent technical acceptance — 18.11.2026
 
 **PASS independent technical scope; PARTIAL full DoD.** Codex agent checks by

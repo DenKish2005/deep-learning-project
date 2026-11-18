@@ -1,5 +1,17 @@
 # Подробный implementation roadmap
 
+MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
+full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired
+initial states42/123/2026, BN/dropout/modes/backward/strict state_dict verified.
+Default950PASS/0FAIL/20opt-in SKIP; separate executed CPU/CUDA2PASS/0SKIP.
+All36protected files retain bytes/SHA-256/mtime; historical DATA/CORR/ROBUST actual
+opt-ins not rerun. No training/optimizer steps, CIFAR model inference or EDA.
+Human understanding/review, PROTO-001/SETUP-002/003 formal approvals, course/source/
+team gates and independent reproduction pending. Paired-init constructor QA does
+not establish optimizer budget/full TEST-S01 or training readiness.
+[Evidence](../report/model001_evidence.json); next candidate [METRIC-001](NEXT_STEP_PROMPT.md).
+Prerequisite edges unchanged; historical updates/cards below retain dated scope.
+
 Обновление ROBUST-00118.11.2026: independent technical PASS/full DoD PARTIAL.
 Production policy/existing train-only hook verified;914default PASS/19opt-in SKIP,
 separate6actual PASS/0SKIP. [Evidence](../report/robust001_evidence.json).
@@ -401,22 +413,22 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** MODEL-001.
 - **2. Title:** CompactCNN v1.
 - **3. Purpose:** Одна архитектура с нуля.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — independent synthetic technical PASS18.11.2026: CompactCNN288746 params, init/shapes/modes/backward/strict state;950default PASS/20SKIP +2executed CPU/CUDA PASS/0SKIP. Human understanding/review and formal PROTO-001/SETUP-002 acceptance pending; no training readiness.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** PROTO-001; SETUP-002.
 - **8. Steps:** 1) 6Conv+BN+ReLU/3pool; 2) GAP/dropout.2/linear; 3) explicit init и architecture ID.
-- **9. Files:** src/models.py; tests/test_models.py.
+- **9. Files:** src/models.py; tests/test_models.py; tests/test_models_devices.py; report/model001_evidence.json; .gitattributes; relevant docs/reproduction/ai_usage.
 - **10. Functions/classes:** CompactCNN; initialize_weights; forward.
 - **11. Inputs:** N×3×32×32.
 - **12. Outputs:** N×10 logits and state_dict.
-- **13. Artifacts:** перечисленные outputs в указанных files/dirs + test/review evidence; paths/hash записать в task/PR.
+- **13. Artifacts:** report/model001_evidence.json (17819bytes, SHA-256f658440c8c34425cae6c9e9831dd822c345e7f04a5e1bae39c1e3471677ee362); source/tests hashes and36protected-file preservation; human review pending.
 - **14. Testing:** TEST-M01..03.
 - **15. Acceptance:** 288746 params; shapes/modes/finite backward correct.
 - **16. DoD:** acceptance выполнен; тестовые результаты и artifacts проверены reviewer; status обновлён. Для OPTIONAL допустимо SKIPPED с причиной, без объявления PASS.
 - **17. Effort:** 3-4 person-hours, без full-training wait time.
 - **18. Risks/common mistakes:** Softmax до CE, лишние conv biases.
-- **19. Branch:** codex/model-001.
+- **19. Branch:** main (current user instruction; no branches/worktrees).
 - **20. Commit/PR scope:** CompactCNN v1; только файлы пункта 9, включая relevant tests/docs; один logical PR, owner Person 3.
 
 ### TRAIN-001 — Shared training/validation engine

@@ -1,5 +1,28 @@
 # План тестирования и QA
 
+## MODEL-001 current technical acceptance — 18.11.2026
+
+Default **950PASS/0FAIL/20SKIP**, separate CPU/CUDA **2PASS/0FAIL/0SKIP**.
+35synthetic tests in test_models.py plus1default CPU device case; CUDA is explicit
+RUN_MODEL_CUDA=1, unavailable opted-in CUDA fails. The19old actual opt-ins retain
+their historical evidence dates. [Evidence](../report/model001_evidence.json).
+
+TEST-M01: literal layer/channel/kernel/BN/head/parameter/buffer oracles; batches
+1/4/128, pool shapes32x16x16/64x8x8/128x4x4; forced signed head oracle rejects
+softmax outputs. TEST-M02: CE vs logsumexp fixture, finite all parameter/input
+gradients, unchanged parameters without optimizer, independent float64 BN mean/
+unbiased running-variance oracle, counters, inverted-dropout mask/scale in forward,
+eval identity and unchanged full state/RNG. TEST-M03: independent normal RNG
+replay for fan_out/relu init, paired full initial states42/123/2026 incl buffers/
+identity, different seed/consumed stream, strict serialized roundtrip with updated
+BN buffers; architecture/classes/dropout/key/shape mismatch errors.
+
+Executed device cases use fixed synthetic linspace only, eval batches1/4/128,
+batch4backward and strict weights_only/map_location roundtrip. CPU/CUDA backend
+flags unchanged; same-device repeated eval equality only. No training/dataset
+inference/accuracy promise, full TEST-S01/budget/general checkpoint acceptance or
+human/formal approval. Full MODEL-001 DoD PARTIAL. Older sections below are history.
+
 ## ROBUST-001 current acceptance — 18.11.2026
 
 Default **914PASS/0FAIL/19opt-in SKIP**; separately **6actual PASS/0FAIL/0SKIP**.

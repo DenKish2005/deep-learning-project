@@ -16,15 +16,42 @@ Gaussian noise and reusable original-test keyed CPU epsilon. CORR-002 adds refle
 Gaussian blur, progressive darkening and `apply_corruption`. CORR-003 adds the
 train-only 10x16 corruption grid, PNG/PDF, source manifest and agent visual audit.
 ROBUST-001 adds production CorruptionPolicy through the existing explicit
-train-only hook. CNN, training, evaluation and metrics plots remain future work.
+train-only hook. MODEL-001 adds CompactCNN v1 and independent synthetic model tests.
+Training, evaluation and metrics plots remain future work.
 No training has run.
 Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
-RGB32×32, all archive/file checksums and class counts pass. Current checks:
+RGB32×32, all archive/file checksums and class counts pass. Historical ROBUST-001 checks:
 914 offline tests pass (19 opt-in tests skipped); separately 6 actual checks pass
 with no skips: policy CPU/CUDA3, CORR references1, frozen grid2. Other13 historical
 opt-ins were not rerun; earlier evidence retains its dates. Raw/split/stats and
 config CLIs passed18.11.2026. ROBUST-001 technical PASS, full DoD PARTIAL;
 human review, Person5/team visual review and formal approvals remain pending.
+
+## Working CompactCNN (MODEL-001)
+
+Synthetic technical **PASS**, full DoD **PARTIAL** (18.11.2026). Default950PASS/
+20opt-in SKIP; separate executed CPU/CUDA2PASS/0SKIP. Exact288746 trainable params,
+6Conv+BN+ReLU,3pools,GAP,Dropout.2,Linear128->10 raw logits. Caller sets torch seed
+before CPU construction; protocol init runs at end of constructor without reseed.
+Move to device afterward. Paired full initial states42/123/2026 match; BN/dropout,
+finite CE/backward without parameter updates, strict identity/state roundtrip PASS.
+
+```python
+import torch
+from src.models import CompactCNN
+
+torch.manual_seed(42)  # Caller owns model RNG.
+model = CompactCNN().eval()
+with torch.inference_mode():
+    logits = model(torch.zeros(4, 3, 32, 32))  # synthetic API example
+```
+
+[Evidence](report/model001_evidence.json), [replay commands](docs/REPRODUCIBILITY.md).
+No training or CIFAR model inference. Backend flags unchanged; same-device repeat
+eval only, no cross-device equality/training determinism/quality claim. Previous
+19actual opt-ins not rerun. Human review/formal prerequisites and course approvals
+pending; full scientific paired budget and general REPRO-001 remain open.
+Next bounded candidate: [METRIC-001 after review](docs/NEXT_STEP_PROMPT.md).
 
 ## Working train-only policy (ROBUST-001)
 

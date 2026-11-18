@@ -1,5 +1,17 @@
 # Проверка готовности foundation
 
+MODEL-001 operational decisions18.11.2026: synthetic technical PASS/full DoD
+PARTIAL, [evidence](../report/model001_evidence.json). Constructor CPU init uses
+caller torch RNG: layer constructor draws, then exactly one initialize_weights.
+Conv fan_out/relu Kaiming normal; BN weight1/bias0 with reset buffers; Linear
+normal std.01/bias0. No reseed or general seed framework. Model state_dict uses
+standard `_extra_state` for architecture/classes/dropout compatibility; strict
+load required into fresh instance, no transactional rollback/resume guarantee.
+Config still fixes10classes/dropout.2; generic constructor alternatives only QA.
+Default950PASS/20SKIP, separate CPU/CUDA2PASS/0SKIP; backend flags unchanged.
+PROTO-001/SETUP-002/003 formal/human approvals, budget/full scientific gate,
+course/team/source policy and independent reproduction stay open. No training.
+
 Обновление ROBUST-00118.11.2026: independent technical PASS/full DoD PARTIAL;
 [evidence](../report/robust001_evidence.json). Existing constructor/API completed
 with immutable frozen probabilities/max3. Exact operational draw order: float64

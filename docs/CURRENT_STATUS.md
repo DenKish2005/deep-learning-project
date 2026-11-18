@@ -1,5 +1,43 @@
 # CURRENT PROJECT STATUS
 
+## MODEL-001 — 18.11.2026
+
+MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
+full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired
+initial states42/123/2026, BN/dropout/modes/backward/strict state_dict verified.
+Default950PASS/0FAIL/20opt-in SKIP; separate executed CPU/CUDA2PASS/0SKIP.
+All36protected files retain bytes/SHA-256/mtime; historical DATA/CORR/ROBUST actual
+opt-ins not rerun. No training/optimizer steps, CIFAR model inference or EDA.
+Human understanding/review, PROTO-001/SETUP-002/003 formal approvals, course/source/
+team gates and independent reproduction pending. Paired-init constructor QA does
+not establish optimizer budget/full TEST-S01 or training readiness.
+
+Implemented src/models.py with only torch/stdlib dependencies. Caller seeds before
+CPU construction; default layer draws precede one final protocol init. No hidden
+reseed. Reinitialize explicitly resets BN buffers and consumes caller RNG.
+Model state_dict includes `_extra_state` architecture/classes/dropout identity;
+load strict=True into a fresh compatible instance, with explicit map_location and
+weights_only=True. Standard PyTorch load has no transactional rollback guarantee.
+
+[Evidence](../report/model001_evidence.json),17819bytes, SHA-256
+`f658440c8c34425cae6c9e9831dd822c345e7f04a5e1bae39c1e3471677ee362`.
+[Commands/results](../report/reproduction.md). CPU/CUDA repeated eval is same-device
+only; backend flags were unchanged (deterministic algorithms/cuDNN deterministic
+false in these checks). No deterministic-training or cross-device equality claim.
+
+| Task | Full DoD | Remaining |
+|---|---|---|
+| MODEL-001 | PARTIAL; synthetic technical PASS | Independent human review/understanding, formal PROTO-001/SETUP-002 acceptance |
+| ROBUST-001 / DATA-003 | PARTIAL; prior technical PASS preserved | Human/formal dependent acceptance; budget/full scientific controls |
+| TRAIN-* / REPRO-001 / METRIC-001 | TODO | Shared trainer; general identity/resume/backup; metrics API |
+
+Published main blocks489eb04 API/tests,11cffd5 modes/strict identity,6dad624 devices/
+evidence; each full diff/tests/staged checks and immediate ordinary push PASS,
+fresh fetch clean0/0. Final docs/handoff separately published. Next independent
+bounded candidate [METRIC-001](NEXT_STEP_PROMPT.md), not started in this stage.
+
+## Historical status snapshots
+
 ## ROBUST-001 — 18.11.2026
 
 Independent technical scope **PASS**; full DoD **PARTIAL**. Production

@@ -37,7 +37,7 @@ freshness, submitted version и AI-policy precedence остаются pending.
 |---|---|---|---|---|---|---|---|
 | A01 | Чёткая проблема; S1a p2–7 | MUST | PROTO-001, REPORT-001 | docs/PROJECT_OVERVIEW.md, report/final_report/report.md | RQ, scope, motivation | Report review vs S1 | Local source checked; RQ draft |
 | A02 | Доступный usable dataset; S1a p2–7 | MUST | DATA-001..003 | src/data.py, data/splits/ | Checksum/counts/split/stats identities | Data tests | Data/production policy integration technical PASS; formal dependent acceptance/human review pending |
-| A03 | Baseline и ≥1 NN, обученная командой; S1a p2–7 | MUST | MODEL-001, CLEAN-001..003 | src/models.py, src/train.py | Checkpoints + logs + attribution | Provenance audit | Local source checked; models TODO |
+| A03 | Baseline и ≥1 NN, обученная командой; S1a p2–7 | MUST | MODEL-001, CLEAN-001..003 | src/models.py, src/train.py | Checkpoints + logs + attribution | Provenance audit | Model synthetic technical PASS/full DoD PARTIAL; team-trained NN still TODO |
 | A04 | Controlled comparison; S1a p2–7 | MUST | PROTO-001, ROBUST-001..003, TEST-002 | configs/, src/train.py | Equality fields, paired seeds | Scientific validity tests | Config controls implemented; run controls TODO |
 | A05 | Quantitative evaluation; S1a p2–7 | MUST | EVAL-001..004, METRIC-001..002 | src/evaluate.py, src/metrics.py | 96 results + tables | Matrix audit | Local source checked; evaluation TODO |
 | A06 | Честное обсуждение successes/failures/limitations; S1a p2–7 | MUST | ANALYSIS-001, REPORT-002 | report/final_report/report.md | Все RQ, uncertainty, negative results | Evidence review | Local source checked; discussion TODO |
@@ -56,9 +56,9 @@ freshness, submitted version и AI-policy precedence остаются pending.
 | ID | Требование / источник | Приоритет | Tasks | Файлы | Evidence | Проверка | Сейчас |
 |---|---|---|---|---|---|---|---|
 | B01 | CIFAR-10 45k/5k/10k, S3 | MUST | DATA-001..003 | src/data.py, data/splits/ | Disjoint stratified indices + stats | TEST-D02..05 | Actual split/stats/loaders and ROBUST-001 integration technical PASS; formal/human gates pending |
-| B02 | Одна compact custom CNN с нуля, S3 | MUST | MODEL-001 | src/models.py | 288746 params, logits N×10 | TEST-M01..03 | Нет |
+| B02 | Одна compact custom CNN с нуля, S3 | MUST | MODEL-001 | src/models.py | 288746 params, logits N×10 | TEST-M01..03 | MODEL-001 synthetic technical PASS/full DoD PARTIAL; evidence report/model001_evidence.json |
 | B03 | Noise, blur, darkening ×5 pixel-space severity, S3 | MUST | CORR-001..003 | src/corruptions.py; scripts/make_plots.py | Severity table + actual train-only PNG/PDF/source manifest | TEST-C01..08; grid tests | CORR-001/002/003 independent technical PASS; Person5/team visual review and formal approvals pending |
-| B04 | Clean vs Robust; только train policy различается, S3 | MUST | TRAIN-001..003, ROBUST-001 | configs/, src/train.py | Paired initialization/order/budget logs | TEST-S01 | Config/input pairing/policy technical PASS; model init/budget/full runtime controls TODO |
+| B04 | Clean vs Robust; только train policy различается, S3 | MUST | TRAIN-001..003, ROBUST-001 | configs/, src/train.py | Paired initialization/order/budget logs | TEST-S01 | Config/input pairing/policy technical PASS; paired model-constructor init technical PASS; budget/full runtime controls TODO |
 | B05 | Seeds 42,123,2026, S3 | MUST | CLEAN-001..003, ROBUST-002..003 | outputs/runs/, checkpoints/ | 6 complete runs | Manifest audit | Нет |
 | B06 | 16 условий/run, 96 оценок, одни test images, S3 | MUST | EVAL-002..004 | scripts/run_all_evaluations.py | 96 keys, 960000 predictions | TEST-E02 | Нет |
 | B07 | Accuracy/drop/RR/mCA/gap/F1/per-class/CM/mean±SD, S3 | MUST | METRIC-001..002 | src/metrics.py | Formula fixtures + exports | TEST-K01..04 | Нет |
