@@ -4,6 +4,8 @@ import math
 
 import torch
 
+from src.utils import stable_seed
+
 
 def severity_params(kind: str, severity: int) -> dict:
     """Exact protocol-v1 parameters; clean is separate from levels 1..5.
@@ -56,3 +58,30 @@ def gaussian_noise(x: torch.Tensor, sigma: float, generator: torch.Generator) ->
     if sigma > torch.finfo(torch.float32).max:
         return (x.double() + sigma * epsilon.double()).clamp(0, 1).to(x.dtype)
     return (x + sigma * epsilon).clamp(0, 1)
+
+
+def keyed_test_generator(original_index: int, *, namespace: str) -> torch.Generator:
+    """Fresh CPU stream for one official original-test ID; eval seed is 100494.
+
+    Require the dataset's full namespace to reject accidental train/val IDs.
+    Its protocol seed alias is 'cifar10-test'. No severity, model or run seed
+    enters the key. Recreate this generator for each image/condition; reusing
+    a consumed generator would change epsilon. No dataset/evaluator is built.
+    """
+    if type(namespace) is not str or namespace != 'cifar10-python/original-test':
+        raise ValueError('namespace must be cifar10-python/original-test')
+    if type(original_index) is not int or not 0 <= original_index < 10000:
+        raise ValueError('original_index must be a Python integer in original-test 0..9999')
+    return torch.Generator(device='cpu').manual_seed(stable_seed(
+        100494, 'cifar10-test', original_index, 'gaussian_noise', 'v1'))
+
+
+def keyed_test_epsilon(original_index: int, *, namespace: str) -> torch.Tensor:
+    """Reusable pre-clamp CPU float32 [3,32,32] N(0,1) for that test identity.
+
+    For pixels use gaussian_noise(x, sigma, keyed_test_generator(...)); both
+    boundaries draw exactly the same epsilon in the locked CPU environment.
+    This tensor is unbounded noise, not an image to normalize or clamp.
+    """
+    generator = keyed_test_generator(original_index, namespace=namespace)
+    return torch.randn((3, 32, 32), dtype=torch.float32, device='cpu', generator=generator)
