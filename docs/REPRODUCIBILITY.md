@@ -1,17 +1,61 @@
 # Воспроизводимость: проверенный setup и будущий pipeline
 
+## Работающие CORR-002 проверки — 18.11.2026
+
+Use existing .venv without install/update/backend changes, from repository root:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip check
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-only
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-split
+.\.venv\Scripts\python.exe -m scripts.prepare_normalization --root data/raw --verify-only
+.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-corr002-final --junitxml=tmp/corr002/default.xml
+$env:RUN_CIFAR_CORRUPTIONS='1'
+$env:RUN_CORR_CUDA='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_corr002_local.py tests/test_corruptions_local.py tests/test_corruptions_cuda.py -q -s --basetemp=.venv/pytest-corr002-actual --junitxml=tmp/corr002/actual.xml
+Remove-Item Env:RUN_CIFAR_CORRUPTIONS
+Remove-Item Env:RUN_CORR_CUDA
+```
+
+Default777PASS/0FAIL/14SKIP; separate6PASS/0FAIL/0SKIP. CPU-only replay omits CUDA
+environment variable and CUDA file:4CIFAR cases, not a GPU PASS. Opt-in missing/
+corrupt inputs and unavailable CUDA fail; tests never download. Original8DATA
+actual cases were not rerun. Actual root/splits env overrides match CORR-001 below.
+
+Reference [corr002_reference.npz](../report/corr002_reference.npz),187438bytes,
+SHA-256 `b4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03`.
+Created once from verified actual persisted train IDs0/1/2, run42 epoch0, clean0
+and severity3 of noise/blur/brightness. Float32 pixels/normalized arrays shape
+[4,3,3,32,32]; IDs/severities int64, kinds Unicode. Pixel arrays from dispatcher
+after integer geometry, normalized output from IndexedCIFAR10 fixed injection
+probe. Actual tests replay independent NumPy2D reflect/direct randn/factor oracles
+for all16conditions×17IDs×2epochs, compare saved subset exactly and preserve the
+old CORR-001 reference. Fixed probes are not production robust policy.
+
+Array semantic hashes use compact sorted ASCII JSON dtype/shape +LF+C-order
+little-endian bytes (Unicode uses NumPy UTF-32LE). Tensor stream hashes use only
+float32 C bytes; list-order streams and shuffled-loader streams differ in order.
+See [evidence](../report/corr002_evidence.json) for per-array and per-stream hashes.
+Do not regenerate a mismatched reference. No NPZ byte equality across platforms/
+versions promised. Canonical keyed epsilon remains CPU even for CUDA models.
+
+All23protected raw/split/stats/config/reference/source/protocol/lock files retain
+bytes/hashes/mtimes. CPU and CUDA blur max oracle error1.7881393432617188e-7;
+CPU tolerance1e-6, CUDA2e-6. No global RNG/backend changes or cross-device bitwise
+claim. CORR-003, ROBUST-001, full DATA-003 gates and general REPRO-001 remain open.
+
 SETUP-002 выполнен локально 30.10.2026; config validation относится к SETUP-003.
 DATA-001 реализует raw-data loader, acquisition/verification CLI и local manifest;
 DATA-002 — persisted split494; DATA-003 — train-only stats/keyed loaders/stats CLI.
-Current default453PASS/11SKIP; separate new CORR-001 actual3PASS/0SKIP,
-including actual CUDA primitive. [Evidence](../report/corr001_evidence.json).
-Historical8actual data checks from31.10.2026 were not rerun in CORR-001.
-CORR-001 technical PASS/full DoD PARTIAL; DATA-003 remains PARTIAL pending
-CORR-002/ROBUST-001 integration, formal gates и independent human review.
+CORR-002 current default777PASS/14SKIP; separate6actual corruption PASS/0SKIP,
+including CUDA and CORR-001 regressions. [Evidence](../report/corr002_evidence.json).
+Original8actual DATA tests from31.10.2026 not rerun; fresh raw/split/stats CLIs PASS.
+CORR-001/002 technical PASS/full DoD PARTIAL; DATA-003 remains PARTIAL pending
+ROBUST-001 full integration, formal gates and independent human review.
 Раздел «Плановые команды pipeline» ниже остаётся будущим интерфейсом для
 train/evaluate/metrics/plots. Успешный empty script не является выполненной задачей.
 
-## Работающие CORR-001 проверки — 18.11.2026
+## Historical CORR-001 проверки — 18.11.2026
 
 Use the existing environment; no reinstall/update/backend changes. From repo root:
 

@@ -1,5 +1,36 @@
 # AI assistance record
 
+## CORR-002 — 18.11.2026
+
+По прямому запросу пользователя Codex проверил clean main/origin/fetch/history,
+перечисленные документы/current source, historical Graphify без rebuild и existing
+env. Baseline453PASS/11SKIP; pip/raw/split/stats verification PASS. Агент реализовал
+reflect separable Gaussian blur, progressive darkening и apply_corruption,324offline
+cases и3new actual opt-in cases. Default777PASS/0FAIL/14SKIP; отдельно6actual PASS/
+0FAIL/0SKIP, включая3existing CORR-001 regressions. Original8DATA actual tests не
+повторялись;31.10evidence остаётся historical, fresh CLIs отдельно PASS.
+
+Actual17fixed persisted train IDs×16conditions×epochs0/1, data→dispatcher→Normalize,
+labels/IDs и spawn0/2 batch7/5 PASS; fixed injection probes не production policy.
+Actual CUDA0 RTX3060Laptop all-family/device/RNG checks PASS; max blur NumPy2D
+oracle error CPU/CUDA1.7881393432617188e-7. Test IDs0/71/9999 — только существующий
+keyed input regression, без tuning. Saved187438byte NPZ на actual train0/1/2,
+run42 epoch0, clean0 иseverity3 каждого семейства; independent replay PASS.
+Все23protected raw/split/stats/config/reference/source/protocol/lock files сохранили
+bytes/hashes/mtimes; frozen source regions/stable_seed/noise/keyed functions unchanged.
+Dependencies/backend/scientific protocol не менялись.
+
+Implementation+tests опубликованы по блокам d339179/72c933a/2586a67; actual artifacts/
+evidence —20724ac. Каждый блок: full diff/tests, explicit staged paths/list/full
+diff, оба diff --check, commit main и immediate ordinary push origin main PASS.
+Final documentation/handoff — отдельный блок. [Evidence](corr002_evidence.json),
+[record](reproduction.md). Следующий этап CORR-003 visual audit; ROBUST-001/full
+DATA-003 dependent acceptance и general REPRO-001 остаются pending. Models/training/
+evaluator/metrics/EDA/plots не реализованы/не запускались. Все проверки/review —
+агентские; independent human understanding/review, course policy/LMS/proposal,
+team/protocol freeze и independent reproduction pending. Technical PASS/full DoD
+PARTIAL; course compliance не заявляется, prerequisite edges сохранены.
+
 ## CORR-001 — 18.11.2026
 
 По прямому запросу пользователя Codex проверил актуальные clean main/origin/docs,

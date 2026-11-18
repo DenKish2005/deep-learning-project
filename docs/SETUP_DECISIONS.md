@@ -1,5 +1,18 @@
 # Проверка готовности foundation
 
+Обновление CORR-00218.11.2026: technical PASS/full DoD PARTIAL;
+[evidence](../report/corr002_evidence.json). Blur uses float64 normalized 1D Gaussian
+weights cast to float32, two grouped spatial convolutions with reflect padding,
+then clamp for roundoff. Positive odd Python kernel and radius<min(H,W) required,
+including sigma0 identity; kernel1 also clones. Sigma finite nonnegative Python
+number. Darkening finite Python factor0..1, no brightening; factor1 identity,
+factor0 black. All deterministic primitives validate the existing noise pixel
+contract. Dispatcher clean accepts only Python int0; three families1..5. Noise
+requires same-device generator; deterministic families accept None or an unused
+Generator on any device, reject other types and never consume RNG. These are
+operational contracts; protocol/maps/YAMLs/backend untouched. Next CORR-003;
+ROBUST-001/full DATA-003 integration and formal/human/source-policy gates pending.
+
 Обновление CORR-00118.11.2026: exact mapping/noise/keyed CPU epsilon technical PASS;
 [verified evidence](../report/corr001_evidence.json). Gaussian primitive validates
 explicit same-device generators; test helper requires full original-test namespace,

@@ -1,6 +1,44 @@
 # CURRENT PROJECT STATUS
 
-## CORR-001 — 18.11.2026
+## CORR-002 — 18.11.2026
+
+Independent technical scope **PASS**; full DoD **PARTIAL**. Implemented normalized
+separable reflect Gaussian blur, multiplicative darkening and apply_corruption.
+CPU pixel contract/range/no mutation, clean0 vs three families1..5, explicit noise
+RNG and untouched deterministic-family generators verified. CORR-001 noise/keyed
+functions, stable_seed, frozen source regions and scientific settings preserved.
+
+Fresh baseline453PASS/11SKIP; final **777PASS/0FAIL/14opt-in SKIP**. Separately
+**6actual PASS/0FAIL/0SKIP**: 2new CIFAR dispatcher cases +1new CUDA dispatcher
+case +3CORR-001 regressions. All16conditions×17fixed train IDs×epochs0/1 =544
+image-conditions; spawn0/2 batch7/5 for clean and severity3 of each family.
+CPU/CUDA blur max NumPy2D oracle error1.7881393432617188e-7. Actual CUDA0 on
+RTX3060Laptop; canonical keyed epsilon stays CPU, no cross-device bitwise claim.
+Missing-input negative control: expected exit1/DataIntegrityError,0SKIP.
+Original8actual DATA tests not rerun; fresh raw/split/stats CLIs PASS.
+
+[Evidence](../report/corr002_evidence.json), [reference](../report/corr002_reference.npz)
+187438bytes, SHA-256 `b4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03`.
+Reference: train IDs0/1/2, run42 epoch0, clean0 +3families atseverity3, pixels and
+normalized outputs. Existing CORR-001 reference unchanged. All23protected files
+bytes/hashes/mtimes preserved; dependencies/backend/configs/protocol unchanged.
+
+| Task | Full DoD | Remaining |
+|---|---|---|
+| CORR-001/002 | PARTIAL, independent technical PASS | PROTO-001/team freeze/source-policy approvals and independent human review |
+| CORR-003 | TODO; next technical stage | Train-only fixed grid, source manifest and human visual audit |
+| DATA-001/002 | PARTIAL, technical PASS | Independent human review |
+| DATA-003 | PARTIAL, independent technical PASS | ROBUST-001 policy/full integration/dependent acceptance and formal gates/review |
+| ROBUST-001 / REPRO-001 | TODO | Policy; general identity/checkpoints/resume/backup |
+
+Published in main: d339179 blur,72c933a darkening,2586a67 dispatcher,20724ac actual
+tests/artifacts/evidence; each checked and immediately pushed origin main PASS.
+Final docs/handoff is a separate commit; hash/fresh-fetch clean sync in Git/chat.
+[Next CORR-003 prompt](NEXT_STEP_PROMPT.md). No models/training/evaluator/metrics/
+EDA/plots/scientific runs. Graphify remains historical; not rebuilt. Dependency
+edges and human/course/team/protocol/reproduction gates remain open.
+
+## Historical CORR-001 — 18.11.2026
 
 Independent technical scope **PASS**; full DoD **PARTIAL**. Exact severity mapping,
 explicit-generator Gaussian noise, `keyed_test_generator` и `keyed_test_epsilon`

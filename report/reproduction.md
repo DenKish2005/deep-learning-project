@@ -1,4 +1,99 @@
-# Verification record — foundation, DATA-001..003 and CORR-001
+# Verification record — foundation, DATA-001..003 and CORR-001/002
+
+## CORR-002 independent technical acceptance — 18.11.2026
+
+**PASS independent technical scope; PARTIAL full DoD.** Codex agent verification
+by direct user instruction. Initial clean main=origin/main b9d72c2 confirmed with
+fresh fetch/history/staged checks. No AGENTS.md in repo/ancestor chain. Listed
+project documents/current source checked; Graphify historical pre-DATA-002 snapshot
+inspected, not rebuilt. Existing Python3.12.10/torch2.9.0+cu126/NumPy2.5.4 environment
+used without installation/update/backend changes. Both YAML identities, scientific
+protocol, stable_seed, DATA-002/003 frozen regions and CORR-001 references preserved.
+
+Implemented reflect separable Gaussian blur (normalized float64 weights cast to
+float32, grouped spatial convolutions, clamp roundoff), progressive multiplicative
+darkening factor0..1 and apply_corruption. Clean only Python int0, families1..5;
+noise needs same-device explicit generator. Deterministic families accept None or
+an unused torch.Generator on any device and consume nothing; other types fail.
+No seed/policy/dataset wrapper is invented by dispatch. Normalize afterward.
+
+### Fresh commands/results
+
+All commands use `.venv/Scripts/python.exe` from repo root; full commands and
+opt-in environment are in [corr002_evidence.json](corr002_evidence.json).
+
+| Command/check | Actual result |
+|---|---|
+| `-m pip check` | PASS, No broken requirements found |
+| `-m pytest tests -q --basetemp=.venv/pytest-corr002-baseline` |453PASS/0FAIL/11SKIP,128.55s |
+| `-m scripts.download_data --root data/raw --verify-only` | PASS archive/files/train50000/test10000, manifest unchanged |
+| `-m scripts.download_data --root data/raw --verify-split` | PASS persisted45000/5000, seed494 |
+| `-m scripts.prepare_normalization --root data/raw --verify-only` | PASS actual45000-only stats/provenance, read-only |
+| Blur block: `-m pytest tests/test_blur.py tests/test_corruptions.py -q --basetemp=.venv/pytest-corr002-blur` |150PASS,5.57s |
+| Darken block: `-m pytest tests/test_darken.py tests/test_blur.py tests/test_corruptions.py -q --basetemp=.venv/pytest-corr002-darken` |221PASS,5.31s |
+| Dispatch block: `-m pytest tests/test_corruption_dispatch.py tests/test_corruptions.py tests/test_blur.py tests/test_darken.py tests/test_keyed_noise.py tests/test_loaders.py -q --basetemp=.venv/pytest-corr002-dispatch` |440PASS,46.69s |
+| `-m pytest tests -q --basetemp=.venv/pytest-corr002-final --junitxml=tmp/corr002/default.xml` |**777PASS/0FAIL/14SKIP**,122.37s console /122.285s JUnit |
+| `RUN_CIFAR_CORRUPTIONS=1`, `RUN_CORR_CUDA=1`, `-m pytest tests/test_corr002_local.py tests/test_corruptions_local.py tests/test_corruptions_cuda.py -q -s --basetemp=.venv/pytest-corr002-actual --junitxml=tmp/corr002/actual.xml` |**6PASS/0FAIL/0SKIP**,201.98s console /201.992s JUnit |
+| Missing-input negative control, `CIFAR10_ROOT=tmp/corr002/intentionally-missing`, new actual all_conditions test | PASS expected exit1/DataIntegrityError,1error/1deselected/0skip |
+| `-m src.utils --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --controlled-pair` | PASS2configs/shared controls; preparation only |
+| Source/input preservation | PASS23protected file bytes/hashes/mtimes, frozen regions, unchanged noise/keyed function ASTs; excluded production paths unchanged versus b9d72c2 |
+| Final documentation/artifact audit | PASS13changed Markdown files/136local links/balanced fences;49cards×20fields/unchanged acyclic prerequisites;96matrix rows/protocol bytes;23protected identities/5reference array hashes/evidence vs JUnit |
+
+14default skips comprise original8DATA +4CIFAR corruption +2CUDA opt-in gates.
+Six actual corruption cases were executed separately, including all3CORR-001
+regressions. Original8DATA actual tests31.10.2026 not rerun; fresh CLI verification
+above is current. Missing/corrupt opted-in inputs fail without download/substitution.
+Ignored before snapshot/logs/JUnit/diagnostic evidence-builder: tmp/corr002/.
+
+### Actual numeric artifacts
+
+17train IDs fixed before this stage: [0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17].
+All16conditions at epochs0/1 =544image-conditions. Independent integer geometry,
+NumPy2D reflect/direct randn/factor oracles, labels/IDs and dispatch→Normalize PASS.
+Workers0/2, batch7/5 equality for clean0 and each family's severity3 across2epochs.
+Fixed injection callables are boundary probes, not production CorruptionPolicy.
+CPU/CUDA blur max absolute NumPy error1.7881393432617188e-7; fixed tolerances CPU1e-6,
+CUDA2e-6. Actual CUDA0 RTX3060Laptop verifies all16conditions, noise wrong-device
+generators both ways, optional unused cross-device generators and global RNG isolation.
+No bitwise CPU/CUDA equality claim; canonical keyed test epsilon remains CPU.
+Existing test IDs0/71/9999 are replayed only for fixed input identity, no tuning.
+
+[corr002_reference.npz](corr002_reference.npz):187438bytes, SHA-256
+`b4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03`.
+Created once from verified actual APIs: persisted train IDs0/1/2, run42 epoch0,
+clean0 +noise3/blur3/brightness3. Arrays train_pixels/train_normalized float32
+[4,3,3,32,32], IDs/severities int64 and kinds Unicode. Independently replayed by
+actual tests; no test pixels/labels in artifact. Semantic array/stream identities
+and generation details in evidence. Do not regenerate on mismatch; cross-version/
+platform NPZ-byte regeneration is not promised.
+
+CORR-001 NPZ remains97580bytes, SHA-256
+`40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33`.
+Split `1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284`,
+manifest `8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21`,
+stats `332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688` unchanged.
+DATA-002 region4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96;
+DATA-003 normalization region1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c.
+
+### Published logical blocks and remaining gates
+
+Every block: editing stopped, full diff/relevant tests checked, explicit task paths
+staged, exact staged list/full staged diff and both diff --check passed; commit
+in main then immediate ordinary push origin main, verified0ahead/0behind/clean.
+
+| Commit | Block | Push |
+|---|---|---|
+|d339179 | Gaussian blur +77offline cases | PASS origin main |
+|72c933a | Darkening +71offline cases | PASS origin main |
+|2586a67 | Dispatcher +176offline/regression cases | PASS origin main |
+|20724ac | Actual2CIFAR/1CUDA additions, references/evidence | PASS origin main |
+
+Final docs/status/ai_usage/handoff is a separate checked commit; hash/fresh-fetch
+clean sync in Git/chat. CORR-003 train-only grid/visual audit is next. ROBUST-001
+production policy/full DATA-003 dependent acceptance, general REPRO-001,
+PROTO-001/team freeze/source-policy approvals/human review and second-machine
+reproduction remain pending. No dependency/gate changes, no models/training/
+evaluator/metrics/EDA/plots or scientific conclusions. Full DoD remains PARTIAL.
 
 ## CORR-001 independent technical acceptance — 18.11.2026
 

@@ -1,6 +1,40 @@
 # План тестирования и QA
 
-## CORR-001 current acceptance — 18.11.2026
+## CORR-002 current acceptance — 18.11.2026
+
+Default **777PASS/0FAIL/14SKIP**; separate corruption actual **6PASS/0FAIL/0SKIP**.
+Added324offline cases:77blur +71darkening +176dispatcher. Added2CIFAR/1CUDA actual
+cases; existing3CORR-001 actual cases rerun. Original8DATA actual tests remain
+historical; fresh raw/split/stats verification CLIs PASS. Negative control missing
+actual raw input gives expected DataIntegrityError/exit1/0SKIP, not synthetic PASS.
+
+TEST-C01/C02 complete for all3×5conditions and clean: float32 RGB CHW, shape/device,
+finite/range, no mutation/new storage; invalid types/pixels/severity/generator.
+TEST-C05: kernels3/7/9/11/13, normalized symmetric impulse weights, constants
+atol1e-6, independent float64 NumPy2D reflect oracle on zero/one/RGB constants,
+center/edge impulses, ramp/checkerboard; high-frequency reduction, no channel mixing,
+noncontiguous/extreme-sigma helpers and incompatible reflect radius rejection.
+TEST-C06: exact factor multiplication atol1e-7, progressive order, identity1/black0,
+no additive shift/brightening; wrong/nonfinite factors rejected.
+TEST-C08: independent corruption→Normalize oracle, reject normalized input,
+noise explicit device-matched generator, untouched optional deterministic-family
+generators (even cross-device), global Python/NumPy/CPU/CUDA RNG isolation.
+Noise/keyed golden/common-epsilon regressions preserved.
+
+Actual17persisted train IDs at epochs0/1, all16conditions =544image-conditions;
+labels/IDs and pixel→dispatcher→Normalize verified with independent numeric oracles.
+Spawn0/2 batch7/5 equality for clean+severity3 of each family; saved NPZ exact replay
+on train IDs0/1/2. Separate actual CUDA0 RTX3060Laptop all16conditions, wrong-device
+noise rejection both ways and unused-generator isolation PASS. CPU and CUDA max
+blur oracle error1.7881393432617188e-7; cross-device bitwise equality not claimed.
+[Evidence](../report/corr002_evidence.json), [commands](../report/reproduction.md).
+
+Files: test_blur.py, test_darken.py, test_corruption_dispatch.py, test_corr002_local.py,
+extended test_corruptions_cuda.py. Default14SKIP =8DATA +4CIFAR corruption +2CUDA.
+Fixed injection probes are tests, not production policy; TEST-C07/ROBUST-001,
+full DATA-003 acceptance and CORR-003 visual/human review remain pending.
+
+## Historical CORR-001 acceptance — 18.11.2026
 
 Fresh default **453PASS/0FAIL/11SKIP**; new actual **3PASS/0FAIL/0SKIP**.
 CORR-001 adds96offline cases:73mapping/noise +23keyed identity. Original8actual

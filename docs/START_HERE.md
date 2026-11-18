@@ -1,13 +1,13 @@
 # С чего начать
 
-Обновление18.11.2026: foundation/data APIs сохранены; CORR-001 independent
-technical scope PASS — exact severity mapping, Gaussian noise и keyed CPU epsilon.
-Default453PASS/11opt-in SKIP, отдельно новые3actual PASS/0SKIP, включая CUDA primitive.
-[Evidence](../report/corr001_evidence.json), [commands](../report/reproduction.md).
-Full CORR-001 DoD PARTIAL до protocol/team/source-policy approvals и human review.
-DATA-003 robust integration/dependent acceptance остаётся CORR-002/ROBUST-001 pending.
-Следующая реализация — [CORR-002](NEXT_STEP_PROMPT.md); модели не обучены.
-LMS freshness/submitted proposal/course-policy precedence и independent review pending.
+Обновление18.11.2026 CORR-002: reflect blur, darkening и apply_corruption
+independent technical PASS/full DoD PARTIAL. Default777PASS/14opt-in SKIP;
+отдельно6actual corruption checks PASS/0SKIP, включая CUDA и CORR-001 regression.
+[Evidence](../report/corr002_evidence.json), [commands](../report/reproduction.md).
+Следующий этап — [CORR-003](NEXT_STEP_PROMPT.md), train-only visual audit.
+ROBUST-001/full DATA-003 integration, general REPRO-001, PROTO-001/team freeze,
+source-policy approvals, independent human review/reproduction pending. Модели
+не обучены; scientific results отсутствуют.
 
 Сначала прочитайте [MASTER_PROJECT_PLAN.md](MASTER_PROJECT_PLAN.md), затем [CURRENT_STATUS.md](CURRENT_STATUS.md). Перед кодом — [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md); перед своим PR — [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md) и карточку задачи в [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md).
 
@@ -17,7 +17,7 @@ LMS freshness/submitted proposal/course-policy precedence и independent review 
 закрыты; у SETUP-002/003 local technical acceptance PASS, formal human review
 pending. DATA-001/002 остаются PARTIAL до independent human review. DATA-003 independent
 technical scope выполнен; dependent robust acceptance pending. Следующая реализация
-— CORR-002 после technical PASS CORR-001. Независимая
+— CORR-003 после technical PASS CORR-002. Независимая
 техническая подготовка не ждёт missing source/team information; full training
 начинается только после policy/protocol и smoke/scientific gates.
 

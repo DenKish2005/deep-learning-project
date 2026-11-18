@@ -1,7 +1,16 @@
 # MASTER PROJECT PLAN — CSCI 494 Robustness to Noise
 
+Обновление CORR-00218.11.2026: independent technical scope PASS/full DoD PARTIAL.
+Reflect blur, progressive darkening и dispatcher реализованы;777offline PASS /
+14opt-in SKIP, отдельно6actual PASS/0SKIP (CPU/CUDA и CORR-001 regression).
+[Evidence](../report/corr002_evidence.json), [текущий статус](CURRENT_STATUS.md).
+Frozen inputs/source regions/configs/protocol/backend сохранены. Следующий этап
+[CORR-003](NEXT_STEP_PROMPT.md): train-only grid/visual audit. ROBUST-001/full
+DATA-003 integration, general REPRO-001 и formal/human gates остаются открытыми.
+Ниже CORR-001 и foundation updates — исторические snapshots; training не запускался.
+
 **Главная точка входа для команды.** Дата:30 октября 2026, Asia/Qyzylorda.
-Обновление18.11.2026: DATA-001..003 technical data acceptance сохранён.
+Историческое обновление18.11.2026 CORR-001: DATA-001..003 technical data acceptance сохранён.
 CORR-001 independent technical scope PASS: severity mapping, Gaussian noise и keyed
 CPU epsilon поверх existing stable_seed. Fresh default453PASS/11opt-in SKIP;
 отдельно новые actual3PASS/0SKIP, включая actual CUDA primitive. Evidence —

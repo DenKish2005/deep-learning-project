@@ -1,6 +1,13 @@
 # Подробный implementation roadmap
 
-Обновление18.11.2026: CORR-001 independent technical scope PASS/full DoD PARTIAL.
+Обновление CORR-00218.11.2026: independent technical PASS/full DoD PARTIAL.
+Reflect blur/darkening/dispatcher,777offline PASS/14SKIP +6actual corruption PASS/
+0SKIP; [evidence](../report/corr002_evidence.json). Следующий этап CORR-003 visual
+audit; ROBUST-001/full DATA-003 acceptance, general REPRO-001 и formal/human gates
+pending. Prerequisites неизменны. Work/commit/push только existing main; branch/PR
+fields в historical cards не переопределяют текущую инструкцию пользователя.
+
+Историческое обновление18.11.2026 CORR-001: CORR-001 independent technical scope PASS/full DoD PARTIAL.
 453offline PASS/11opt-in SKIP; новые actual3PASS/0SKIP, включая CUDA primitive.
 [Evidence](../report/corr001_evidence.json). Следующий independent technical этап
 CORR-002; ROBUST-001/full DATA-003 integration и formal approvals/review pending.
@@ -261,7 +268,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** DATA-003.
 - **2. Title:** Normalization и loaders.
 - **3. Purpose:** Правильный deterministic input.
-- **4. Current status:** PARTIAL — independent technical acceptance PASS: actual45k-only stats/provenance, keyed transforms/order, typed clean loaders, policy boundary и CLI;357offline PASS/8SKIP +8actual PASS/0SKIP (31.10.2026). CORR-001 technical PASS18.11.2026; formal prerequisite gates, CORR-002/ROBUST-001 full robust integration, dependent acceptance и independent human review pending.
+- **4. Current status:** PARTIAL — independent technical acceptance PASS: actual45k-only stats/provenance, keyed transforms/order, typed clean loaders, policy boundary и CLI;357offline PASS/8SKIP +8actual PASS/0SKIP (31.10.2026). CORR-001 technical PASS18.11.2026; formal prerequisite gates; CORR-002 primitive boundary verified18.11.2026, ROBUST-001 full robust integration/dependent acceptance и independent human review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 2 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** DATA-002; CORR-001.
@@ -330,22 +337,22 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** CORR-002.
 - **2. Title:** Gaussian blur и darkening.
 - **3. Purpose:** Завершить 3 семейства.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — independent technical acceptance PASS18.11.2026: reflect blur/darkening/dispatcher;777offline PASS/14SKIP +6actual corruption PASS/0SKIP. PROTO-001/team freeze/source-policy approvals/independent human review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 2 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** CORR-001.
 - **8. Steps:** 1) odd kernels3/7/9/11/13; 2) reflect Gaussian; 3) factors.9/.8/.7/.55/.4; 4) errors/identity helpers.
-- **9. Files:** src/corruptions.py; tests/test_corruptions.py.
+- **9. Files:** src/corruptions.py; tests/test_blur.py; tests/test_darken.py; tests/test_corruption_dispatch.py; tests/test_corr002_local.py; tests/test_corruptions_cuda.py; report/corr002_evidence.json; report/corr002_reference.npz; relevant docs/reproduction/ai_usage.
 - **10. Functions/classes:** gaussian_blur; darken; apply_corruption.
 - **11. Inputs:** pixel tensors + severity.
 - **12. Outputs:** 3-family corruption module.
-- **13. Artifacts:** перечисленные outputs в указанных files/dirs + test/review evidence; paths/hash записать в task/PR.
+- **13. Artifacts:** report/corr002_evidence.json; report/corr002_reference.npz (187438bytes, SHA-256 b4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03); report/reproduction.md. Human review pending.
 - **14. Testing:** TEST-C05..06, C08.
 - **15. Acceptance:** Constant blur preserved, correct factors, CPU tests pass.
 - **16. DoD:** acceptance выполнен; тестовые результаты и artifacts проверены reviewer; status обновлён. Для OPTIONAL допустимо SKIPPED с причиной, без объявления PASS.
 - **17. Effort:** 3-4 person-hours, без full-training wait time.
 - **18. Risks/common mistakes:** Неверная padding/brightening вместо darkening.
-- **19. Branch:** codex/corr-002.
+- **19. Branch:** main (current user instruction).
 - **20. Commit/PR scope:** Gaussian blur и darkening; только файлы пункта 9, включая relevant tests/docs; один logical PR, owner Person 2.
 
 ### CORR-003 — Sanity examples и corruption audit

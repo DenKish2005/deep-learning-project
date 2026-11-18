@@ -12,14 +12,16 @@ integrity CLI and a versioned local manifest. DATA-002 adds the persisted strati
 45k/5k split, seed494, verified NPZ/manifest and offline prepare/verify CLI.
 DATA-003 adds train-only normalization, keyed transforms/order and deterministic
 typed loaders. CORR-001 adds exact three-family severity mapping, explicit-generator
-Gaussian noise and reusable original-test keyed CPU epsilon. Blur/darkening, policy,
-CNN, training, evaluation and plotting remain future work.
+Gaussian noise and reusable original-test keyed CPU epsilon. CORR-002 adds reflect
+Gaussian blur, progressive darkening and `apply_corruption`. Policy, CNN, training,
+evaluation and plotting remain future work.
 No training has run.
 Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
 RGB32×32, all archive/file checksums and class counts pass. Current checks:
-453 offline tests pass (11 opt-in tests skipped); separately the new CORR-001
-actual checks pass 3/3, including CUDA primitive validation. The original 8 actual
-data tests were not rerun in CORR-001; their results remain dated 31.10.2026.
+777 offline tests pass (14 opt-in tests skipped); separately 6 corruption actual
+checks pass, including CUDA and CORR-001 regression. The original 8 actual DATA
+tests were not rerun in CORR-002; their results remain dated 31.10.2026. Raw/split/
+stats verification CLIs were freshly run on 18.11.2026.
 
 ## Working installation and checks
 
@@ -177,7 +179,7 @@ alignment passed. [Contracts](docs/TECHNICAL_ARCHITECTURE.md),
 ## Working Gaussian noise and keyed epsilon (CORR-001)
 
 `severity_params(kind, severity)` returns fresh parameter dicts for noise/blur/
-brightness levels 1..5. Clean is separate; blur mapping does not implement blur.
+brightness levels 1..5. Clean is separate.
 `gaussian_noise(x, sigma, generator)` accepts dense CPU/CUDA float32 RGB CHW pixels
 in [0,1], positive H/W and finite nonnegative Python sigma. It returns new pixels
 with the same shape/device/dtype, without global RNG use. Invalid inputs fail
@@ -215,6 +217,40 @@ record fixed train IDs/noise-before-Normalize and fixed test-key inputs, without
 model runs or test-based tuning. Full CORR-001 DoD remains PARTIAL pending review
 and approvals.
 
+## Working blur, darkening and dispatcher (CORR-002)
+
+`gaussian_blur(x, sigma, kernel_size)` uses normalized discrete separable weights,
+reflect padding and independent RGB channels. Sigma0/kernel1 clone; a positive odd
+kernel must have radius smaller than both image dimensions, even for identity.
+`darken(x, factor)` multiplies and clamps; Python finite factor0..1 only, with
+factor1 identity and factor0 black. Both share the noise pixel contract.
+
+`apply_corruption(x, kind, severity, generator=None)` supports `clean` at Python
+integer0 and the three protocol families at1..5. Noise requires an explicit matching
+generator; use existing keyed_test_generator for fixed evaluation input identity.
+Clean/blur/brightness accept None or an unused torch.Generator on any device,
+without consuming it. Wrong generator types fail. Normalize after dispatch.
+
+```python
+from src.corruptions import apply_corruption
+import torch
+
+pixels = torch.full((3, 32, 32), .5)
+blurred = apply_corruption(pixels, 'gaussian_blur', 3)
+darkened = apply_corruption(pixels, 'brightness', 3)
+clean = apply_corruption(pixels, 'clean', 0)  # new storage, validated pixels
+```
+
+Actual replay: use the CORR-001 opt-in environment above and add
+`tests/test_corr002_local.py` to the pytest file list. Combined result18.11.2026:
+6PASS/0FAIL/0SKIP; default777PASS/14opt-in SKIP. Tests cover all16conditions on
+17persisted train IDs, epochs0/1, and spawn0/2 batch7/5 for clean+severity3 families.
+CPU and CUDA NumPy-oracle blur error max1.78814e-7. Fixed probe callables do not
+implement the production training policy. [Evidence](report/corr002_evidence.json),
+[actual reference](report/corr002_reference.npz), [commands](report/reproduction.md).
+Full CORR-002 DoD PARTIAL pending formal approvals and independent human review;
+CORR-003 visual review, ROBUST-001 and general REPRO-001 remain open.
+
 ## Project documents and next work
 
 Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
@@ -223,9 +259,9 @@ Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
 CSR and proposal candidates; submitted version, current rubric/LMS confirmation,
 AI-policy conflict and team approvals remain pending.
 
-Next: CORR-002 reflect Gaussian blur, darkening and apply_corruption;
+Next: CORR-003 train-only corruption grid and visual audit;
 [next-step prompt](docs/NEXT_STEP_PROMPT.md). Independent DATA-003 technical scope
-PASS; full DoD PARTIAL until CORR-002/ROBUST-001 integration and independent human
+PASS; full DoD PARTIAL until ROBUST-001 integration/formal gates and independent human
 review. Full DATA-001/002 DoD also remains PARTIAL; agent checks do not replace review.
 All commits and ordinary pushes use `main`, per the user's current instruction.
 Commands in the future-pipeline section of [REPRODUCIBILITY](docs/REPRODUCIBILITY.md)

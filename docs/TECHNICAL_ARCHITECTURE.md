@@ -6,7 +6,7 @@ file/partition inspection и acquisition CLI/manifest. DATA-002 реализуе
 create_split/load_split, provenance/reuse/failure safety и split CLI. DATA-003
 реализует stats, keyed transforms/order, clean typed loaders и policy boundary;
 CORR-001 реализует severity mapping, Gaussian noise и keyed CPU epsilon.
-Full robust integration остаётся CORR-002/ROBUST-001 pending. Остальные production APIs ниже
+CORR-002 adds reflect blur, darkening and dispatch. Full robust integration remains ROBUST-001 pending. Остальные production APIs ниже
 ещё не реализованы. Состояние: [CURRENT_STATUS.md](CURRENT_STATUS.md), уточнения
 и причины: [SETUP_DECISIONS.md](SETUP_DECISIONS.md). Протокол —
 [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md). Новые frameworks не вводятся.
@@ -125,7 +125,7 @@ format можно выбрать командой. Дополнительные 
 
 `severity_params` returns fresh dicts: noise `sigma`, blur `sigma`/`kernel_size`,
 brightness `factor`; exact protocol tables, Python severity int1..5, invalid
-kind/type/severity → ValueError. Mapping all families does not implement blur/darken.
+kind/type/severity → ValueError. CORR-002 implements blur/darken below.
 
 `gaussian_noise` validates dense strided CPU/CUDA float32 RGB CHW, positive H/W,
 finite [0,1] pixels, finite nonnegative Python sigma and explicit torch.Generator
@@ -150,10 +150,37 @@ Actual train probe checks data→noise→Normalize with frozen artifacts; it is 
 test callable, not CorruptionPolicy. Actual CUDA primitive validation passed locally;
 keyed reference stays CPU and no CPU/CUDA bitwise equality is claimed.
 
-`gaussian_blur`, `darken`, `apply_corruption` remain CORR-002; `CorruptionPolicy`
-remains ROBUST-001. Production CorruptedDataset/evaluator, condition manifests,
+`CorruptionPolicy` remains ROBUST-001. CORR-002 primitives are implemented below. Production CorruptedDataset/evaluator, condition manifests,
 visual grid and full robust acceptance are future tasks. Technical PASS/full DoD
 PARTIAL; [evidence](../report/corr001_evidence.json).
+
+#### CORR-002 operational boundary (implemented 18.11.2026)
+
+`gaussian_blur(x, sigma, kernel_size)` shares the dense CPU/CUDA float32 RGB CHW,
+positive H/W and finite [0,1] contract. Sigma: finite nonnegative Python int/float,
+excluding bool. Kernel: positive odd Python int; reflect radius<both H,W required,
+even when sigma0. Sigma0 or kernel1 clones; otherwise weights are exp(-.5*(q/sigma)^2)
+in float64, normalized/cast to float32. Two grouped horizontal/vertical convolutions
+use reflect padding, no channel mixing. Clamp contains [0,1] roundoff. New storage,
+same shape/device/dtype; no RNG. Exact main sigma/kernel tables unchanged.
+
+`darken(x, factor)` validates the same pixels and finite Python factor0..1 (not bool),
+returns clamp(factor*x,0,1). Factor1 identity/new storage; factor0 black. Factors>1
+rejected. No additive shift, mutation or RNG.
+
+`apply_corruption(x, kind, severity, generator=None)`: clean only Python int0,
+three families only1..5 via severity_params. Noise delegates to unchanged primitive
+and requires matching explicit generator. Deterministic families accept None or a
+torch.Generator on any device, ignore it without draws; other types fail. Clean
+validates pixels then clones. Invalid arguments fail before drawing; no seed/policy/
+dataset wrapper assignment. Callers normalize after dispatch. Evaluation callers
+retain existing keyed_test_generator/CPU identity boundary.
+
+TEST-C01/C02/C05/C06/C08 numeric/contract acceptance PASS; separate actual17train
+IDs×16conditions×epochs0/1, spawn0/2 and actual CUDA tests PASS. Saved actual reference
+covers train0/1/2, clean0 and severity3 families. [Evidence](../report/corr002_evidence.json).
+CORR-003 visual audit and ROBUST-001/full DATA-003 integration remain separate.
+Full DoD PARTIAL pending formal/human review; general REPRO-001 remains TODO.
 
 ### `src/data.py`
 
@@ -231,7 +258,7 @@ exclusive fsynced publication and verification, then stage deletion and lock las
 Missing/tampered/partial/foreign stats or interrupted diagnostics fail and remain
 preserved. Recovery: inspect/preserve them and explicitly select a new stats path;
 no automatic repair. This readiness protocol is not a power-loss transaction.
-General REPRO-001/checkpoint/backup work and full CORR-002/ROBUST-001 integration remain pending.
+General REPRO-001/checkpoint/backup work and full ROBUST-001 integration remain pending.
 
 #### DATA-003 keyed loaders (implemented)
 
@@ -242,8 +269,8 @@ uses a CPU torch.Generator: zero pad4, two randint(0,9) crop offsets, rand()<.5
 horizontal flip, then float32 CHW/255. An optional train-only callable has
 `policy(x, generator=local_generator) -> (Tensor, dict)`. Mutation, wrong dtype,
 shape/device/nonfinite/range output fail; labels/IDs are always obtained from base.
-Policy is injected by the caller; CORR-001 noise is implemented, while full
-CORR-002/ROBUST-001 corruption/policy integration remains pending.
+Policy is injected by the caller; CORR-001/002 primitives and fixed actual injection
+probes are verified. Full ROBUST-001 policy/integration remains pending.
 
 `EpochOrderSampler` creates a fresh local generator per iteration from
 stable_seed(run_seed, epoch, 'order'); dataset.set_epoch updates order/geometry.
