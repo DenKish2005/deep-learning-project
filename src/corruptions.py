@@ -1,5 +1,6 @@
-"""Pixel-space noise, reflect blur, darkening and dispatch; policy is separate."""
+"""Pixel-space primitives, dispatch and explicit-generator training policy."""
 
+from dataclasses import dataclass
 import math
 
 import torch
@@ -174,3 +175,52 @@ def keyed_test_epsilon(original_index: int, *, namespace: str) -> torch.Tensor:
     """
     generator = keyed_test_generator(original_index, namespace=namespace)
     return torch.randn((3, 32, 32), dtype=torch.float32, device='cpu', generator=generator)
+
+
+@dataclass(frozen=True)
+class CorruptionPolicy:
+    """One protocol-v1 event per image; caller owns the explicit local stream.
+
+    Constructor accepts the frozen robust probabilities only, in event order
+    identity/noise/blur/brightness, and max_train_severity=3. Copy the sequence
+    into an immutable tuple; this API does not provide per-run policy tuning.
+
+    Draw order on x.device: scalar float64 rand for intervals [0,.50),
+    [.50,.67), [.67,.84), [.84,1); only corrupted events draw scalar int64
+    randint(1,4); only noise then draws float32 randn(x.shape). Identity draws
+    no severity and reports 0. Metadata contains only event and severity.
+    All validation precedes draws, including radius4 compatibility for any
+    possible blur. Thus policy pixels require H,W>4; CIFAR uses32x32.
+    Normalize afterward. No seed assignment, global RNG, labels or batch state.
+    """
+
+    probabilities: tuple
+    max_train_severity: int = 3
+
+    def __post_init__(self):
+        probabilities = self.probabilities
+        if (not isinstance(probabilities, (tuple, list)) or len(probabilities) != 4
+                or any(type(p) not in (int, float) for p in probabilities)
+                or tuple(probabilities) != (.50, .17, .17, .16)):
+            raise ValueError('probabilities must be protocol-v1 [.50,.17,.17,.16]')
+        if type(self.max_train_severity) is not int or self.max_train_severity != 3:
+            raise ValueError('max_train_severity must be the protocol-v1 Python integer 3')
+        object.__setattr__(self, 'probabilities', tuple(probabilities))
+
+    def __call__(self, x: torch.Tensor, generator: torch.Generator) -> tuple[torch.Tensor, dict]:
+        _validate_pixels(x)
+        if not isinstance(generator, torch.Generator):
+            raise ValueError('generator must be an explicit torch.Generator')
+        if generator.device != x.device:
+            raise ValueError('generator device must match x device (including CUDA index)')
+        if min(x.shape[1:]) <= 4:
+            raise ValueError('policy requires H,W>4 for every possible reflect blur')
+        u = torch.rand((), dtype=torch.float64, device=x.device, generator=generator).item()
+        if u < .50:
+            event, kind, severity = 'identity', 'clean', 0
+        else:
+            kind = ('gaussian_noise' if u < .67 else
+                    'gaussian_blur' if u < .84 else 'brightness')
+            event = kind
+            severity = int(torch.randint(1, 4, (), device=x.device, generator=generator).item())
+        return apply_corruption(x, kind, severity, generator), {'event': event, 'severity': severity}
