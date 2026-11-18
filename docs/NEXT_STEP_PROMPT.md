@@ -3,14 +3,19 @@
 Обновлён18.11.2026 после CORR-002 independent technical PASS/full DoD PARTIAL.
 Implementation/tests: d339179 blur,72c933a darkening,2586a67 dispatcher;
 actual tests/reference/evidence:20724ac. Каждый блок сразу push origin main PASS.
-Final docs/handoff публикуются отдельно; точный HEAD/clean sync — Git history.
+Final docs/status/ai_usage/handoff опубликованы в fa5a619; fresh fetch подтвердил
+clean main=origin/main на этом commit перед текущим уточнением промпта.
+Все пять блоков CORR-002 опубликованы ordinary push origin main PASS.
+Ниже handoff для нового чата; сохранение этого файла не запускает CORR-003.
 Counts ниже actual18.11.2026; original8DATA opt-in cases не повторялись.
 
 ```text
 Продолжи проект CSCI494 — Robustness to Noise.
-Работай/коммить/пушь только в существующую exact branch main. Не создавай codex/*,
-feature branches или worktrees. Разрешаю commits и ordinary git push origin main
-после каждого проверенного блока без повторного согласования.
+Работай, коммить и пушь всегда только в существующую exact branch main.
+Не создавай codex/*, другие feature branches или worktrees. Исторические branch/PR
+советы в planning docs не переопределяют это правило. Разрешаю самостоятельные
+commits и ordinary git push origin main после каждого проверенного блока без
+повторного согласования. Это постоянное разрешение на весь CORR-003.
 
 Выполни independent technical объём CORR-003: train-only corruption sanity grid,
 source manifest и честный visual audit поверх CORR-001/002. Работай до проверяемого
@@ -119,22 +124,39 @@ Missing/corrupt actual inputs — FAIL с диагностикой, не synthet
 
 БЛОКИ И ПУБЛИКАЦИЯ
 
-Work in small finished logical blocks; implementation and related tests together.
-Suggested: selection/pixel-grid preparation+tests; rendering/CLI+tests; actual
-PNG/PDF/manifest/evidence and export checks; final docs/status/ai_usage/next prompt.
-Adapt to current source, no artificial placeholders/cosmetic commits. Finish and
-publish each block before editing the next. Continue autonomously to CORR-003
-technical result; intermediate push is not the end of the task.
+Раздели работу на небольшие завершённые логические блоки. Ориентир:
+1. Выбор fixed train IDs, подготовка pixels/conditions/keyed noise и связанные tests.
+2. PNG/PDF rendering, bounded CLI и связанные tests.
+3. Actual opt-in checks, PNG/PDF/source manifest, визуальная проверка и evidence.
+4. Итоговые docs/status/ai_usage и следующий prompt.
 
-After EVERY block: stop editing, inspect FULL diff/relevant tests; stage only
-explicit task paths (no git add . / -A); inspect exact staged list and FULL staged
-diff; git diff --check and git diff --cached --check; working commit in exact main;
-IMMEDIATELY ordinary git push origin main; verify successful push and0ahead/behind,
-report checks/hash/push, then continue. Never accumulate everything for final commit.
-Failed push: diagnose/read remote history before further edits; safe fast-forward
-allowed, no force/amend/reset/history rewrite or automatic conflict/divergence overwrite.
-No raw/env/caches/secrets/machine paths/diagnostic partials in commits. Final fresh
-fetch, clean status, empty staged list, exact main=origin/main. Final Russian report:
-PASS/FAIL/SKIP with reasons, actual artifacts/evidence/hashes, every commit/push,
-remaining limits/gates and next concrete task. No training readiness claim.
+Адаптируй размер блоков к current source. Implementation и связанные tests коммить
+вместе. Если блок слишком большой — раздели на меньшие рабочие части. Не делай
+commits с заглушками, падающими tests или искусственными косметическими частями.
+Не накапливай реализацию до одного финального commit.
+
+После КАЖДОГО завершённого блока:
+- останови editing и проверь ПОЛНЫЙ diff и relevant tests;
+- выполни git diff --check; stage только явные task paths, без git add . / -A;
+- проверь git diff --cached --name-only и ПОЛНЫЙ git diff --cached: staged list
+  должен содержать только файлы текущего блока;
+- выполни git diff --check и git diff --cached --check;
+- сделай отдельный рабочий commit в exact branch main;
+- СРАЗУ выполни ordinary git push origin main;
+- проверь успешный push, main=origin/main и отсутствие неопубликованных changes;
+- сообщи checks, commit hash и результат push.
+
+Только после успешной публикации блока переходи к editing следующего. После push
+продолжай самостоятельно без повторного согласования до CORR-003 technical result;
+промежуточный commit не является завершением задачи.
+
+При failed push сначала разберись с причиной и прочитай remote history, до новых
+edits. Safe fast-forward допустим; divergence/conflicts не затирай и не merge
+автоматически. Без force, amend/reset и history rewrite.
+Не коммить raw/archives/env/caches/credentials/absolute machine paths/diagnostic
+partials. Versioned artifacts/evidence должны быть actual, compact и verified.
+В конце fresh fetch, clean status, пустой staged list и exact main=origin/main.
+Финал по-русски: PASS/FAIL/SKIP с причинами, actual artifacts/evidence/hashes,
+каждый commit и результат push, оставшиеся ограничения/gates и next concrete task.
+Training readiness не заявляй.
 ```
