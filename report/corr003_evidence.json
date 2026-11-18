@@ -1,0 +1,298 @@
+{
+  "agent_visual_audit": {
+    "independent_person5_team_review": "PENDING: no human evidence supplied",
+    "limits": [
+      "Ten fixed train images are an implementation sanity sample, not representativeness or human recognizability proof.",
+      "Visual review cannot prove absence of every pixel artifact or monotonic model accuracy; no severity/policy tuning performed."
+    ],
+    "observations": [
+      "All10 rows/16columns present, ordered clean/noise/blur/darkening; class names, IDs, severities and parameters readable, no clipped or overlapping labels.",
+      "Noise pattern stays spatially consistent per row as amplitude increases; s5 colored speckle obscures fine details; clipping measured numerically, not inferred from appearance.",
+      "Blur s1 nearly clean, later levels smooth detail; inspected outer edges show no obvious black padding frame, wraparound seam or channel-color displacement. Reflect correctness rests on independent numeric oracle.",
+      "Brightness retains spatial details and color balance while progressively darkening; no visible per-cell contrast recovery. Cat ID9 and dog ID27 are already dark and difficult at s5.",
+      "PNG and rendered PDF have consistent visible colors/layout; 480 RGB samples match exactly between exports at160dpi."
+    ],
+    "status": "PASS for bounded implementation audit; not human approval",
+    "viewed": [
+      "actual PNG 3520x2320",
+      "actual PDF rendered by Poppler to 2200x1450 PNG"
+    ]
+  },
+  "artifacts": {
+    "outputs/figures/corruption_examples.pdf": {
+      "bytes": 738357,
+      "sha256": "0a3fa45fcc4ded82332e0a0aeb04cd75fc528744c6c521005f4750b20962e2fa"
+    },
+    "outputs/figures/corruption_examples.png": {
+      "bytes": 776955,
+      "sha256": "9a056d31a97522ae5089fa1999a6b20f00df4b97a98d041802f3f0b493f776f3"
+    },
+    "outputs/figures/corruption_examples.source.json": {
+      "bytes": 7622,
+      "sha256": "f5f09446078fc53d26f8d0e5df4d057c62042ff0540de409d363f26ae2ae5854"
+    }
+  },
+  "checks": {
+    "actual_optin": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 2,
+      "seconds": 36.945,
+      "skip": 0
+    },
+    "baseline": {
+      "command": ".venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-corr003-baseline",
+      "fail": 0,
+      "pass": 777,
+      "seconds": 103.46,
+      "skip": 14
+    },
+    "block1": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 215,
+      "seconds": 20.781,
+      "skip": 0
+    },
+    "block2": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 38,
+      "seconds": 68.698,
+      "skip": 0
+    },
+    "controlled_config_cli": "PASS: controlled settings equal; preparation only",
+    "default_final": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 815,
+      "seconds": 210.572,
+      "skip": 16
+    },
+    "export_create_verify_reuse": "PASS: actual create plus read-only --verify-only and default reuse",
+    "historical_optins": "SKIP: existing14 opt-in cases (8 DATA,4 CIFAR corruption,2 CUDA) not rerun; previous evidence retains original dates",
+    "negative_controls": {
+      "corrupt_cli": {
+        "corrupt_input_preserved": true,
+        "diagnostic_input": "128-byte truncated copy of actual train data_batch_1 in ignored tmp",
+        "error": "CIFAR-10 checksum mismatch",
+        "exit_code": 1,
+        "no_output_created": true,
+        "status": "PASS expected failure"
+      },
+      "missing_optin": {
+        "error": "DataIntegrityError",
+        "errors": 1,
+        "exit_code": 1,
+        "skip": 0,
+        "status": "PASS expected failure"
+      }
+    },
+    "normalization_verify_cli": "PASS: actual train45000-only stats/provenance; no writes",
+    "pip_check": "PASS: No broken requirements found",
+    "raw_verify_cli": "PASS: archive/files and train50000/test10000 integrity, manifest unchanged; test decoded for integrity only",
+    "split_verify_cli": "PASS: persisted train45000/val5000 seed494",
+    "training_eda_robust_policy": "SKIP: outside CORR-003"
+  },
+  "commands": {
+    "actual": {
+      "command": ".venv/Scripts/python.exe -m pytest tests/test_corruption_grid_local.py -q -s --basetemp=.venv/pytest-corr003-actual --junitxml=tmp/corr003/actual.xml",
+      "environment": {
+        "RUN_CORR_GRID": "1"
+      }
+    },
+    "create": ".venv/Scripts/python.exe -m scripts.make_plots --corruption-grid --root data/raw --output outputs/figures",
+    "default": ".venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-corr003-final --junitxml=tmp/corr003/default.xml",
+    "pdf_color_render": "pdftoppm -f 1 -singlefile -r 160 -png outputs/figures/corruption_examples.pdf tmp/corr003/pdf-160dpi",
+    "pdf_open": "pdfinfo outputs/figures/corruption_examples.pdf",
+    "pdf_preview": "pdftoppm -f 1 -singlefile -scale-to 2200 -png outputs/figures/corruption_examples.pdf tmp/corr003/pdf-preview",
+    "verify": ".venv/Scripts/python.exe -m scripts.make_plots --corruption-grid --verify-only"
+  },
+  "date_local": "2026-11-18",
+  "full_dod": "PARTIAL",
+  "implementation_commits": [
+    "3c7a46e",
+    "b57a3c7"
+  ],
+  "initial_revision": "0490833",
+  "limitations": [
+    "CORR-003 full DoD remains PARTIAL pending independent Person5/team visual/code/artifact review.",
+    "PROTO-001/team freeze/source-policy/course AI policy approvals remain PENDING; agent checks do not replace them.",
+    "ROBUST-001/full DATA-003 robust integration/dependent acceptance, general REPRO-001 and second-machine reproduction remain open.",
+    "Canonical audit is CPU in locked local runtime; no cross-platform/version or regenerated PNG/PDF byte equality promised.",
+    "CLI verifies existing artifacts against actual source/implementation/pixel/output hashes; conflicts or partial sets fail without overwrite. Publication failure may leave a partial set; preserve it and choose a new empty output directory.",
+    "Official test decoded only by required baseline integrity CLI, never by train-only grid or actual grid tests. No models/training/evaluator/metrics/EDA or scientific conclusions."
+  ],
+  "observations": {
+    "exports": {
+      "global_rng_unchanged": true,
+      "max_rgb_quantization_error_255": 0.9961624145507812,
+      "outputs": {
+        "corruption_examples.pdf": {
+          "bytes": 738357,
+          "sha256": "0a3fa45fcc4ded82332e0a0aeb04cd75fc528744c6c521005f4750b20962e2fa"
+        },
+        "corruption_examples.png": {
+          "bytes": 776955,
+          "sha256": "9a056d31a97522ae5089fa1999a6b20f00df4b97a98d041802f3f0b493f776f3"
+        }
+      },
+      "png_rgb_samples": 480,
+      "reuse_and_verify_preserve_bytes_mtimes": true,
+      "source_manifest": {
+        "bytes": 7622,
+        "sha256": "f5f09446078fc53d26f8d0e5df4d057c62042ff0540de409d363f26ae2ae5854"
+      }
+    },
+    "numeric_replay": {
+      "ids_class_order": [
+        29,
+        4,
+        6,
+        9,
+        3,
+        27,
+        0,
+        7,
+        8,
+        1
+      ],
+      "image_conditions": 160,
+      "max_blur_numpy2d_error": 1.7881393432617188e-07,
+      "noise_and_darken_bitwise_oracles": true,
+      "noise_clipped_values_per_level": [
+        155,
+        560,
+        1128,
+        2049,
+        3521
+      ],
+      "pixel_sha256_c_bytes": "3ed856ca62f960b3bdfa18807f440451fdc15ce83a9c5d56bb874baf66d711b1",
+      "test_decoded": false,
+      "values_per_noise_level": 30720
+    }
+  },
+  "pdf_audit": {
+    "all_samples_within_one_8bit_code": true,
+    "max_pdf_png_rgb_difference_255": 0,
+    "max_pdf_rgb_source_error_255": 0.9961624145507812,
+    "pdf_page_count": 1,
+    "pdf_size_points": [
+      1584,
+      1044
+    ],
+    "pdfinfo": "PASS: 1 page, PDF1.4, 1584x1044pt, unencrypted",
+    "preview_sha256": "220bfe3d7e828656a1fc348b95861795c1f64cf0142c283ee96c4f0e5f3fb484",
+    "render_dpi": 160,
+    "renderer": "Poppler pdftoppm 26.07.0",
+    "rgb_samples": 480,
+    "sample_rule": "For every cell use plot_corruption_grid axes.transData at (3,3),(16,16),(28,28); sample rendered RGB at height-1-int(y),int(x); compare float source*255 and actual PNG"
+  },
+  "preservation": {
+    "bytes_hashes_mtimes_unchanged": true,
+    "configs_protocol_dependency_backend_changes": false,
+    "count": 23,
+    "files": {
+      "configs/clean_cnn.yaml": {
+        "bytes": 1741,
+        "sha256": "60fbd56b703d1987d4d50de46dc0b32d7053f7ad81229e956763a51c4cbfd209"
+      },
+      "configs/robust_cnn.yaml": {
+        "bytes": 1745,
+        "sha256": "1b080d66103d4cf5650967fbcd016311917e2cf177e57625246b542568a67371"
+      },
+      "data/raw/.cifar-acquire-mi72s456/cifar-10-python.tar.gz": {
+        "bytes": 113246208,
+        "sha256": "19a73dc43a696d7feea6d147fe4dda29a4c0d3f4320b5030f877887578280f6f"
+      },
+      "data/raw/.gitkeep": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "data/raw/cifar-10-batches-py/batches.meta": {
+        "bytes": 158,
+        "sha256": "f962466ef690d46b226450fb9aadc74ba4bc64a76aa526b5827fe4bc5c7125cb"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_1": {
+        "bytes": 31035704,
+        "sha256": "54636561a3ce25bd3e19253c6b0d8538147b0ae398331ac4a2d86c6d987368cd"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_2": {
+        "bytes": 31035320,
+        "sha256": "766b2cef9fbc745cf056b3152224f7cf77163b330ea9a15f9392beb8b89bc5a8"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_3": {
+        "bytes": 31035999,
+        "sha256": "0f00d98ebfb30b3ec0ad19f9756dc2630b89003e10525f5e148445e82aa6a1f9"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_4": {
+        "bytes": 31035696,
+        "sha256": "3f7bb240661948b8f4d53e36ec720d8306f5668bd0071dcb4e6c947f78e9682b"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_5": {
+        "bytes": 31035623,
+        "sha256": "d91802434d8376bbaeeadf58a737e3a1b12ac839077e931237e0dcd43adcb154"
+      },
+      "data/raw/cifar-10-batches-py/test_batch": {
+        "bytes": 31035526,
+        "sha256": "f53d8d457504f7cff4ea9e021afcf0e0ad8e24a91f3fc42091b8adef61157831"
+      },
+      "data/raw/cifar-10-python.tar.gz": {
+        "bytes": 170498071,
+        "sha256": "6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce"
+      },
+      "data/raw/cifar10_integrity_v1.json": {
+        "bytes": 3696,
+        "sha256": "62cd6967926f0546a09cba8ec6424a0f14f954a5841afa9c419c95e5332d68b7"
+      },
+      "data/splits/cifar10_split_v1.npz": {
+        "bytes": 76550,
+        "sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284"
+      },
+      "data/splits/normalization.json": {
+        "bytes": 2429,
+        "sha256": "332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688"
+      },
+      "data/splits/split_manifest.json": {
+        "bytes": 2539,
+        "sha256": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21"
+      },
+      "report/corr001_reference.npz": {
+        "bytes": 97580,
+        "sha256": "40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33"
+      },
+      "report/corr002_reference.npz": {
+        "bytes": 187438,
+        "sha256": "b4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03"
+      },
+      "requirements-lock.txt": {
+        "bytes": 862,
+        "sha256": "8b0777e634a6c32fae37ddbbb997eba9fa08408dfba3b9c21c3e689fc5c3c412"
+      },
+      "requirements.txt": {
+        "bytes": 354,
+        "sha256": "ca2143d760b887c8a980ec9cf1cdf935a9885c8b23eef3bde67aa651ee62be69"
+      },
+      "src/corruptions.py": {
+        "bytes": 8930,
+        "sha256": "bb9b424bb7bb1bb093810cc9bb616f081d36847552dae5bd7a6ad51059ddf8a0"
+      },
+      "src/data.py": {
+        "bytes": 43949,
+        "sha256": "f05c198c6e2f6630bc414f038c99ed880deac2d475152d0c6d18621bcbb8e9bc"
+      },
+      "src/utils.py": {
+        "bytes": 12688,
+        "sha256": "48ad055860dddf3482e63112b1369af08edcc608058cf557ef19b358a185b6d9"
+      }
+    },
+    "frozen_regions": {
+      "DATA-002-v1": "4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96",
+      "DATA-003-normalization-v1": "1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c"
+    },
+    "graphify": "Historical pre-DATA-002 snapshot navigated; not rebuilt"
+  },
+  "task": "CORR-003",
+  "technical_scope": "PASS",
+  "timezone": "Asia/Qyzylorda"
+}

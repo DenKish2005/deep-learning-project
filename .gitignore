@@ -29,6 +29,9 @@ outputs/figures/*
 !outputs/checkpoints/.gitkeep
 !outputs/metrics/.gitkeep
 !outputs/figures/.gitkeep
+!outputs/figures/corruption_examples.png
+!outputs/figures/corruption_examples.pdf
+!outputs/figures/corruption_examples.source.json
 
 # Notebook checkpoints
 .ipynb_checkpoints/

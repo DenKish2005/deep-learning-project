@@ -1,0 +1,303 @@
+{
+  "outputs": {
+    "corruption_examples.pdf": {
+      "bytes": 738357,
+      "sha256": "0a3fa45fcc4ded82332e0a0aeb04cd75fc528744c6c521005f4750b20962e2fa"
+    },
+    "corruption_examples.png": {
+      "bytes": 776955,
+      "sha256": "9a056d31a97522ae5089fa1999a6b20f00df4b97a98d041802f3f0b493f776f3"
+    }
+  },
+  "schema_version": 1,
+  "source": {
+    "conditions": [
+      {
+        "kind": "clean",
+        "params": {},
+        "severity": 0
+      },
+      {
+        "kind": "gaussian_noise",
+        "params": {
+          "sigma": 0.02
+        },
+        "severity": 1
+      },
+      {
+        "kind": "gaussian_noise",
+        "params": {
+          "sigma": 0.05
+        },
+        "severity": 2
+      },
+      {
+        "kind": "gaussian_noise",
+        "params": {
+          "sigma": 0.08
+        },
+        "severity": 3
+      },
+      {
+        "kind": "gaussian_noise",
+        "params": {
+          "sigma": 0.12
+        },
+        "severity": 4
+      },
+      {
+        "kind": "gaussian_noise",
+        "params": {
+          "sigma": 0.18
+        },
+        "severity": 5
+      },
+      {
+        "kind": "gaussian_blur",
+        "params": {
+          "kernel_size": 3,
+          "sigma": 0.3
+        },
+        "severity": 1
+      },
+      {
+        "kind": "gaussian_blur",
+        "params": {
+          "kernel_size": 7,
+          "sigma": 0.7
+        },
+        "severity": 2
+      },
+      {
+        "kind": "gaussian_blur",
+        "params": {
+          "kernel_size": 9,
+          "sigma": 1.1
+        },
+        "severity": 3
+      },
+      {
+        "kind": "gaussian_blur",
+        "params": {
+          "kernel_size": 11,
+          "sigma": 1.5
+        },
+        "severity": 4
+      },
+      {
+        "kind": "gaussian_blur",
+        "params": {
+          "kernel_size": 13,
+          "sigma": 2.0
+        },
+        "severity": 5
+      },
+      {
+        "kind": "brightness",
+        "params": {
+          "factor": 0.9
+        },
+        "severity": 1
+      },
+      {
+        "kind": "brightness",
+        "params": {
+          "factor": 0.8
+        },
+        "severity": 2
+      },
+      {
+        "kind": "brightness",
+        "params": {
+          "factor": 0.7
+        },
+        "severity": 3
+      },
+      {
+        "kind": "brightness",
+        "params": {
+          "factor": 0.55
+        },
+        "severity": 4
+      },
+      {
+        "kind": "brightness",
+        "params": {
+          "factor": 0.4
+        },
+        "severity": 5
+      }
+    ],
+    "dataset": "cifar10-python/original-train",
+    "implementation_sha256_lf": {
+      "scripts/make_plots.py": "8c4def9aa927907a0ebe378de7964b8a6724c9228e640c7263a036268e3a6b0c",
+      "src/corruptions.py": "bb9b424bb7bb1bb093810cc9bb616f081d36847552dae5bd7a6ad51059ddf8a0",
+      "src/data.py": "f05c198c6e2f6630bc414f038c99ed880deac2d475152d0c6d18621bcbb8e9bc",
+      "src/utils.py": "e7486cfd5f972b859e9457f41fe96b50911a8c3c536ec8e03e1d4b4155e8c3ea"
+    },
+    "noise_key": {
+      "namespace": "cifar10-python/original-train/corr003-audit",
+      "parts": [
+        494,
+        "cifar10-python/original-train/corr003-audit",
+        "<original_id>",
+        "gaussian_noise",
+        "v1"
+      ],
+      "reuse": "fresh CPU generator with same key for each noise severity",
+      "seed": 494
+    },
+    "pixels": {
+      "device": "cpu",
+      "dtype": "<f4",
+      "observed_max": 1.0,
+      "observed_min": 0.0,
+      "range": [
+        0,
+        1
+      ],
+      "sha256_c_bytes": "3ed856ca62f960b3bdfa18807f440451fdc15ce83a9c5d56bb874baf66d711b1",
+      "shape": [
+        10,
+        16,
+        3,
+        32,
+        32
+      ]
+    },
+    "preprocessing": "uint8 RGB -> CPU float32 CHW /255 -> apply_corruption; no geometry or Normalize",
+    "raw_integrity": {
+      "archive": {
+        "bytes": 170498071,
+        "md5": "c58f30108f718f92721af3b95e74349a",
+        "sha256": "6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce"
+      },
+      "files": {
+        "batches.meta": {
+          "bytes": 158,
+          "md5": "5ff9c542aee3614f3951f8cda6e48888",
+          "sha256": "f962466ef690d46b226450fb9aadc74ba4bc64a76aa526b5827fe4bc5c7125cb"
+        },
+        "data_batch_1": {
+          "bytes": 31035704,
+          "md5": "c99cafc152244af753f735de768cd75f",
+          "sha256": "54636561a3ce25bd3e19253c6b0d8538147b0ae398331ac4a2d86c6d987368cd"
+        },
+        "data_batch_2": {
+          "bytes": 31035320,
+          "md5": "d4bba439e000b95fd0a9bffe97cbabec",
+          "sha256": "766b2cef9fbc745cf056b3152224f7cf77163b330ea9a15f9392beb8b89bc5a8"
+        },
+        "data_batch_3": {
+          "bytes": 31035999,
+          "md5": "54ebc095f3ab1f0389bbae665268c751",
+          "sha256": "0f00d98ebfb30b3ec0ad19f9756dc2630b89003e10525f5e148445e82aa6a1f9"
+        },
+        "data_batch_4": {
+          "bytes": 31035696,
+          "md5": "634d18415352ddfa80567beed471001a",
+          "sha256": "3f7bb240661948b8f4d53e36ec720d8306f5668bd0071dcb4e6c947f78e9682b"
+        },
+        "data_batch_5": {
+          "bytes": 31035623,
+          "md5": "482c414d41f54cd18b22e5b47cb7c3cb",
+          "sha256": "d91802434d8376bbaeeadf58a737e3a1b12ac839077e931237e0dcd43adcb154"
+        },
+        "test_batch": {
+          "bytes": 31035526,
+          "md5": "40351d587109b95175f43aff81a1287e",
+          "sha256": "f53d8d457504f7cff4ea9e021afcf0e0ad8e24a91f3fc42091b8adef61157831"
+        }
+      }
+    },
+    "render": {
+      "auto_contrast": false,
+      "dpi": 160,
+      "figsize_inches": [
+        22,
+        14.5
+      ],
+      "font": "DejaVu Sans",
+      "interpolation": "nearest",
+      "rgb_range": [
+        0,
+        1
+      ]
+    },
+    "rows": [
+      {
+        "class_name": "airplane",
+        "label": 0,
+        "noise_seed": 1217358241043422088,
+        "original_id": 29
+      },
+      {
+        "class_name": "automobile",
+        "label": 1,
+        "noise_seed": 3535804306120099434,
+        "original_id": 4
+      },
+      {
+        "class_name": "bird",
+        "label": 2,
+        "noise_seed": 3341155192727011528,
+        "original_id": 6
+      },
+      {
+        "class_name": "cat",
+        "label": 3,
+        "noise_seed": 1219382663360285530,
+        "original_id": 9
+      },
+      {
+        "class_name": "deer",
+        "label": 4,
+        "noise_seed": 3810838178436922561,
+        "original_id": 3
+      },
+      {
+        "class_name": "dog",
+        "label": 5,
+        "noise_seed": 2489949885617094484,
+        "original_id": 27
+      },
+      {
+        "class_name": "frog",
+        "label": 6,
+        "noise_seed": 3767223836376555624,
+        "original_id": 0
+      },
+      {
+        "class_name": "horse",
+        "label": 7,
+        "noise_seed": 6926952153176366841,
+        "original_id": 7
+      },
+      {
+        "class_name": "ship",
+        "label": 8,
+        "noise_seed": 7141443947340651838,
+        "original_id": 8
+      },
+      {
+        "class_name": "truck",
+        "label": 9,
+        "noise_seed": 7590804994618462303,
+        "original_id": 1
+      }
+    ],
+    "selection_rule": "smallest original ID per class among persisted train45k; class order 0..9",
+    "split": {
+      "manifest_sha256": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21",
+      "npz_sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284",
+      "train_indices_sha256": "7d59b48de10d46620a62bdc85d9d3dd62a8c2a2b902617c6807569f4a0a2ee41"
+    },
+    "test_decoded": false,
+    "versions": {
+      "matplotlib": "3.11.2",
+      "numpy": "2.5.4",
+      "python": "3.12.10",
+      "torch": "2.9.0+cu126"
+    }
+  }
+}

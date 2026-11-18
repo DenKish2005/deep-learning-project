@@ -5,3 +5,7 @@ report/data002_evidence.json text eol=lf
 report/data003_evidence.json text eol=lf
 report/corr001_evidence.json text eol=lf
 report/corr001_reference.npz binary
+outputs/figures/corruption_examples.png binary
+outputs/figures/corruption_examples.pdf binary
+outputs/figures/corruption_examples.source.json text eol=lf
+report/corr003_evidence.json text eol=lf
