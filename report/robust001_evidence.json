@@ -1,0 +1,750 @@
+{
+  "actual": {
+    "actual_cuda": {
+      "cpu_cuda_bitwise_equality_claimed": false,
+      "device": "cuda:0",
+      "global_cpu_cuda_rng_unchanged": true,
+      "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "max_numpy2d_oracle_error": 1.1920928955078125e-07,
+      "same_device_replay": true,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "wrong_generator_devices_rejected_before_draws": true
+    },
+    "actual_numeric": {
+      "epochs": [
+        0,
+        1
+      ],
+      "event_counts": {
+        "brightness": 11,
+        "gaussian_blur": 22,
+        "gaussian_noise": 16,
+        "identity": 53
+      },
+      "ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "image_conditions": 102,
+      "make_loaders_explicit_production_policy": true,
+      "max_normalized_oracle_error": 7.748603820800781e-07,
+      "max_pixel_numpy2d_oracle_error": 1.7881393432617188e-07,
+      "seeds": [
+        42,
+        123,
+        2026
+      ],
+      "streams": [
+        {
+          "epoch": 0,
+          "event_counts": {
+            "brightness": 1,
+            "gaussian_blur": 1,
+            "gaussian_noise": 3,
+            "identity": 12
+          },
+          "events_severities_sha256_compact_json": "48cf83cc1aa68ea4b96bbf5e7151d92643d2eaed5d16ca369ae73d26d2f8158f",
+          "normalized_sha256": "cf53b5ede2eb21d311939721f85d41dd7d86c46906adc03612330c975ea4acde",
+          "seed": 42
+        },
+        {
+          "epoch": 1,
+          "event_counts": {
+            "brightness": 3,
+            "gaussian_blur": 5,
+            "gaussian_noise": 3,
+            "identity": 6
+          },
+          "events_severities_sha256_compact_json": "8fa6cbe0264283670c7affb850163f451781824c8fca9856e232111dba46d327",
+          "normalized_sha256": "91f440d6b323e20add9667cff824475d98d1a7ae8d68c147574f78694282a0f7",
+          "seed": 42
+        },
+        {
+          "epoch": 0,
+          "event_counts": {
+            "brightness": 1,
+            "gaussian_blur": 4,
+            "gaussian_noise": 4,
+            "identity": 8
+          },
+          "events_severities_sha256_compact_json": "bb600c8a1022068e34343626b80538c1ebb817053baf7260633c86ae3d55238f",
+          "normalized_sha256": "23f55f5c7a19513098ec89d480913b372dbb0fd271736ebb369e23d9ca67b951",
+          "seed": 123
+        },
+        {
+          "epoch": 1,
+          "event_counts": {
+            "brightness": 2,
+            "gaussian_blur": 3,
+            "gaussian_noise": 1,
+            "identity": 11
+          },
+          "events_severities_sha256_compact_json": "26c4b525acc423561d556359a2e53a06e25bf18729a234665079ff5af97816d9",
+          "normalized_sha256": "96e80b59474095848e558461c5bd03e9dd1556a06e5df7f17fc445ff64d179d2",
+          "seed": 123
+        },
+        {
+          "epoch": 0,
+          "event_counts": {
+            "brightness": 2,
+            "gaussian_blur": 4,
+            "gaussian_noise": 1,
+            "identity": 10
+          },
+          "events_severities_sha256_compact_json": "fca4439551c6582d026c432ebc05dac7846d9612b8649b5b2559d28fb138646e",
+          "normalized_sha256": "c6fd5eed446e0375f0eb26c7c54e78f8df3fe3d361af55c7342dd8cf6a84a68e",
+          "seed": 2026
+        },
+        {
+          "epoch": 1,
+          "event_counts": {
+            "brightness": 2,
+            "gaussian_blur": 5,
+            "gaussian_noise": 4,
+            "identity": 6
+          },
+          "events_severities_sha256_compact_json": "21e4bb88d6fedbb18210282fa56cdbf9b2e456b3403832b7d45a35946b78cb4b",
+          "normalized_sha256": "0bc921cb2e78d4d3b36efe6c7e538660f22726a994a390f26f435f61de39a907",
+          "seed": 2026
+        }
+      ],
+      "test_decoded": false,
+      "validation_samples": 17
+    },
+    "actual_spawn": {
+      "batch_sizes": [
+        7,
+        5
+      ],
+      "global_rng_unchanged": true,
+      "paired_order_labels_ids": true,
+      "seed": 42,
+      "streams": [
+        {
+          "epoch": 0,
+          "normalized_sha256": "539ed51128cddd441995d7bb901fcf74baea3588987688fcd7fa1e73ef766de1",
+          "ordered_ids": [
+            10,
+            13,
+            3,
+            14,
+            9,
+            6,
+            2,
+            7,
+            11,
+            16,
+            5,
+            15,
+            17,
+            8,
+            0,
+            4,
+            1
+          ]
+        },
+        {
+          "epoch": 1,
+          "normalized_sha256": "45d427819945baf5014c55779bc2c6379172de0fa7ded2953103f1279141a64f",
+          "ordered_ids": [
+            16,
+            13,
+            4,
+            1,
+            11,
+            9,
+            7,
+            6,
+            15,
+            8,
+            2,
+            3,
+            5,
+            10,
+            17,
+            14,
+            0
+          ]
+        }
+      ],
+      "test_decoded": false,
+      "workers": [
+        0,
+        2
+      ]
+    }
+  },
+  "checks": {
+    "actual_distinct_final_tests": 6,
+    "actual_final_fail": 0,
+    "actual_final_skip": 0,
+    "actual_grid_after_policy": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 2,
+      "seconds": 37.674,
+      "skip": 0,
+      "started_at": "2026-11-18T22:15:55.638762+05:00"
+    },
+    "actual_new_policy_cpu_cuda": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 3,
+      "seconds": 70.839,
+      "skip": 0,
+      "started_at": "2026-11-18T22:14:00.914740+05:00"
+    },
+    "actual_old_references": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 1,
+      "seconds": 14.683,
+      "skip": 0,
+      "started_at": "2026-11-18T22:15:21.770814+05:00"
+    },
+    "baseline": {
+      "command": ".venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-robust001-baseline",
+      "fail": 0,
+      "pass": 815,
+      "seconds_console": 223.85,
+      "skip": 16
+    },
+    "block1_offline": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 41,
+      "seconds": 99.851,
+      "skip": 0,
+      "started_at": "2026-11-18T19:30:18.496915+05:00"
+    },
+    "block2_initial_policy_dispatch_keyed": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 282,
+      "seconds": 47.627,
+      "skip": 0,
+      "started_at": "2026-11-18T19:33:51.298879+05:00"
+    },
+    "block2_policy": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 84,
+      "seconds": 31.996,
+      "skip": 0,
+      "started_at": "2026-11-18T19:34:48.352107+05:00"
+    },
+    "block3_integration_loaders": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 32,
+      "seconds": 48.536,
+      "skip": 0,
+      "started_at": "2026-11-18T19:36:44.215575+05:00"
+    },
+    "cli_results": {
+      "configs": {
+        "command": ".venv/Scripts/python.exe -m src.utils --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --controlled-pair",
+        "exit": 0,
+        "result": "PASS: 2 config(s); controlled settings equal.\nPreparation schema only; dataset artifacts/hashes and training readiness are NOT verified."
+      },
+      "grid_current_expected_mismatch": {
+        "command": ".venv/Scripts/python.exe -m scripts.make_plots --corruption-grid --verify-only",
+        "exit": 1,
+        "result": {
+          "error": "source/implementation/pixel/output hash mismatch; preserve artifacts, no regeneration",
+          "status": "failed"
+        }
+      },
+      "grid_frozen": {
+        "command": ".venv/Scripts/python.exe -m scripts.verify_frozen_corr003",
+        "exit": 0,
+        "result": {
+          "mode": "verify-only",
+          "outputs": {
+            "corruption_examples.pdf": {
+              "bytes": 738357,
+              "sha256": "0a3fa45fcc4ded82332e0a0aeb04cd75fc528744c6c521005f4750b20962e2fa"
+            },
+            "corruption_examples.png": {
+              "bytes": 776955,
+              "sha256": "9a056d31a97522ae5089fa1999a6b20f00df4b97a98d041802f3f0b493f776f3"
+            }
+          },
+          "revision": "21ede652d2d1638ec69e4637f4707bcebf3c8224",
+          "source_manifest": {
+            "bytes": 7622,
+            "sha256": "f5f09446078fc53d26f8d0e5df4d057c62042ff0540de409d363f26ae2ae5854"
+          },
+          "status": "verified"
+        }
+      },
+      "pip": {
+        "command": ".venv/Scripts/python.exe -m pip check",
+        "exit": 0,
+        "result": "No broken requirements found."
+      },
+      "raw": {
+        "command": ".venv/Scripts/python.exe -m scripts.download_data --root data/raw --verify-only",
+        "exit": 0,
+        "result": {
+          "archive_verified": true,
+          "manifest": "unchanged",
+          "mode": "verify-only",
+          "status": "verified",
+          "test": 10000,
+          "train": 50000
+        }
+      },
+      "split": {
+        "command": ".venv/Scripts/python.exe -m scripts.download_data --root data/raw --verify-split",
+        "exit": 0,
+        "result": {
+          "mode": "verify-split",
+          "namespace": "cifar10-python/original-train",
+          "seed": 494,
+          "split_sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284",
+          "status": "verified",
+          "train": 45000,
+          "validation": 5000
+        }
+      },
+      "stats": {
+        "command": ".venv/Scripts/python.exe -m scripts.prepare_normalization --root data/raw --verify-only",
+        "exit": 0,
+        "result": {
+          "mean": [
+            0.4913397271582242,
+            0.48209963252314836,
+            0.44655201729302807
+          ],
+          "mode": "verify-only",
+          "normalization_file_sha256": "332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688",
+          "samples": 45000,
+          "statistics_semantic_sha256": "4450836de3384df4286535985ed0b56b9a411f3033a60ecf57bbfe5edcb01877",
+          "status": "stats_verified",
+          "std": [
+            0.2469009494849942,
+            0.24334132835714897,
+            0.2615066322799661
+          ]
+        }
+      }
+    },
+    "default_final": {
+      "errors": 0,
+      "fail": 0,
+      "pass": 914,
+      "seconds": 279.989,
+      "skip": 19,
+      "started_at": "2026-11-18T19:40:10.209042+05:00"
+    },
+    "initial_resource_failures": [
+      {
+        "check": "parallel reference replay",
+        "error": "NumPy MemoryError during stats verification",
+        "errors": 1,
+        "exit": 1,
+        "resolved": "same check passed sequentially without source/data/backend changes",
+        "skips": 0,
+        "status": "FAIL"
+      },
+      {
+        "check": "first actual policy attempt overlapping default/reference processes",
+        "error": "spawn child WinError1455 loading torch DLL; own stalled check processes stopped",
+        "resolved": "all3 actual cases passed sequentially; failed diagnostic log retained ignored",
+        "status": "INCOMPLETE/STOPPED"
+      }
+    ],
+    "negative_controls": {
+      "corrupt": {
+        "error_type": "DataIntegrityError",
+        "errors": 1,
+        "expected_exit": 1,
+        "skips": 0,
+        "truncated_bytes_preserved": 128
+      },
+      "missing": {
+        "error_type": "DataIntegrityError",
+        "errors": 1,
+        "expected_exit": 1,
+        "skips": 0
+      }
+    },
+    "other_historical_optins": "SKIP: 13 existing cases not rerun (8 DATA,3 CIFAR corruption,2 old CUDA); retain original evidence dates"
+  },
+  "date": "2026-11-18",
+  "draw_contract": {
+    "batch_quotas": false,
+    "compositions": false,
+    "event_draw": "same-device torch.rand scalar float64; [0,.50),[.50,.67),[.67,.84),[.84,1)",
+    "event_order": [
+      "identity",
+      "gaussian_noise",
+      "gaussian_blur",
+      "brightness"
+    ],
+    "generator_key": "caller-owned stable_seed(run_seed,epoch,original_id,'train_corruption')",
+    "global_rng_fallback": false,
+    "noise_draw": "only noise, after event/severity: same-device float32 torch.randn(x.shape)",
+    "probabilities": [
+      0.5,
+      0.17,
+      0.17,
+      0.16
+    ],
+    "severity_draw": "only corrupted events: same-device torch.randint(1,4,()); identity severity0/no draw",
+    "validation": "frozen probabilities/max3, pixels and explicit matching generator before draws; H,W>4 for possible blur"
+  },
+  "environment": {
+    "OS": "Windows AMD64",
+    "dependency_backend_changes": false,
+    "existing_venv": true,
+    "numpy": "2.5.4",
+    "python": "3.12.10",
+    "torch": "2.9.0+cu126"
+  },
+  "frozen_corr003": {
+    "changed_implementation_paths": [
+      "src/corruptions.py"
+    ],
+    "current_source_status": "expected strict mismatch, not historical audit FAIL; no fingerprints/artifacts rewritten",
+    "exports": {
+      "global_rng_unchanged": true,
+      "max_rgb_quantization_error_255": 0.9961624145507812,
+      "outputs": {
+        "corruption_examples.pdf": {
+          "bytes": 738357,
+          "sha256": "0a3fa45fcc4ded82332e0a0aeb04cd75fc528744c6c521005f4750b20962e2fa"
+        },
+        "corruption_examples.png": {
+          "bytes": 776955,
+          "sha256": "9a056d31a97522ae5089fa1999a6b20f00df4b97a98d041802f3f0b493f776f3"
+        }
+      },
+      "png_rgb_samples": 480,
+      "reuse_and_verify_preserve_bytes_mtimes": true,
+      "source_manifest": {
+        "bytes": 7622,
+        "sha256": "f5f09446078fc53d26f8d0e5df4d057c62042ff0540de409d363f26ae2ae5854"
+      }
+    },
+    "numeric": {
+      "ids_class_order": [
+        29,
+        4,
+        6,
+        9,
+        3,
+        27,
+        0,
+        7,
+        8,
+        1
+      ],
+      "image_conditions": 160,
+      "max_blur_numpy2d_error": 1.7881393432617188e-07,
+      "noise_and_darken_bitwise_oracles": true,
+      "noise_clipped_values_per_level": [
+        155,
+        560,
+        1128,
+        2049,
+        3521
+      ],
+      "pixel_sha256_c_bytes": "3ed856ca62f960b3bdfa18807f440451fdc15ce83a9c5d56bb874baf66d711b1",
+      "test_decoded": false,
+      "values_per_noise_level": 30720
+    },
+    "recorded_revision": "21ede652d2d1638ec69e4637f4707bcebf3c8224",
+    "snapshot": "four authenticated implementation blobs plus src/__init__.py from git show, ignored temporary snapshot; no branch/worktree"
+  },
+  "full_DoD": "PARTIAL",
+  "limits": [
+    "No training/models/evaluator/metrics/EDA/core runs or test-based tuning.",
+    "Actual policy/grid/reference checks decode only original train; required raw integrity CLI decodes official test for integrity only.",
+    "No model initialization, optimizer budget, checkpoints/resume or full TEST-S01/scientific training readiness claim.",
+    "CPU/CUDA bitwise or cross-platform reproduction not claimed; sequential tests required under current memory limits.",
+    "Independent human code/artifact review, CORR-003 Person5/team visual review, PROTO-001/team freeze, course/source-policy/LMS/proposal approvals pending.",
+    "General REPRO-001 and independent second-machine reproduction remain open."
+  ],
+  "prerequisite_review": {
+    "CORR-002": "independent technical PASS/full DoD PARTIAL",
+    "DATA-003": "technical PASS; production policy integration verified here; full DoD PARTIAL",
+    "SETUP-003": "local technical PASS/formal human review pending",
+    "dependency_edges_changed": false
+  },
+  "preservation": {
+    "all_bytes_hashes_mtimes_unchanged": true,
+    "all_preexisting_corruption_functions_AST_unchanged": [
+      "_validate_pixels",
+      "apply_corruption",
+      "darken",
+      "gaussian_blur",
+      "gaussian_noise",
+      "keyed_test_epsilon",
+      "keyed_test_generator",
+      "severity_params"
+    ],
+    "artifacts": {
+      "configs/clean_cnn.yaml": {
+        "bytes": 1741,
+        "mtime_unchanged": true,
+        "sha256": "60fbd56b703d1987d4d50de46dc0b32d7053f7ad81229e956763a51c4cbfd209"
+      },
+      "configs/robust_cnn.yaml": {
+        "bytes": 1745,
+        "mtime_unchanged": true,
+        "sha256": "1b080d66103d4cf5650967fbcd016311917e2cf177e57625246b542568a67371"
+      },
+      "data/raw/cifar-10-batches-py/batches.meta": {
+        "bytes": 158,
+        "mtime_unchanged": true,
+        "sha256": "f962466ef690d46b226450fb9aadc74ba4bc64a76aa526b5827fe4bc5c7125cb"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_1": {
+        "bytes": 31035704,
+        "mtime_unchanged": true,
+        "sha256": "54636561a3ce25bd3e19253c6b0d8538147b0ae398331ac4a2d86c6d987368cd"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_2": {
+        "bytes": 31035320,
+        "mtime_unchanged": true,
+        "sha256": "766b2cef9fbc745cf056b3152224f7cf77163b330ea9a15f9392beb8b89bc5a8"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_3": {
+        "bytes": 31035999,
+        "mtime_unchanged": true,
+        "sha256": "0f00d98ebfb30b3ec0ad19f9756dc2630b89003e10525f5e148445e82aa6a1f9"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_4": {
+        "bytes": 31035696,
+        "mtime_unchanged": true,
+        "sha256": "3f7bb240661948b8f4d53e36ec720d8306f5668bd0071dcb4e6c947f78e9682b"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_5": {
+        "bytes": 31035623,
+        "mtime_unchanged": true,
+        "sha256": "d91802434d8376bbaeeadf58a737e3a1b12ac839077e931237e0dcd43adcb154"
+      },
+      "data/raw/cifar-10-batches-py/test_batch": {
+        "bytes": 31035526,
+        "mtime_unchanged": true,
+        "sha256": "f53d8d457504f7cff4ea9e021afcf0e0ad8e24a91f3fc42091b8adef61157831"
+      },
+      "data/raw/cifar-10-python.tar.gz": {
+        "bytes": 170498071,
+        "mtime_unchanged": true,
+        "sha256": "6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce"
+      },
+      "data/raw/cifar10_integrity_v1.json": {
+        "bytes": 3696,
+        "mtime_unchanged": true,
+        "sha256": "62cd6967926f0546a09cba8ec6424a0f14f954a5841afa9c419c95e5332d68b7"
+      },
+      "data/splits/cifar10_split_v1.npz": {
+        "bytes": 76550,
+        "mtime_unchanged": true,
+        "sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284"
+      },
+      "data/splits/normalization.json": {
+        "bytes": 2429,
+        "mtime_unchanged": true,
+        "sha256": "332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688"
+      },
+      "data/splits/split_manifest.json": {
+        "bytes": 2539,
+        "mtime_unchanged": true,
+        "sha256": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21"
+      },
+      "docs/EXPERIMENT_PROTOCOL.md": {
+        "bytes": 40112,
+        "mtime_unchanged": true,
+        "sha256": "4e8e72d84ad87df27663549ca4494806b983b4b579dc39b82562eb997632c309"
+      },
+      "outputs/figures/corruption_examples.pdf": {
+        "bytes": 738357,
+        "mtime_unchanged": true,
+        "sha256": "0a3fa45fcc4ded82332e0a0aeb04cd75fc528744c6c521005f4750b20962e2fa"
+      },
+      "outputs/figures/corruption_examples.png": {
+        "bytes": 776955,
+        "mtime_unchanged": true,
+        "sha256": "9a056d31a97522ae5089fa1999a6b20f00df4b97a98d041802f3f0b493f776f3"
+      },
+      "outputs/figures/corruption_examples.source.json": {
+        "bytes": 7622,
+        "mtime_unchanged": true,
+        "sha256": "f5f09446078fc53d26f8d0e5df4d057c62042ff0540de409d363f26ae2ae5854"
+      },
+      "report/corr001_evidence.json": {
+        "bytes": 12973,
+        "mtime_unchanged": true,
+        "sha256": "179185ea0313efa7f041382153435a200871d707bbd1ee1673e39dde6ff41491"
+      },
+      "report/corr001_reference.npz": {
+        "bytes": 97580,
+        "mtime_unchanged": true,
+        "sha256": "40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33"
+      },
+      "report/corr002_evidence.json": {
+        "bytes": 24134,
+        "mtime_unchanged": true,
+        "sha256": "5cff5a67a5a7d32335ce232c2a83c2c72a8eea1914500cf29ab798e5f131cb7e"
+      },
+      "report/corr002_reference.npz": {
+        "bytes": 187438,
+        "mtime_unchanged": true,
+        "sha256": "b4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03"
+      },
+      "report/corr003_evidence.json": {
+        "bytes": 12271,
+        "mtime_unchanged": true,
+        "sha256": "b093405cc6f7080e078e34e76c05520876fc52cb6c5067d090451bf0055c6d15"
+      },
+      "requirements-lock.txt": {
+        "bytes": 862,
+        "mtime_unchanged": true,
+        "sha256": "8b0777e634a6c32fae37ddbbb997eba9fa08408dfba3b9c21c3e689fc5c3c412"
+      },
+      "requirements.txt": {
+        "bytes": 354,
+        "mtime_unchanged": true,
+        "sha256": "ca2143d760b887c8a980ec9cf1cdf935a9885c8b23eef3bde67aa651ee62be69"
+      }
+    },
+    "checked_files": 28,
+    "diagnostics_and_markers_included_in_check_not_versioned": 3,
+    "source_regions": {
+      "DATA-002": "4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96",
+      "DATA-003": "1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c"
+    },
+    "src_data_utils_unchanged": true
+  },
+  "production_revision": "0c3d3ca7ab890059b9bb0fb8acfc958ee558dbb1",
+  "production_source_sha256_lf": "8112b736a6a2853c350fce3e77e8f35b7bffd4d03e14daf6bf97d322cf4b6e50",
+  "publication": "each checked block committed on main and immediately ordinary push origin main PASS; evidence/docs hashes recorded by subsequent Git commits",
+  "published_blocks_before_evidence": [
+    "ef78e059b84ef251290af0c66977d8e5790e00fe",
+    "0c3d3ca7ab890059b9bb0fb8acfc958ee558dbb1",
+    "d4d56b03baec9a15c890d85234f5ad53298c8893"
+  ],
+  "reference_replay": {
+    "conditions": 16,
+    "epochs": [
+      0,
+      1
+    ],
+    "ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "image_conditions": 544,
+    "labels_ids_unchanged": true,
+    "max_blur_oracle_error": 1.7881393432617188e-07,
+    "normalize_after_dispatch": true,
+    "reference_sha256": "b4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03",
+    "run_seed": 42,
+    "test_decoded": false
+  },
+  "reviewer": "Codex agent checks; independent human review and formal approvals PENDING",
+  "sampling_audit": {
+    "conditional_severity_counts": [
+      [
+        5562,
+        5656,
+        5617
+      ],
+      [
+        5791,
+        5648,
+        5784
+      ],
+      [
+        5423,
+        5285,
+        5320
+      ]
+    ],
+    "conditional_severity_tolerance": 0.02,
+    "counts": [
+      49914,
+      16835,
+      17223,
+      16028
+    ],
+    "event_tolerance": 0.01,
+    "key": "stable_seed(42,0,original_id,'train_corruption'), ID0..99999 (synthetic audit keys)",
+    "max_conditional_severity_error": 0.0053997561400452865,
+    "max_event_frequency_error": 0.002229999999999982,
+    "method": "production policy selection/validation; dispatcher replaced with clone only for frequency audit; real dispatcher numeric and RNG tests separately PASS",
+    "selections": 100000
+  },
+  "schema_version": 1,
+  "starting_main": "de20097",
+  "task": "ROBUST-001",
+  "technical_acceptance": "PASS",
+  "timezone": "Asia/Qyzylorda"
+}
