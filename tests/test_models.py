@@ -1,5 +1,7 @@
 """Independent synthetic TEST-M01/M03 oracles; no data or optimizer steps."""
 
+import copy
+import io
 import math
 
 import pytest
@@ -103,9 +105,9 @@ def test_caller_seed_pairs_clean_robust_full_initial_state(seed):
         torch.manual_seed(seed)
         model = CompactCNN(num_classes=cfg['num_classes'], dropout=cfg['dropout'])
         assert cfg['architecture'] == model.architecture
-        states.append({k: v.clone() for k, v in model.state_dict().items()})
+        states.append(copy.deepcopy(model.state_dict()))
     assert states[0].keys() == states[1].keys()
-    assert all(torch.equal(states[0][k], states[1][k]) for k in states[0])
+    assert_states_equal(states[0], states[1])
     torch.manual_seed(seed + 1)
     other = CompactCNN().state_dict()
     assert not torch.equal(states[0]['features.0.weight'], other['features.0.weight'])
@@ -135,3 +137,132 @@ def test_invalid_shape_before_bn_or_dropout(shape):
         model(torch.empty(shape))
     assert torch.equal(before, torch.get_rng_state())
     assert all(m.num_batches_tracked == 0 for m in model.modules() if isinstance(m, nn.BatchNorm2d))
+
+
+def assert_states_equal(left, right):
+    assert left.keys() == right.keys()
+    for key in left:
+        if isinstance(left[key], torch.Tensor):
+            assert torch.equal(left[key], right[key]), key
+        else:
+            assert left[key] == right[key], key
+
+
+@pytest.mark.parametrize('batch', [1, 4])
+def test_finite_ce_backward_without_parameter_updates(batch):
+    torch.manual_seed(42)
+    model = CompactCNN().train()
+    weights = {k: p.detach().clone() for k, p in model.named_parameters()}
+    x = torch.linspace(-2, 2, batch * 3 * 32 * 32).reshape(batch, 3, 32, 32).requires_grad_()
+    targets = torch.arange(batch) % 10
+    logits = model(x)
+    loss = nn.CrossEntropyLoss()(logits, targets)
+    expected = (logits.logsumexp(1) - logits[torch.arange(batch), targets]).mean()
+    torch.testing.assert_close(loss, expected, atol=1e-6, rtol=0)
+    loss.backward()
+    assert torch.isfinite(loss) and x.grad is not None and torch.isfinite(x.grad).all()
+    for name, p in model.named_parameters():
+        assert p.grad is not None and torch.isfinite(p.grad).all(), name
+        assert torch.equal(p, weights[name]), name
+    assert all(m.num_batches_tracked == 1 for m in model.modules() if isinstance(m, nn.BatchNorm2d))
+
+
+def test_bn_training_numeric_buffers_and_eval_freeze():
+    model = CompactCNN().train()
+    x = torch.linspace(-1, 2, 4 * 3 * 32 * 32).reshape(4, 3, 32, 32)
+    first_bn_input = []
+    handle = model.features[1].register_forward_pre_hook(
+        lambda m, args: first_bn_input.append(args[0].detach().clone()))
+    with torch.no_grad():
+        model(x)
+    handle.remove()
+    z = first_bn_input[0].double()
+    mean = z.mean((0, 2, 3))
+    variance = ((z - mean[None, :, None, None]) ** 2).sum((0, 2, 3)) / (4 * 32 * 32 - 1)
+    torch.testing.assert_close(model.features[1].running_mean.double(), .1 * mean, atol=1e-7, rtol=1e-6)
+    torch.testing.assert_close(model.features[1].running_var.double(), .9 + .1 * variance, atol=1e-7, rtol=1e-6)
+    assert all(m.num_batches_tracked == 1 for m in model.modules() if isinstance(m, nn.BatchNorm2d))
+    model.eval()
+    before = copy.deepcopy(model.state_dict())
+    rng = torch.get_rng_state().clone()
+    with torch.inference_mode():
+        first, second = model(x), model(x)
+    assert torch.equal(first, second) and torch.isfinite(first).all()
+    assert torch.equal(rng, torch.get_rng_state())
+    assert_states_equal(before, model.state_dict())
+    model.train()
+    with torch.no_grad():
+        model(x)
+    assert all(m.num_batches_tracked == 2 for m in model.modules() if isinstance(m, nn.BatchNorm2d))
+    model.initialize_weights()
+    for m in model.modules():
+        if isinstance(m, nn.BatchNorm2d):
+            assert m.num_batches_tracked == 0 and torch.count_nonzero(m.running_mean) == 0
+            assert torch.equal(m.running_var, torch.ones_like(m.running_var))
+
+
+def test_dropout_in_forward_has_inverted_scaling_and_eval_identity():
+    model = CompactCNN().train()
+    observed = []
+    handle = model.dropout.register_forward_hook(
+        lambda m, args, out: observed.append((args[0].detach().clone(), out.detach().clone())))
+    x = torch.linspace(-2, 2, 4 * 3 * 32 * 32).reshape(4, 3, 32, 32)
+    torch.manual_seed(123)
+    with torch.no_grad():
+        model(x)
+    before, after = observed.pop()
+    assert before.shape == after.shape == (4, 128)
+    assert torch.all((after == 0) | (after == before * 1.25))
+    # Fixed seed/fixture, structural mask assertions rather than frequency bounds.
+    assert torch.any((before != 0) & (after == 0)) and torch.any(after != 0)
+    model.eval()
+    with torch.no_grad():
+        model(x)
+    before, after = observed.pop()
+    handle.remove()
+    assert torch.equal(before, after)
+
+
+def test_strict_state_dict_serialized_roundtrip_including_bn_and_identity():
+    model = CompactCNN().train()
+    x = torch.linspace(-1, 1, 4 * 3 * 32 * 32).reshape(4, 3, 32, 32)
+    with torch.no_grad():
+        model(x)  # Exercise non-initial BN buffers, without any parameter update.
+    model.eval()
+    buffer = io.BytesIO()
+    torch.save(model.state_dict(), buffer)
+    buffer.seek(0)
+    state = torch.load(buffer, map_location='cpu', weights_only=True)
+    assert state['_extra_state'] == {'architecture': 'compact_cnn_v1', 'num_classes': 10, 'dropout': .2}
+    restored = CompactCNN().eval()
+    result = restored.load_state_dict(state, strict=True)
+    assert result.missing_keys == result.unexpected_keys == []
+    assert_states_equal(model.state_dict(), restored.state_dict())
+    with torch.inference_mode():
+        assert torch.equal(model(x), restored(x))
+
+
+@pytest.mark.parametrize('target', [{'num_classes': 11}, {'dropout': .3}])
+def test_incompatible_model_config_rejected(target):
+    with pytest.raises(RuntimeError, match='incompatible CompactCNN architecture/config'):
+        CompactCNN(**target).load_state_dict(CompactCNN().state_dict(), strict=True)
+
+
+@pytest.mark.parametrize('damage', ['architecture', 'metadata_missing', 'missing_weight',
+                                    'extra_weight', 'wrong_shape'])
+def test_strict_state_dict_rejects_incompatible_architecture_or_keys(damage):
+    state = CompactCNN().state_dict()
+    match = r'Error\(s\) in loading state_dict'
+    if damage == 'architecture':
+        state['_extra_state']['architecture'] = 'compact_cnn_v2'
+        match = 'incompatible CompactCNN architecture/config'
+    elif damage == 'metadata_missing':
+        del state['_extra_state']
+    elif damage == 'missing_weight':
+        del state['features.0.weight']
+    elif damage == 'extra_weight':
+        state['unexpected.weight'] = torch.zeros(1)
+    else:
+        state['classifier.weight'] = torch.zeros(11, 128)
+    with pytest.raises(RuntimeError, match=match):
+        CompactCNN().load_state_dict(state, strict=True)

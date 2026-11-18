@@ -47,6 +47,24 @@ class CompactCNN(nn.Module):
         self.classifier = nn.Linear(128, num_classes, bias=True)
         self.initialize_weights()
 
+    def get_extra_state(self) -> dict:
+        """Bind model identity to the standard PyTorch state_dict."""
+        return {'architecture': self.architecture, 'num_classes': self.num_classes,
+                'dropout': self.dropout.p}
+
+    def set_extra_state(self, state) -> None:
+        """Reject incompatible identity on load; use load_state_dict(strict=True).
+
+        This is model-level compatibility only, not experiment provenance or a
+        checkpoint/resume framework. Like PyTorch loading, failures are not a
+        transactional rollback; load into a fresh compatible model instance.
+        """
+        expected = self.get_extra_state()
+        if (type(state) is not dict or state.keys() != expected.keys()
+                or any(type(state[k]) is not type(v) or state[k] != v
+                       for k, v in expected.items())):
+            raise RuntimeError(f'incompatible CompactCNN architecture/config: expected {expected}')
+
     def initialize_weights(self) -> None:
         """Reinitialize using the current torch RNG, including fresh BN buffers.
 
