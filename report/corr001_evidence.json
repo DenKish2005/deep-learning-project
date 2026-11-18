@@ -1,0 +1,327 @@
+{
+  "checks": {
+    "actual_opt_in": {
+      "command": ".venv/Scripts/python.exe -m pytest tests/test_corruptions_local.py tests/test_corruptions_cuda.py -q -s --basetemp=.venv/pytest-corr001-actual --junitxml=tmp/corr001/actual.xml",
+      "environment": {
+        "RUN_CIFAR_CORRUPTIONS": "1",
+        "RUN_CORR_CUDA": "1"
+      },
+      "fail": 0,
+      "pass": 3,
+      "seconds": 61.972,
+      "skip": 0
+    },
+    "baseline": {
+      "command": ".venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-corr001-baseline",
+      "fail": 0,
+      "pass": 357,
+      "seconds": 119.37,
+      "skip": 8
+    },
+    "controlled_config_cli": "PASS: two configs, controlled settings equal; preparation only",
+    "default_final": {
+      "command": ".venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-corr001-final --junitxml=tmp/corr001/default.xml",
+      "fail": 0,
+      "pass": 453,
+      "seconds": 122.431,
+      "skip": 11
+    },
+    "excluded_source_scope": "PASS: protected paths unchanged versus 2dc71de",
+    "expected_missing_input_failure": {
+      "command": ".venv/Scripts/python.exe -m pytest tests/test_corruptions_local.py -k actual_train_noise -q --basetemp=.venv/pytest-corr001-missing",
+      "diagnostic": "DataIntegrityError; 1 error, 1 deselected, no skip; expected negative-control failure",
+      "environment": {
+        "CIFAR10_ROOT": "tmp/corr001/intentionally-missing",
+        "RUN_CIFAR_CORRUPTIONS": "1"
+      },
+      "exit_code": 1,
+      "root": "tmp/corr001/intentionally-missing",
+      "status": "PASS"
+    },
+    "historical_actual_data_tests": "SKIP in this stage: original 8 opt-in cases not rerun; 31.10.2026 results remain historical",
+    "multi_gpu": "SKIP: only actual cuda:0 exercised; CPU/CUDA generator mismatch tested both ways",
+    "normalization_verify_cli": "PASS: actual45000-only stats; no writes",
+    "pip_check": "PASS: No broken requirements found",
+    "raw_verify_cli": "PASS: archive verified, train50000/test10000; historical manifest unchanged",
+    "split_verify_cli": "PASS: persisted45000/5000; seed494",
+    "training_evaluation_eda": "SKIP: outside CORR-001 scope"
+  },
+  "date_local": "2026-11-18",
+  "environment": {
+    "backend_changes": false,
+    "machine": "AMD64",
+    "numpy": "2.5.4",
+    "python": "3.12.10",
+    "system": "Windows",
+    "torch": "2.9.0+cu126"
+  },
+  "frozen_regions": {
+    "DATA-002-v1": "4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96",
+    "DATA-003-normalization-v1": "1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c"
+  },
+  "full_dod": "PARTIAL",
+  "initial_revision": "2dc71dea75733db6108e33f8f4003ffc095029c4",
+  "limitations": [
+    "Full CORR-001 DoD pending PROTO-001/team freeze/source-policy approvals and independent human review; prerequisite edges unchanged",
+    "CORR-002 blur/darkening/apply_corruption, ROBUST-001 actual policy and full DATA-003 robust integration remain pending",
+    "keyed_test_generator/epsilon accept only full original-test namespace and IDs0..9999; canonical epsilon is CPU float32 3x32x32",
+    "Gaussian primitive allows positive spatial sizes, but keyed helpers intentionally fix CIFAR shape; no production CorruptedDataset/evaluator/condition identity manifests",
+    "Fixed train-noise callable is a boundary probe, not production robust policy, training or scientific evaluation",
+    "Bitwise reference claims cover the locked local CPU environment only; CUDA primitive tested locally, no cross-device/version/platform equality claim",
+    "General REPRO-001 config identity/global seed/checkpoints/resume/backup and second-machine reproduction remain pending",
+    "Default11skips comprise original8actual gates, new2CIFAR noise gates and1CUDA gate; only new3actual cases executed separately in this stage"
+  ],
+  "observations": {
+    "cuda_primitive": {
+      "cpu_cuda_equality_claimed": false,
+      "cross_device_generator_rejected": true,
+      "device": "cuda:0",
+      "global_rng_unchanged": true,
+      "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "same_device_determinism": true
+    },
+    "test_keyed_contract": {
+      "eval_seed": 100494,
+      "fixed_inputs_only": true,
+      "namespace": "cifar10-python/original-test",
+      "no_model_or_tuning": true,
+      "samples": [
+        {
+          "epsilon_sha256": "3610d879c6494713a3ea9f8eebf41a57c6cbafcf32415919b3f1ea2d314097dd",
+          "original_index": 0,
+          "severity_1_to_5_pixels_sha256": [
+            "0b2ecdb0c6fa605d8feba1fd7a560813c6ea2591b6d1fb33ce8f65d775c89390",
+            "8d0109cc58bbd2ba5f8ad2c73cceffa12f5dd6b9369434e2d4d8ecb7c6f97f31",
+            "29a48fd6e757d90926d6a4e702e1de8a82cf2ec56478d38e87f624a80635851e",
+            "47b8c461611f8c48b5d21b70805dca665d032238747887c8b8292995a25bdac6",
+            "4432b8351da943a43821660a09fdd9ff4e019102bf2b5ee974ba203c7e97be58"
+          ]
+        },
+        {
+          "epsilon_sha256": "9cd9b7b9a3439f60f802a2beac875fa06bade801aca624cff1b735da680f8d09",
+          "original_index": 71,
+          "severity_1_to_5_pixels_sha256": [
+            "64b535a9d90e9960ff1e8b11664ccd81cd808fc4bd1918d42ff287402cf52dab",
+            "6d14550bab882d07238a3a019d25b42b74c74a47db9e7bce3c18b842da8c8bd3",
+            "46a4f57c9ddd82a8b0d51b747ed25ea975820cf10142d497d86f6cd0f89e8d17",
+            "0b41355b008d8d1d42e9706ce9527ff437d713e30f943a4b8a9810943575e119",
+            "6e98ad12603102f5255e107cda5ee653ddeda07b2e04894242f3187ef3204dd1"
+          ]
+        },
+        {
+          "epsilon_sha256": "e37289ad029a04f6d521fd1b832f11b1c91e036500269707cf337ff5c859ed72",
+          "original_index": 9999,
+          "severity_1_to_5_pixels_sha256": [
+            "f9dcda2e16ab478519cf590e8fec2b838edaf59cb602f86e2372b9cdea266a25",
+            "546460a59c7d19f3426577818caceada0e310cc3517edb5fb111e6150d5926fb",
+            "a0548bc6cd59ebdbfa3937745c2cf24632b9b8f03a51269c41599a709e3319bd",
+            "00574318ccc6842e1b7b25b7690d13644a05a7d4ca1aa3cfd4657f059e50a1cd",
+            "14b1fa2d57d3729be2e04088c4e28d548f50df052c2cf7ac22be022559376f99"
+          ]
+        }
+      ]
+    },
+    "train_boundary": {
+      "batch_sizes": [
+        7,
+        5
+      ],
+      "epochs": [
+        {
+          "epoch": 0,
+          "normalized_stream_sha256": "ab7a93c4dada758bb7c06d37838d5dc8d49d5863973f91d2d0b1fb1059f830f2"
+        },
+        {
+          "epoch": 1,
+          "normalized_stream_sha256": "9cf1d93cd5f00b654b1bad71b91f7f9f3f01300fc2c7fdb91637cb4a331e2276"
+        }
+      ],
+      "ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "labels_ids_unchanged": true,
+      "normalize_after_noise": true,
+      "raw_split_stats_configs_preserved": true,
+      "reference_sha256": "40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33",
+      "run_seed": 42,
+      "sigma": 0.08,
+      "test_decoded": false,
+      "workers": [
+        0,
+        2
+      ]
+    }
+  },
+  "preservation": {
+    "after_identical_bytes_hashes_mtimes": true,
+    "file_count": 16,
+    "files_before": {
+      "configs/clean_cnn.yaml": {
+        "bytes": 1741,
+        "mtime_ns": 1793463732755669000,
+        "sha256": "60fbd56b703d1987d4d50de46dc0b32d7053f7ad81229e956763a51c4cbfd209"
+      },
+      "configs/robust_cnn.yaml": {
+        "bytes": 1745,
+        "mtime_ns": 1793463732756783400,
+        "sha256": "1b080d66103d4cf5650967fbcd016311917e2cf177e57625246b542568a67371"
+      },
+      "data/raw/.cifar-acquire-mi72s456/cifar-10-python.tar.gz": {
+        "bytes": 113246208,
+        "mtime_ns": 1793346034535687500,
+        "sha256": "19a73dc43a696d7feea6d147fe4dda29a4c0d3f4320b5030f877887578280f6f"
+      },
+      "data/raw/.gitkeep": {
+        "bytes": 0,
+        "mtime_ns": 1790052317416594300,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "data/raw/cifar-10-batches-py/batches.meta": {
+        "bytes": 158,
+        "mtime_ns": 1793347189946465600,
+        "sha256": "f962466ef690d46b226450fb9aadc74ba4bc64a76aa526b5827fe4bc5c7125cb"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_1": {
+        "bytes": 31035704,
+        "mtime_ns": 1793347185260899300,
+        "sha256": "54636561a3ce25bd3e19253c6b0d8538147b0ae398331ac4a2d86c6d987368cd"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_2": {
+        "bytes": 31035320,
+        "mtime_ns": 1793347186472334300,
+        "sha256": "766b2cef9fbc745cf056b3152224f7cf77163b330ea9a15f9392beb8b89bc5a8"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_3": {
+        "bytes": 31035999,
+        "mtime_ns": 1793347187429723300,
+        "sha256": "0f00d98ebfb30b3ec0ad19f9756dc2630b89003e10525f5e148445e82aa6a1f9"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_4": {
+        "bytes": 31035696,
+        "mtime_ns": 1793347187733424500,
+        "sha256": "3f7bb240661948b8f4d53e36ec720d8306f5668bd0071dcb4e6c947f78e9682b"
+      },
+      "data/raw/cifar-10-batches-py/data_batch_5": {
+        "bytes": 31035623,
+        "mtime_ns": 1793347189025853000,
+        "sha256": "d91802434d8376bbaeeadf58a737e3a1b12ac839077e931237e0dcd43adcb154"
+      },
+      "data/raw/cifar-10-batches-py/test_batch": {
+        "bytes": 31035526,
+        "mtime_ns": 1793347189643218500,
+        "sha256": "f53d8d457504f7cff4ea9e021afcf0e0ad8e24a91f3fc42091b8adef61157831"
+      },
+      "data/raw/cifar-10-python.tar.gz": {
+        "bytes": 170498071,
+        "mtime_ns": 1793347180833740700,
+        "sha256": "6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce"
+      },
+      "data/raw/cifar10_integrity_v1.json": {
+        "bytes": 3696,
+        "mtime_ns": 1793347198064308700,
+        "sha256": "62cd6967926f0546a09cba8ec6424a0f14f954a5841afa9c419c95e5332d68b7"
+      },
+      "data/splits/cifar10_split_v1.npz": {
+        "bytes": 76550,
+        "mtime_ns": 1793435023883509900,
+        "sha256": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284"
+      },
+      "data/splits/normalization.json": {
+        "bytes": 2429,
+        "mtime_ns": 1793463707134146700,
+        "sha256": "332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688"
+      },
+      "data/splits/split_manifest.json": {
+        "bytes": 2539,
+        "mtime_ns": 1793435023887559000,
+        "sha256": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21"
+      }
+    }
+  },
+  "production_revision": "f89d70f61c67b520686769589d65288d6afc30c2",
+  "production_source_sha256_lf": "668dd4c685748a0d68fe4d6444033c2b84cc0c17aff44d4f9ab56b9f9d44f643",
+  "reference": {
+    "array_hash_encoding": "ASCII compact sorted JSON dtype/shape, LF, C-order little-endian bytes",
+    "arrays": {
+      "test_epsilon": {
+        "dtype": "<f4",
+        "semantic_sha256": "6a9ca8df43a9684777d4b786e73dd49b654ca47d37384194851436e3328f396e",
+        "shape": [
+          3,
+          3,
+          32,
+          32
+        ]
+      },
+      "test_ids": {
+        "dtype": "<i8",
+        "semantic_sha256": "f6adba8bde50462540cfdd765b828aef6ae4a4288e83ec2edcee3565c00b22c1",
+        "shape": [
+          3
+        ]
+      },
+      "train_ids": {
+        "dtype": "<i8",
+        "semantic_sha256": "8bcc165a55231f50ca09d50030a64bd03f963225fafe534a964b5d77d99a6c5e",
+        "shape": [
+          3
+        ]
+      },
+      "train_noisy": {
+        "dtype": "<f4",
+        "semantic_sha256": "c6e72cbaace9f2f9a6aeb632e40b9911ecdd9aa920023e0b62c915162b27ad8b",
+        "shape": [
+          3,
+          3,
+          32,
+          32
+        ]
+      },
+      "train_normalized": {
+        "dtype": "<f4",
+        "semantic_sha256": "c76c3db504379a679c7151901939a737188997f6512c98d92c79f810ae4f16ac",
+        "shape": [
+          3,
+          3,
+          32,
+          32
+        ]
+      }
+    },
+    "bytes": 97580,
+    "file_sha256": "40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33",
+    "generation": "Verified actual IndexedCIFAR10 train IDs0/1/2, run42 epoch0, fixed .08 noise probe; CPU keyed test epsilon for IDs0/71/9999; saved with numpy.savez_compressed. No raw/test pixels or labels saved. Independently replayed by actual tests.",
+    "path": "report/corr001_reference.npz"
+  },
+  "reviewer": "Codex agent checks; independent human review pending",
+  "schema_version": 1,
+  "stable_seed_implementation_unchanged": true,
+  "statistical_oracle": {
+    "clipping": "known signed epsilon and boundary inputs tested separately",
+    "epsilon_mean": 0.0005027506832308905,
+    "epsilon_population_std": 0.9997264346504501,
+    "fixture": "CPU float32 N(0,1), shape3x512x512, local seed100494; measured using float64 moments",
+    "mean_abs_limit": 0.01,
+    "output_sigma_fixture": 0.02,
+    "std_abs_error_limit": 0.02
+  },
+  "task": "CORR-001",
+  "technical_acceptance": "PASS",
+  "timezone": "Asia/Qyzylorda"
+}
