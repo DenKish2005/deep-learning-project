@@ -3,8 +3,54 @@
 import math
 
 import torch
+import torch.nn.functional as F
 
 from src.utils import stable_seed
+
+
+def _validate_pixels(x: torch.Tensor) -> None:
+    """The common pixel boundary for deterministic primitives and clean."""
+    if (not isinstance(x, torch.Tensor) or x.layout != torch.strided
+            or x.dtype != torch.float32 or x.ndim != 3 or x.shape[0] != 3
+            or min(x.shape[1:]) <= 0 or x.device.type not in ('cpu', 'cuda')):
+        raise ValueError('x must be dense CPU/CUDA float32 RGB CHW with positive H,W')
+    if not torch.isfinite(x).all() or not ((x >= 0) & (x <= 1)).all():
+        raise ValueError('x must contain finite pixels in [0,1] before normalization')
+
+
+def gaussian_blur(x: torch.Tensor, sigma: float, kernel_size: int) -> torch.Tensor:
+    """Normalized discrete separable Gaussian, reflect padding, no channel mixing.
+
+    Finite nonnegative Python sigma and positive odd Python kernel are required.
+    Radius must be smaller than both H and W, including identity calls. Sigma0
+    (or kernel1) returns a clone. Positive sigma weights are computed in float64,
+    normalized then cast to pixel dtype; convolution and output are float32.
+    The final clamp contains roundoff at the [0,1] boundary. No RNG is used.
+    """
+    _validate_pixels(x)
+    try:
+        valid = type(sigma) in (int, float) and math.isfinite(sigma) and sigma >= 0
+    except OverflowError:
+        valid = False
+    if not valid:
+        raise ValueError('sigma must be a finite nonnegative Python number (not bool)')
+    if type(kernel_size) is not int or kernel_size <= 0 or kernel_size % 2 != 1:
+        raise ValueError('kernel_size must be a positive odd Python integer')
+    radius = kernel_size // 2
+    if radius >= min(x.shape[1:]):
+        raise ValueError('reflect radius must be smaller than both image dimensions')
+    if sigma == 0 or kernel_size == 1:
+        return x.clone()
+    coordinates = torch.arange(-radius, radius + 1, dtype=torch.float64, device=x.device)
+    # Divide before squaring: tiny sigma tends to a delta, huge sigma to uniform.
+    weights = torch.exp(-0.5 * (coordinates / sigma).square())
+    weights = (weights / weights.sum()).to(x.dtype)
+    horizontal = weights.reshape(1, 1, 1, -1).repeat(3, 1, 1, 1)
+    vertical = weights.reshape(1, 1, -1, 1).repeat(3, 1, 1, 1)
+    y = F.conv2d(F.pad(x.unsqueeze(0), (radius, radius, 0, 0), mode='reflect'),
+                 horizontal, groups=3)
+    y = F.conv2d(F.pad(y, (0, 0, radius, radius), mode='reflect'), vertical, groups=3)
+    return y.squeeze(0).clamp(0, 1)
 
 
 def severity_params(kind: str, severity: int) -> dict:
