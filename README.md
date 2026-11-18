@@ -11,12 +11,15 @@ DATA-001 adds verified raw CIFAR-10 loading, explicit acquisition, a read-only
 integrity CLI and a versioned local manifest. DATA-002 adds the persisted stratified
 45k/5k split, seed494, verified NPZ/manifest and offline prepare/verify CLI.
 DATA-003 adds train-only normalization, keyed transforms/order and deterministic
-typed loaders. Corruptions, CNN, training, evaluation and plotting remain future
-work; actual robust integration awaits CORR-001/002.
+typed loaders. CORR-001 adds exact three-family severity mapping, explicit-generator
+Gaussian noise and reusable original-test keyed CPU epsilon. Blur/darkening, policy,
+CNN, training, evaluation and plotting remain future work.
 No training has run.
 Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
 RGB32×32, all archive/file checksums and class counts pass. Current checks:
-357 offline tests pass (8 opt-in tests skipped); separately all 8 actual tests pass.
+453 offline tests pass (11 opt-in tests skipped); separately the new CORR-001
+actual checks pass 3/3, including CUDA primitive validation. The original 8 actual
+data tests were not rerun in CORR-001; their results remain dated 31.10.2026.
 
 ## Working installation and checks
 
@@ -165,11 +168,52 @@ int64 labels/IDs, drop_last=False. Train uses keyed pad/crop/flip, optional inje
 pixel-space policy, then Normalize; val/test are sequential and deterministic.
 Call `loader.dataset.set_epoch(epoch)` before iterator creation. Future training
 must request `partitions=('train','val')` to avoid decoding test. Augmentation-enabled
-config requires an explicit policy; actual corruptions and training readiness are pending.
+config requires an explicit policy; full robust policy/integration and training readiness are pending.
 Workers0 reference and Windows spawn2 equality passed on synthetic fixtures and129
 actual train IDs across epochs/batch sizes. Full coverage45k/5k/10k and label
 alignment passed. [Contracts](docs/TECHNICAL_ARCHITECTURE.md),
 [actual evidence](report/data003_evidence.json), [commands/results](report/reproduction.md).
+
+## Working Gaussian noise and keyed epsilon (CORR-001)
+
+`severity_params(kind, severity)` returns fresh parameter dicts for noise/blur/
+brightness levels 1..5. Clean is separate; blur mapping does not implement blur.
+`gaussian_noise(x, sigma, generator)` accepts dense CPU/CUDA float32 RGB CHW pixels
+in [0,1], positive H/W and finite nonnegative Python sigma. It returns new pixels
+with the same shape/device/dtype, without global RNG use. Invalid inputs fail
+before generator draws; sigma0 clones without drawing. Normalize afterward.
+
+```python
+from src.corruptions import gaussian_noise, keyed_test_generator, keyed_test_epsilon
+
+namespace = 'cifar10-python/original-test'
+epsilon = keyed_test_epsilon(71, namespace=namespace)  # CPU float32 [3,32,32]
+# x is the raw original-test image71 converted to CPU float32 CHW /255.
+# Recreate this generator for every image/condition; do not reuse a consumed stream.
+# noisy = gaussian_noise(x, .08, keyed_test_generator(71, namespace=namespace))
+```
+
+The full original-test namespace and Python ID0..9999 are required. The seed uses
+existing `stable_seed(100494,'cifar10-test',id,'gaussian_noise','v1')`; severity and
+model/run seed are absent. This is a primitive boundary; CorruptedDataset,
+evaluator and robust policy remain future tasks. CPU bitwise references cover
+only the locked local environment. CUDA primitive PASS does not imply CPU/CUDA
+equality; canonical test epsilon stays CPU.
+
+```powershell
+$env:RUN_CIFAR_CORRUPTIONS='1'
+$env:RUN_CORR_CUDA='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_corruptions_local.py tests/test_corruptions_cuda.py -q -s --basetemp=.venv/pytest-corr001-actual
+Remove-Item Env:RUN_CIFAR_CORRUPTIONS
+Remove-Item Env:RUN_CORR_CUDA
+```
+
+Actual CIFAR checks require existing verified raw/split/stats; no downloads.
+Missing/corrupt inputs fail when opted in. CUDA opt-in also fails if unavailable.
+[Evidence](report/corr001_evidence.json) and [saved regression tensors](report/corr001_reference.npz)
+record fixed train IDs/noise-before-Normalize and fixed test-key inputs, without
+model runs or test-based tuning. Full CORR-001 DoD remains PARTIAL pending review
+and approvals.
 
 ## Project documents and next work
 
@@ -179,9 +223,9 @@ Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
 CSR and proposal candidates; submitted version, current rubric/LMS confirmation,
 AI-policy conflict and team approvals remain pending.
 
-Next: CORR-001 keyed noise using the implemented stable seed encoding;
+Next: CORR-002 reflect Gaussian blur, darkening and apply_corruption;
 [next-step prompt](docs/NEXT_STEP_PROMPT.md). Independent DATA-003 technical scope
-PASS; full DoD PARTIAL until CORR-001/002 robust integration and independent human
+PASS; full DoD PARTIAL until CORR-002/ROBUST-001 integration and independent human
 review. Full DATA-001/002 DoD also remains PARTIAL; agent checks do not replace review.
 All commits and ordinary pushes use `main`, per the user's current instruction.
 Commands in the future-pipeline section of [REPRODUCIBILITY](docs/REPRODUCIBILITY.md)

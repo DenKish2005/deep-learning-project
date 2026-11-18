@@ -1,149 +1,145 @@
-# Промпт следующего этапа — CORR-001
+# Промпт следующего этапа — CORR-002
 
-Обновлён 18.11.2026 после повторной проверки clean main и origin/main на d2d54ee.
-Все изменения DATA-003 уже опубликованы; повторный push: Everything up-to-date.
-Evidence DATA-003 ниже относится к проверкам 31.10.2026, а не к новому прогону.
-Скопируйте текст блока в новый чат; этот handoff не запускает CORR-001 сам по себе.
+Обновлён18.11.2026 после CORR-001 independent technical PASS/full DoD PARTIAL.
+Implementation/evidence опубликованы в main7d47569/b73536b/f89d70f/5d12a06;
+финальный documentation commit — в Git history. Каждый блок сразу push origin main PASS.
+Ниже handoff, он не запускает CORR-002 сам по себе. Counts — actual18.11.2026;
+original8DATA opt-in checks здесь не повторялись (их31.10evidence historical).
 
 ```text
-Продолжи проект CSCI 494 — Robustness to Noise.
-Выполни независимый технический объём CORR-001: severity mapping и keyed Gaussian
-noise поверх existing stable_seed. Не обучай модели; не расширяй этап на CORR-002,
-ROBUST-001, EDA или scientific evaluation. Работай самостоятельно до проверяемого
-результата с actual artifacts, tests и evidence. Не ограничивайся планом и не
-останавливайся после промежуточного commit: продолжай до завершения этого этапа.
+Продолжи проект CSCI494 — Robustness to Noise.
+Выполни независимый технический объём CORR-002: reflect Gaussian blur, progressive
+darkening и apply_corruption поверх existing CORR-001. Работай самостоятельно до
+проверяемого результата с actual artifacts, tests и evidence. Не обучай модели,
+не расширяй этап на ROBUST-001/CORR-003/EDA/scientific evaluation и не останавливайся
+после промежуточного commit.
 
-СНАЧАЛА ПРОВЕРЬ АКТУАЛЬНОЕ СОСТОЯНИЕ
+СНАЧАЛА ПРОВЕРЬ АКТУАЛЬНЫЙ РЕПОЗИТОРИЙ
 
-Прочитай AGENTS.md при наличии, README и docs/MASTER_PROJECT_PLAN.md,
-START_HERE.md, CURRENT_STATUS.md, REQUIREMENTS.md, TECHNICAL_ARCHITECTURE.md,
-EXPERIMENT_PROTOCOL.md, IMPLEMENTATION_ROADMAP.md (CORR-001/002, DATA-003,
-ROBUST-001, REPRO-001), REPRODUCIBILITY.md, TESTING_PLAN.md, SETUP_DECISIONS.md;
-report/reproduction.md, report/data003_evidence.json, report/ai_usage.md,
-report/course_materials/README.md, data/splits/split_manifest.json
-и data/splits/normalization.json.
-Проверь main/status/staged list/log, fetch и remote history/origin/main.
-Graphify — historical snapshot до DATA-002; сверяй с current source, не rebuild.
+Прочитай AGENTS.md при наличии, README, docs/MASTER_PROJECT_PLAN.md, START_HERE.md,
+CURRENT_STATUS.md, REQUIREMENTS.md, TECHNICAL_ARCHITECTURE.md, EXPERIMENT_PROTOCOL.md,
+IMPLEMENTATION_ROADMAP.md (CORR-001/002/003, DATA-003, ROBUST-001, REPRO-001),
+REPRODUCIBILITY.md, TESTING_PLAN.md, SETUP_DECISIONS.md, report/reproduction.md,
+report/corr001_evidence.json, report/ai_usage.md, report/course_materials/README.md,
+data/splits/split_manifest.json и normalization.json. Проверь main/status/staged
+list/log; fetch и remote history/origin/main. Graphify — historical snapshot до
+DATA-002; сверяй с current source, не rebuild. Source/gates не менять ради DONE.
 
-Исторические результаты DATA-003 от 31.10.2026, не замена fresh checks:
-- DATA-001/002 technical PASS/full DoD PARTIAL до independent human review.
-- DATA-003 independent technical scope PASS: stats, keyed geometry/order,
-  clean typed loaders/CLI и synthetic policy boundary. Full DoD PARTIAL:
-  CORR-001 prerequisite, CORR-002 actual robust integration/dependent acceptance,
-  human review pending. Не меняй dependency edges ради DONE.
-- Default357PASS/0FAIL/8actual opt-in SKIP, отдельно8actual PASS/0FAIL/0SKIP.
-- Actual45k-only mean [0.4913397271582242,0.48209963252314836,0.44655201729302807],
-  population std [0.2469009494849942,0.24334132835714897,0.2615066322799661].
-- Stats FILE SHA-256332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688;
-  semantic4450836de3384df4286535985ed0b56b9a411f3033a60ecf57bbfe5edcb01877.
-- Frozen NPZ1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284;
-  manifest8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21.
-- Actual full45k/5k/10k typed coverage/labels; train352batches(last72).
-  Spawn2/0 equality on129actual train IDs across epochs0/1, batches64/37 PASS.
-- stable_seed/seed_worker уже реализованы в src/utils.py. Encoding v1:
-  prefix csci494-stable-seed-v1 + LF + compact JSON list, ensure_ascii=False,
-  UTF-8 SHA-256, low63bits big-endian; только Python int (не bool) и str.
-- Geometry stable_seed(run_seed,epoch,original_index,'geometry'); order
-  stable_seed(run_seed,epoch,'order'); policy отдельный 'train_corruption'.
-- Test noise seed stable_seed(100494,'cifar10-test',original_index,
-  'gaussian_noise','v1'), без run/model seed или severity: общий epsilon.
-- Published DATA-003 cdffe3d/df6745b/60464bd/de303d0; docs commit в Git history.
-- Existing .venv/lock/backend неизменны. General REPRO-001 остаётся TODO;
-  DATA-003 не реализует global seeding/checkpoints/resume/backup.
+ПЕРЕД ИЗМЕНЕНИЯМИ — EXISTING ENV, FRESH CHECKS
 
-ПЕРЕД ИЗМЕНЕНИЯМИ
-
-Используй existing .venv, без reinstall/update/global env/backend changes:
+Используй existing .venv без reinstall/update/global/backend changes:
 .\.venv\Scripts\python.exe -m pip check
-.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-corr001-baseline
+.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-corr002-baseline
 .\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-only
 .\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-split
 .\.venv\Scripts\python.exe -m scripts.prepare_normalization --root data/raw --verify-only
+
 Missing/corrupt actual inputs — FAIL с диагностикой, не synthetic PASS/skip.
-Сохрани bytes/hashes/mtimes raw/split/stats; не regenerate их молча. DATA-002 v1
-source-region hash4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96
-и DATA-003 normalization v1 region hash1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c
-не менять. При необходимой correction сначала preservation/diagnostics и explicit
+Сохрани raw/split/stats/config и CORR-001 reference bytes/hashes/mtimes; не regenerate
+молча. DATA-002 source-region hash4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96
+и DATA-003 normalization region1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c
+не менять. Necessary correction требует preservation/diagnostics и explicit
 compatibility/migration evidence; validation не обходить.
 
-ОБЪЁМ CORR-001
+СОХРАНЁННЫЙ CORR-001 CONTRACT — ПРОВЕРЬ, НЕ ПЕРЕПИСЫВАЙ
 
-1. Сохрани existing stable_seed encoding/golden tests; не реализуй второй RNG
-   protocol. Добавь только необходимые seed identity regression tests.
-2. Реализуй severity_params(kind,severity) по exact protocol tables. Все3families
-   mapping допустимы, но actual gaussian_blur/darken/apply_corruption/CorruptionPolicy
-   implementation остаются CORR-002/ROBUST-001. Invalid types/kind/severity fail.
-3. gaussian_noise(x,sigma,generator): float32 RGB CHW [0,1], same shape/device/dtype,
-   finite, no mutation; clip(x+sigma*epsilon,0,1). sigma>=0 finite, sigma0 identity
-   clone допустима. Local explicit generator/device validation, no global RNG.
-4. Зафиксируй reusable keyed epsilon boundary согласно architecture/protocol:
-   original test namespace/IDs, eval100494, общий epsilon across severity/models,
-   независимо от batch/worker/order. Не делай CorruptedDataset/evaluator или policy
-   scope молча; missing operational API согласованно документируй/tests.
-5. TEST-C01..04 и нужный TEST-U02: exact mapping/errors, input mutation/range,
-   same index/namespace identity, common pre-clamp epsilon, statistical oracle
-   на synthetic large tensor, clipping, global Python/NumPy/torch RNG isolation,
-   batch/order/fresh-process determinism. CUDA только если actual used/tested;
-   CPU reference обязателен. Не выдавай skipped CUDA за PASS.
-6. Meaningful actual opt-in на заранее фиксированных train IDs для data→noise→
-   Normalize boundary и сохранности frozen identities; no test-based tuning,
-   no model/scientific runs. Actual test access допустим только как fixed keyed
-   input contract по protocol, если для проверки нужен original-test namespace.
-7. Отдельно technical PASS и pending full DoD: PROTO-001/team freeze/policy/source
-   approvals/human review остаются pending. DATA-003 robust integration нельзя
-   закрыть одним noise API; CORR-002 и ROBUST-001 ещё отсутствуют.
-8. Обнови relevant docs/report/ai_usage, compact actual evidence и следующий prompt
-   для CORR-002. Не создавай неподтверждённые results/plots/course compliance.
+- Exact severity_params: gaussian_noise→sigma .02/.05/.08/.12/.18;
+  gaussian_blur→sigma .3/.7/1.1/1.5/2.0 и kernel_size3/7/9/11/13;
+  brightness→factor .90/.80/.70/.55/.40. Fresh dict, Python int1..5, invalid→ValueError.
+- gaussian_noise: dense float32 RGB CHW [0,1], positive H/W, CPU/CUDA, explicit
+  same-device torch.Generator, finite sigma>=0 (Python int/float, not bool),
+  no mutation/global RNG, new same shape/device/dtype. Sigma0 clones/no draw;
+  invalid inputs fail before generator draws. Main CIFAR shape3x32x32.
+- keyed_test_generator(original_index, *, namespace) и keyed_test_epsilon(...):
+  full namespace cifar10-python/original-test, Python ID0..9999, fresh CPU stream /
+  float32[3,32,32] epsilon. Existing stable_seed(100494,'cifar10-test',id,
+  'gaussian_noise','v1'); no severity/model/run seed. Recreate each image/condition,
+  consumed generator не reuse. Canonical keyed epsilon CPU, даже при CUDA model.
+- Existing stable_seed encoding v1/golden tests unchanged: prefix
+  csci494-stable-seed-v1 + LF + compact ordered JSON list, ensure_ascii=False,
+  UTF-8 SHA-256 low63bits big-endian; только Python int(not bool)/str.
+- Geometry/order/train_corruption streams unchanged. Training probe in tests is
+  fixed sigma.08 callable, not production policy. CorruptedDataset/evaluator и
+  condition manifests отсутствуют; не добавляй их в CORR-002 молча.
+- 18.11.2026 default453PASS/0FAIL/11opt-in SKIP; separate new actual3PASS/0FAIL/0SKIP:
+  2CIFAR cases RUN_CIFAR_CORRUPTIONS=1 +1CUDA RUN_CORR_CUDA=1. Actual CUDA primitive
+  на RTX3060Laptop проверен same-device и wrong-device generators both ways;
+  CPU/CUDA bitwise equality не заявлена. Original8actual DATA tests historical.
+- Actual train IDs [0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17], epochs0/1, batch7/5,
+  workers0/2; original-test IDs0/71/9999 only fixed keyed input contract, no tuning.
+- report/corr001_reference.npz97580bytes SHA-256
+  40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33.
+  Contains train IDs0/1/2 noisy/normalized tensors(epoch0), test IDs0/71/9999 epsilon;
+  independent actual regression tests read-only. Do not regenerate on mismatch.
+- Frozen split1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284;
+  manifest8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21;
+  stats FILE332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688;
+  semantic4450836de3384df4286535985ed0b56b9a411f3033a60ecf57bbfe5edcb01877.
+
+ОБЪЁМ CORR-002
+
+1. gaussian_blur(x,sigma,kernel_size): normalized separable/discrete Gaussian,
+   no channel mixing, reflect padding; exact tables and odd kernels. Explicit
+   finite/types/range/channel/device checks, no mutation, same shape/device/dtype.
+   Reject invalid kernels/sigma and reflect radius incompatible with image size.
+   Согласованно зафиксируй helper identity sigma0 при поддержке; main map1..5.
+2. darken(x,factor): clip(factor*x,0,1), main factors<=1, boundary helpers factor1
+   identity/factor0 black, invalid factors/types fail. Не превращать в brightening
+   или additive shift. Input validation согласуй с existing noise contract.
+3. apply_corruption(x,kind,severity,generator=None): clean отдельно severity0;
+   noise/blur/brightness severity1..5; no silent global RNG fallback. Noise требует
+   explicit matching generator; evaluation caller использует existing keyed_test_generator.
+   Dispatcher не должен изобретать model/severity seed, policy или dataset wrapper.
+   Validate clean arguments и no mutation. Документируй unused-generator behavior
+   deterministic families; preserve RNG isolation and error-before-draw contract.
+4. TEST-C05/C06/C08 и all-family C01/C02 completion: kernels3/7/9/11/13, normalized
+   weights/symmetry, constant preserve atol1e-6, independent impulse/ramp/checkerboard
+   oracle/high-frequency reduction, factors exact atol1e-7, input/range/errors,
+   noise golden/common epsilon regression, Normalize boundary и RNG isolation.
+   CPU reference обязателен; actual-used CUDA path проверяй отдельно без ложного PASS
+   skipped GPU. Не вводи dependencies/frameworks.
+5. Meaningful actual opt-in на заранее фиксированных persisted train IDs для
+   data→dispatcher→Normalize и frozen identity/reference preservation, без model
+   runs/EDA/plots. Можно использовать fixed test inputs только для regression
+   existing keyed identity, без tuning/scientific evaluation. Failure actual
+   inputs — FAIL. Все reference outputs реальны, не synthetic под видом actual.
+6. Compact verified evidence, relevant docs/status/ai_usage и next handoff для
+   следующего согласованного технического этапа. Не закрывай ROBUST-001/full DATA-003
+   robust integration одним dispatcher. CORR-003 visual audit остаётся отдельным.
+   PROTO-001/team freeze/source-policy approvals/human review pending; full DoD
+   отделяй от independent technical PASS. General REPRO-001 остаётся TODO.
 
 НЕБОЛЬШИЕ ЗАВЕРШЁННЫЕ БЛОКИ
 
-Разделяй реализацию на рабочие логические блоки. Ориентир для CORR-001:
-1. Severity mapping и validation вместе с соответствующими offline tests.
-2. Gaussian noise, explicit generator/input contracts и связанные numeric tests.
-3. Keyed epsilon boundary и tests на общий epsilon, порядок, batching и RNG isolation.
-4. Actual opt-in checks, компактные verified artifacts/evidence и связанные tests.
-5. Итоговые docs/status/ai_usage и промпт следующего этапа CORR-002.
-Адаптируй границы к коду: большой блок дели на меньшие рабочие части; тесно
-связанные implementation и tests держи вместе. Не создавай commits с заглушками,
-падающими tests или искусственными косметическими частями ради количества.
-После каждого завершённого блока проверь, закоммить и СРАЗУ запушь его, затем
-продолжай следующий. Не накапливай всю реализацию до одного финального commit.
-
-ГРАНИЦЫ
-
-Без blur/darkening/policy implementations, моделей/training/evaluation/metrics,
-EDA/plots/scientific runs, новых frameworks/services. Scientific protocol,
-augmentation probabilities/budget и оба YAML identities неизменны. Human/course
-uncertainties не блокируют independent technical work, но остаются явными gates.
+Ориентир: blur+numeric tests; darken+tests; dispatcher+all-family tests;
+actual checks/artifacts/evidence; final docs/handoff. Тесно связанные implementation
+и tests коммить вместе. Без заглушек/падающих tests/cosmetic commits ради количества.
+После каждого finished block commit и СРАЗУ push, затем продолжай до завершения.
+Scientific protocol/maps/budget/probabilities и оба YAML identities неизменны.
+Без models/training/evaluator/metrics/EDA/plots/policy/new services.
 
 GIT — ПОСТОЯННОЕ ПРАВИЛО
 
-Пользователь разрешил самостоятельные commits и обычный git push origin main
-для следующего этапа без повторного согласования на каждый блок.
-Работай, коммить и пушь ВСЕГДА ТОЛЬКО в ветку с точным именем main.
-Не создавай codex/*, feature branches или worktrees. Старые branch/PR рекомендации
-planning docs заменены этим правилом; границы задач и prerequisites сохранены.
-Перед изменениями проверь текущую ветку и чужие changes. Если ветка не main,
-не редактируй её; переходи в main только без потери/переноса чужой работы.
-Не включай посторонние changes в свои commits. PR для публикации не требуется.
+Пользователь разрешил самостоятельные commits и ordinary git push origin main
+без повторных согласований. Работай/коммить/пушь ТОЛЬКО в exact branch main.
+Не создавай codex/*, feature branches или worktrees. Planning branch/PR советы
+исторические; границы задач и prerequisites сохранены. До edits проверь branch
+и чужие changes; main переключай только без потери/переноса чужой работы.
 
-После КАЖДОГО небольшого завершённого логического блока:
-- останови editing, проверь ПОЛНЫЙ diff и relevant tests;
-- implementation и связанные tests публикуй вместе;
-- git diff --check; stage только explicit task paths, без git add . / -A;
+После КАЖДОГО небольшого finished logical block:
+- останови editing; проверь ПОЛНЫЙ diff и relevant tests;
+- git diff --check; stage только explicit task paths (без git add . / -A);
 - git diff --cached --name-only, ПОЛНЫЙ git diff --cached,
-  git diff --cached --check, отсутствие посторонних files;
-- отдельный рабочий commit в main; СРАЗУ обычный git push origin main;
-- проверь успешный результат push и sync; сообщи block/checks/commit hash/push,
-  затем продолжай следующий блок самостоятельно без повторного согласования.
-Не копи commits локально и не объединяй всё в финальный commit. Failed push
-разбери до дальнейших edits; remote changes сначала прочитай. Safe fast-forward
-допустим; divergence/conflicts не затирай и не merge автоматически. Без force,
-amend/reset/history rewrite. Не коммить raw/archives/env/caches/credentials,
-absolute machine paths и diagnostic partials. Compact verified evidence versioned.
-В конце clean status/staged empty и main=origin/main после fresh fetch.
+  git diff --cached --check; exact staged list без посторонних files;
+- отдельный рабочий commit в main; СРАЗУ ordinary git push origin main;
+- проверь push/sync и сообщи block/checks/hash/push, продолжай самостоятельно.
+Не копи всё в финальный commit. Failed push разбери до дальнейших edits; remote
+changes сначала прочитай. Safe fast-forward допустим; divergence/conflicts не
+затирай и не merge автоматически. Без force/amend/reset/history rewrite.
+Не коммить raw/archives/env/caches/credentials/absolute machine paths/diagnostic
+partials. Versioned evidence compact и verified. В конце fresh fetch, clean status,
+пустой staged list и exact main=origin/main.
 
-Финал по-русски: PASS/FAIL/SKIP с причинами, actual evidence/hashes/limits,
-каждый commit и результат его push, clean status, пустой staged list и точное
-совпадение main с origin/main, remaining gates и next concrete task.
+Финал по-русски: PASS/FAIL/SKIP с причинами, actual evidence/hashes, каждый commit
+и push, ограничения/gates, clean/staged empty/main sync и next concrete task.
 ```

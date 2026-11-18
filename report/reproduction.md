@@ -1,4 +1,91 @@
-# Verification record — foundation and DATA-001..003
+# Verification record — foundation, DATA-001..003 and CORR-001
+
+## CORR-001 independent technical acceptance — 18.11.2026
+
+**PASS independent technical scope; PARTIAL full DoD.** Codex agent checks by direct
+user instruction; independent human review and source/policy/team/protocol approvals
+pending. Initial clean main=origin/main2dc71de verified by fresh fetch; no AGENTS.md
+in repository/ancestor chain. Historical Graphify navigated, not rebuilt. Existing
+Python3.12.10 / torch2.9.0+cu126 / NumPy2.5.4 environment and lock/backend unchanged.
+
+Implemented exact mapping, explicit-generator Gaussian noise, keyed_test_generator
+and keyed_test_epsilon using existing unchanged stable_seed. Canonical test epsilon
+is CPU float32 [3,32,32], original-test full namespace required; seed encoding/key
+matches protocol. Same pre-clamp epsilon across30model/severity identities verified;
+order/batching/spawn/fresh-process/global RNG isolation tested. No model instantiated.
+
+### Fresh commands and results
+
+All commands use `.venv/Scripts/python.exe` from repository root.
+
+| Command/check | Actual result |
+|---|---|
+| `-m pip check` | PASS, No broken requirements found |
+| `-m pytest tests -q --basetemp=.venv/pytest-corr001-baseline` |357PASS/0FAIL/8SKIP,119.37s |
+| `-m scripts.download_data --root data/raw --verify-only` | PASS raw archive/files,50000train/10000test, manifest unchanged |
+| `-m scripts.download_data --root data/raw --verify-split` | PASS frozen45000/5000 seed494 |
+| `-m scripts.prepare_normalization --root data/raw --verify-only` | PASS fresh actual45000-only stats and provenance |
+| Mapping block: `-m pytest tests/test_corruptions.py tests/test_utils.py -q` |142PASS |
+| Gaussian block: `-m pytest tests/test_corruptions.py -q` |73PASS |
+| Keyed block: `-m pytest tests/test_corruptions.py tests/test_keyed_noise.py tests/test_loaders.py -q` |116PASS, including real spawn; edited CPU seed check rerun3PASS |
+| `-m pytest tests -q --basetemp=.venv/pytest-corr001-final --junitxml=tmp/corr001/default.xml` |**453PASS/0FAIL/11SKIP**,122.50s console (JUnit122.431s) |
+| `RUN_CIFAR_CORRUPTIONS=1`, `RUN_CORR_CUDA=1`, `-m pytest tests/test_corruptions_local.py tests/test_corruptions_cuda.py -q -s --basetemp=.venv/pytest-corr001-actual --junitxml=tmp/corr001/actual.xml` |**3PASS/0FAIL/0SKIP**,61.97s |
+| Missing-input negative control: actual train test with `CIFAR10_ROOT=tmp/corr001/intentionally-missing` | PASS expected exit1/DataIntegrityError,1error/1deselected/0skip; not a happy-path failure |
+| `-m src.utils --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --controlled-pair` | PASS2configs/shared controls; preparation only |
+| Source/inputs preservation | PASS16raw/split/stats/config bytes/hashes/mtimes; utils/data/future ML modules/scripts/notebook/lock/Graphify unchanged versus2dc71de |
+| Final documentation/artifact audit | PASS14changed Markdown files,118local links/balanced fences,49cards×20fields,unchanged acyclic prerequisites/96matrix rows/severity protocol; NPZ file/array/source hashes and16input identities verified |
+
+11default skips are original8data +2newCIFAR +1CUDA explicit gates. Only new3actual
+cases rerun separately here; original8actual results31.10.2026 remain historical.
+Missing/corrupt opted-in inputs fail without download or synthetic substitution.
+Full details and precise commands/environments: [corr001_evidence.json](corr001_evidence.json).
+Ignored logs/JUnit and before snapshot are in tmp/corr001/; no machine paths or raw logs versioned.
+
+### Actual artifacts and numerical evidence
+
+Fixed train IDs `[0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17]` are from persisted train.
+Run42, epochs0/1, fixed sigma.08 test callable verifies noise before Normalize,
+independent integer geometry/direct randn oracle, labels/IDs and spawn0/2 batch7/5
+bitwise equality. This callable is a probe, not production robust policy.
+Original-test IDs `[0,71,9999]` only verify fixed keyed inputs, all5severity,
+no scientific tuning. Actual CUDA0 RTX3060Laptop primitive checks same-device RNG,
+wrong CPU/CUDA generator both ways and global RNG isolation; no cross-device equality.
+
+Saved [corr001_reference.npz](corr001_reference.npz),97580bytes, SHA-256
+`40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33`.
+Arrays: `<i8` train_ids/test_ids[3], `<f4` train_noisy/train_normalized/test_epsilon
+[3,3,32,32]. Train tensor IDs0/1/2 use epoch0; test epsilon has no raw pixels.
+Created from verified actual data APIs; independently replayed by actual tests.
+Array semantic identities/dtype/shapes and corrupted test tensor hashes are in
+compact evidence. Do not silently regenerate mismatched reference artifacts.
+
+Synthetic pre-clamp3×512×512 standard normal oracle: mean0.0005027506832308905,
+population std0.9997264346504501, within fixed .01/.02 bounds. Low-sigma.02 center
+fixture avoids clipping; separate signed epsilon fixtures verify exact clipping.
+NPZ split hash `1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284`,
+manifest `8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21`,
+stats `332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688` unchanged.
+Frozen DATA-002/003 region hashes unchanged; full before identities in evidence.
+
+### Published logical blocks and limits
+
+Every block checked full diff, relevant tests, exact staged paths/full staged diff,
+both diff --check commands, committed in main and immediately ordinary-pushed.
+
+| Commit | Block | Push |
+|---|---|---|
+|7d47569 | Exact severity mapping and26offline cases | PASS origin main |
+|b73536b | Gaussian primitive and47additional numeric/input cases | PASS origin main |
+|f89d70f | Keyed generator/epsilon and23identity/spawn/process cases | PASS origin main |
+|5d12a06 |2actual CIFAR +1actual CUDA tests, saved reference and verified evidence | PASS origin main |
+
+Final documentation/handoff is a separate checked commit, with final hash/push/clean
+sync in chat/Git history. CORR-001 technical PASS does not close PROTO-001/team/
+source-policy/human gates or full DATA-003 robust acceptance. CORR-002 dispatcher/
+blur/darkening, ROBUST-001 policy, CORR-003 visual review and general REPRO-001
+remain pending. No models/training/evaluation metrics/plots/EDA/scientific runs.
+Only locked local CPU bitwise references; no cross-version/platform equality or
+second-machine reproduction. Next concrete task: CORR-002.
 
 ## DATA-003 independent technical acceptance — 31.10.2026
 

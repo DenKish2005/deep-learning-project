@@ -1,6 +1,40 @@
 # CURRENT PROJECT STATUS
 
-## DATA-003 — 31.10.2026
+## CORR-001 — 18.11.2026
+
+Independent technical scope **PASS**; full DoD **PARTIAL**. Exact severity mapping,
+explicit-generator Gaussian noise, `keyed_test_generator` и `keyed_test_epsilon`
+реализованы поверх неизменённого stable_seed. CPU reference фиксирует original-test
+namespace/IDs, eval100494 и общий epsilon для всех severity/model identities.
+Никаких production wrapper/evaluator/policy или training runs не добавлено.
+
+Fresh baseline357PASS/0FAIL/8SKIP; final **453PASS/0FAIL/11opt-in SKIP**.
+Отдельно новые actual checks **3PASS/0FAIL/0SKIP**: noise→Normalize на17fixed train
+IDs, epochs0/1, batch7/5 и spawn workers0/2; test IDs0/71/9999 только input contract;
+CUDA primitive на RTX3060Laptop, same-device equality и wrong-device errors.
+Missing actual input проверен negative control: ожидаемый DataIntegrityError/exit1,
+без skip. Original8actual data cases в этом этапе не повторялись; их evidence ниже
+остаётся историческим. Cross-device/platform bitwise equality не заявлена.
+
+[Evidence](../report/corr001_evidence.json), [reference NPZ](../report/corr001_reference.npz)
+97580bytes, SHA-256 `40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33`.
+Все16raw/split/stats/config files сохранили bytes/hashes/mtimes; source regions
+DATA-002/003, оба YAML, lock/backend и scientific settings неизменны.
+
+| Task | Полный DoD | Остаток |
+|---|---|---|
+| CORR-001 | PARTIAL, independent technical PASS | PROTO-001/team freeze/source-policy approvals и independent human review |
+| CORR-002 | TODO | Reflect blur, darkening, apply_corruption; следующий технический этап |
+| DATA-001/002 | PARTIAL, technical PASS | Independent human review |
+| DATA-003 | PARTIAL, independent technical PASS | CORR-001 formal gates, CORR-002/ROBUST-001 full integration/dependent acceptance и human review |
+| ROBUST-001 / REPRO-001 | TODO | Policy; general identity/global seed/checkpoints/resume/backup |
+
+Commits7d47569/b73536b/f89d70f/5d12a06 проверены и сразу push origin main PASS.
+Финальная документация публикуется отдельно; hash/clean sync — в Git history/ответе.
+Dependency edges сохранены. Human/course/LMS/proposal/team и independent reproduction
+pending. Следующий [prompt CORR-002](NEXT_STEP_PROMPT.md); Graphify historical, без rebuild.
+
+## Исторический DATA-003 snapshot — 31.10.2026
 
 Independent technical scope **PASS**; full DoD **PARTIAL**. CORR-001 prerequisite
 ещё TODO; CORR-002/actual robust integration/dependent acceptance и independent

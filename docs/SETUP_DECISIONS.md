@@ -1,5 +1,14 @@
 # Проверка готовности foundation
 
+Обновление CORR-00118.11.2026: exact mapping/noise/keyed CPU epsilon technical PASS;
+[verified evidence](../report/corr001_evidence.json). Gaussian primitive validates
+explicit same-device generators; test helper requires full original-test namespace,
+uses the existing protocol seed alias and excludes severity/model seeds. These are
+operational contracts, not scientific changes. Both YAML/lock/backend and frozen
+source regions/artifacts unchanged. PROTO-001/team/source-policy approvals/human
+review remain pending; DATA-003 integration awaits CORR-002/ROBUST-001. General
+REPRO-001 is still TODO. Next technical stage CORR-002.
+
 Обновление DATA-00331.10.2026: normalization FILE SHA-256 в обоих YAML теперь
 `332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688`.
 Actual45k-only stats/loader evidence — [data003_evidence.json](../report/data003_evidence.json).

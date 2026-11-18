@@ -3,11 +3,48 @@
 SETUP-002 выполнен локально 30.10.2026; config validation относится к SETUP-003.
 DATA-001 реализует raw-data loader, acquisition/verification CLI и local manifest;
 DATA-002 — persisted split494; DATA-003 — train-only stats/keyed loaders/stats CLI.
-Current default357PASS/8SKIP, separate actual8PASS/0SKIP;
-[evidence](../report/data003_evidence.json). Full DATA-003 DoD PARTIAL:
-CORR-001/002 robust integration и independent human review pending.
+Current default453PASS/11SKIP; separate new CORR-001 actual3PASS/0SKIP,
+including actual CUDA primitive. [Evidence](../report/corr001_evidence.json).
+Historical8actual data checks from31.10.2026 were not rerun in CORR-001.
+CORR-001 technical PASS/full DoD PARTIAL; DATA-003 remains PARTIAL pending
+CORR-002/ROBUST-001 integration, formal gates и independent human review.
 Раздел «Плановые команды pipeline» ниже остаётся будущим интерфейсом для
 train/evaluate/metrics/plots. Успешный empty script не является выполненной задачей.
+
+## Работающие CORR-001 проверки — 18.11.2026
+
+Use the existing environment; no reinstall/update/backend changes. From repo root:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-corr001-final
+$env:RUN_CIFAR_CORRUPTIONS='1'
+$env:RUN_CORR_CUDA='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_corruptions_local.py tests/test_corruptions_cuda.py -q -s --basetemp=.venv/pytest-corr001-actual
+Remove-Item Env:RUN_CIFAR_CORRUPTIONS
+Remove-Item Env:RUN_CORR_CUDA
+```
+
+Default453PASS/0FAIL/11SKIP; separate3PASS/0FAIL/0SKIP. Defaults do not read actual
+raw/split/stats and do not require CUDA. Opted-in missing/corrupt actual inputs fail;
+opted-in unavailable CUDA fails. For CPU-only actual replay omit RUN_CORR_CUDA and
+its test file: the2CIFAR tests still require RUN_CIFAR_CORRUPTIONS=1.
+Actual defaults: CIFAR10_ROOT=data/raw, CIFAR10_SPLIT_DIR=data/splits. The saved
+reference is repository-relative report/corr001_reference.npz, read-only, pickle-free.
+
+The reference stores float32 noisy/normalized pixels for fixed actual train IDs0/1/2,
+run42 epoch0 sigma.08, and CPU keyed epsilon for test IDs0/71/9999. It was created
+from verified actual IndexedCIFAR10 output with numpy.savez_compressed; actual tests
+replay independent integer geometry and direct local-generator noise oracles.
+Do not silently regenerate a mismatched reference. File SHA-256 and dtype/shape/
+semantic array hashes are in [evidence](../report/corr001_evidence.json); array hash
+encoding is compact sorted ASCII JSON dtype/shape + LF + little-endian C bytes.
+Tensor stream hashes omit the header and use C-order little-endian float32 bytes.
+NPZ ZIP-byte regeneration across versions/platforms is not promised.
+
+Canonical test generator/epsilon remain CPU; CUDA primitive is only a separately
+verified helper path. No global RNG, device/backend or scientific setting changes;
+all16raw/split/stats/config hashes and mtimes preserved. General REPRO-001 and
+production wrapper/evaluator/policy remain pending. Full DoD PARTIAL.
 
 ## Окружение
 

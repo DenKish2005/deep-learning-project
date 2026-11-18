@@ -1,6 +1,37 @@
 # План тестирования и QA
 
-## DATA-003 current acceptance — 31.10.2026
+## CORR-001 current acceptance — 18.11.2026
+
+Fresh default **453PASS/0FAIL/11SKIP**; new actual **3PASS/0FAIL/0SKIP**.
+CORR-001 adds96offline cases:73mapping/noise +23keyed identity. Original8actual
+DATA cases were not rerun; the11default skips are8old +2new CIFAR +1CUDA gates.
+Missing actual input negative control yielded expected DataIntegrityError/exit1,
+0skips; this intentional failure confirms the opt-in contract.
+
+TEST-C01 noise subset only: all5levels×zero/one/ramp, same shape/device/dtype,
+range/finite/no mutation; C02 all3family exact mapping/errors and config equality;
+C04 known signed epsilon clipping, zero-sigma/no draws, noncontiguous pixels,
+invalid layouts/types/range/finite values and local generator state. Statistical
+oracle uses synthetic3×512×512 N(0,1): mean .0005027506832308905, population std
+.9997264346504501; low-sigma fixture verifies pre-clamp scale without clipping.
+C03/U02 seed subset: exact v1 payload, original namespace/ID errors, common epsilon
+across30severity/model identities, changed ID, fresh storage, global Python/NumPy/
+torch RNG isolation, order/batching, real Windows spawn2 and fresh subprocesses
+with PYTHONHASHSEED1/991. Existing stable_seed encoding/golden tests preserved;
+config/condition identity hashing remains REPRO-001 future.
+
+New actual tests require RUN_CIFAR_CORRUPTIONS=1: fixed17train IDs, noise→Normalize
+oracle, epochs0/1, batch7/5, workers0/2, frozen identities; saved NPZ exact equality.
+Test IDs0/71/9999 are fixed keyed input contract only. Separate RUN_CORR_CUDA=1
+checks actual RTX3060Laptop same-device draws, wrong-device generator rejection
+both ways, finite/clone/no-mutation/global RNG; no cross-device equality claim.
+[Evidence](../report/corr001_evidence.json), [commands](../report/reproduction.md).
+
+Blur/darkening/all-family dispatcher/C01 completion/C05/C06 remain CORR-002;
+C07/production robust policy remain ROBUST-001; visual grid/review remains CORR-003.
+DATA-003 full robust acceptance and independent human review remain pending.
+
+## Historical DATA-003 acceptance — 31.10.2026
 
 Default **357PASS/0FAIL/8SKIP**; separate actual **8PASS/0FAIL/0SKIP**. DATA-003
 добавил75offline cases:48stats +20loaders/seed +7CLI, и3actual opt-in cases.

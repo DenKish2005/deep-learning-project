@@ -1,17 +1,13 @@
 # С чего начать
 
-Foundation этап выполнен в локальном техническом объёме: отдельная `.venv`, exact
-versions, CPU/CUDA environment smoke, complete YAMLs и strict validation с116
-passing tests. DATA-001 теперь реализует raw loader/acquisition/CLI/manifest;
-DATA-002 добавляет verified persisted split494,45000/5000,4500/500per class и
-prepare/verify CLI. DATA-003 теперь имеет train-only stats, keyed transforms/order,
-typed loaders/CLI: default357PASS/8opt-in SKIP, отдельно8actual PASS/0SKIP.
-Evidence — report/reproduction.md и report/data003_evidence.json. Independent
-technical scope PASS; full DATA-003 DoD PARTIAL до CORR-001/002 integration и human
-review. Следующая реализация — CORR-001 keyed noise; модели не обучены.
-Найдены guidelines/CSR и proposal candidates; submitted version, policy precedence
-и human approvals pending. Актуальные статусы полного DoD — в CURRENT_STATUS,
-проверенные команды — README, evidence — report/reproduction.md.
+Обновление18.11.2026: foundation/data APIs сохранены; CORR-001 independent
+technical scope PASS — exact severity mapping, Gaussian noise и keyed CPU epsilon.
+Default453PASS/11opt-in SKIP, отдельно новые3actual PASS/0SKIP, включая CUDA primitive.
+[Evidence](../report/corr001_evidence.json), [commands](../report/reproduction.md).
+Full CORR-001 DoD PARTIAL до protocol/team/source-policy approvals и human review.
+DATA-003 robust integration/dependent acceptance остаётся CORR-002/ROBUST-001 pending.
+Следующая реализация — [CORR-002](NEXT_STEP_PROMPT.md); модели не обучены.
+LMS freshness/submitted proposal/course-policy precedence и independent review pending.
 
 Сначала прочитайте [MASTER_PROJECT_PLAN.md](MASTER_PROJECT_PLAN.md), затем [CURRENT_STATUS.md](CURRENT_STATUS.md). Перед кодом — [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md); перед своим PR — [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md) и карточку задачи в [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md).
 
@@ -21,7 +17,7 @@ review. Следующая реализация — CORR-001 keyed noise; мод
 закрыты; у SETUP-002/003 local technical acceptance PASS, formal human review
 pending. DATA-001/002 остаются PARTIAL до independent human review. DATA-003 independent
 technical scope выполнен; dependent robust acceptance pending. Следующая реализация
-— CORR-001 с existing stable_seed, затем CORR-002. Независимая
+— CORR-002 после technical PASS CORR-001. Независимая
 техническая подготовка не ждёт missing source/team information; full training
 начинается только после policy/protocol и smoke/scientific gates.
 

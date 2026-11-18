@@ -1,5 +1,11 @@
 # Подробный implementation roadmap
 
+Обновление18.11.2026: CORR-001 independent technical scope PASS/full DoD PARTIAL.
+453offline PASS/11opt-in SKIP; новые actual3PASS/0SKIP, включая CUDA primitive.
+[Evidence](../report/corr001_evidence.json). Следующий independent technical этап
+CORR-002; ROBUST-001/full DATA-003 integration и formal approvals/review pending.
+Dependency edges не изменены. Ниже data counts31.10.2026 — исторические результаты.
+
 Дата: 30.10.2026. AUDIT-001 DONE; SETUP-001/002/003, PROTO-001 и TEAM-001
 **PARTIAL** по полному DoD. У SETUP-002/003 вся локальная техническая реализация
 и acceptance выполнены, human reviewer approval ещё pending. DATA-001: raw
@@ -10,7 +16,7 @@ PARTIAL: actual split494/45k/5k, manifest/hash/reuse verified;282default PASS/5S
 DATA-003 independent technical scope PASS: stats/keyed loaders/CLI,357offline
 PASS/8SKIP, separately8actual PASS/0SKIP. Full DoD PARTIAL: CORR-001 prerequisite,
 CORR-002 robust integration/dependent acceptance и human review pending;
-dependency edges сохранены. Остальные tasks TODO. Training/evaluation не запускались. Evidence: [CURRENT_STATUS](CURRENT_STATUS.md),
+dependency edges сохранены. Остальные tasks, кроме technical scope CORR-001, TODO. Training/evaluation не запускались. Evidence: [CURRENT_STATUS](CURRENT_STATUS.md),
 [reproduction record](../report/reproduction.md). Канонические interfaces:
 [TECHNICAL_ARCHITECTURE](TECHNICAL_ARCHITECTURE.md); methodology:
 [EXPERIMENT_PROTOCOL](EXPERIMENT_PROTOCOL.md); tests: [TESTING_PLAN](TESTING_PLAN.md).
@@ -255,7 +261,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** DATA-003.
 - **2. Title:** Normalization и loaders.
 - **3. Purpose:** Правильный deterministic input.
-- **4. Current status:** PARTIAL — independent technical acceptance PASS: actual45k-only stats/provenance, keyed transforms/order, typed clean loaders, policy boundary и CLI;357offline PASS/8SKIP +8actual PASS/0SKIP. CORR-001 prerequisite/CORR-002 actual robust integration, dependent acceptance и independent human review pending.
+- **4. Current status:** PARTIAL — independent technical acceptance PASS: actual45k-only stats/provenance, keyed transforms/order, typed clean loaders, policy boundary и CLI;357offline PASS/8SKIP +8actual PASS/0SKIP (31.10.2026). CORR-001 technical PASS18.11.2026; formal prerequisite gates, CORR-002/ROBUST-001 full robust integration, dependent acceptance и independent human review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 2 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** DATA-002; CORR-001.
@@ -301,16 +307,16 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** CORR-001.
 - **2. Title:** Noise и stable RNG primitives.
 - **3. Purpose:** Общие pixel corruptions.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — independent technical PASS: exact mapping, Gaussian noise, keyed CPU generator/epsilon;453offline PASS/11SKIP, separate3actual PASS/0SKIP. PROTO-001/team/source-policy approvals и independent human review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 2 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** PROTO-001; SETUP-002.
 - **8. Steps:** 1) stable_seed SHA256; 2) severity mapping; 3) CPU noise local generator+clamp без mutation.
-- **9. Files:** src/corruptions.py; src/utils.py; tests/test_corruptions.py; tests/test_utils.py.
-- **10. Functions/classes:** stable_seed; severity_params; gaussian_noise.
+- **9. Files:** src/corruptions.py; src/utils.py; tests/test_corruptions.py; existing tests/test_loaders.py seed golden; tests/test_keyed_noise.py; tests/test_corruptions_local.py; tests/test_corruptions_cuda.py; report/corr001_evidence.json; report/corr001_reference.npz.
+- **10. Functions/classes:** existing unchanged stable_seed; severity_params; gaussian_noise; keyed_test_generator; keyed_test_epsilon.
 - **11. Inputs:** float32 pixel tensors.
 - **12. Outputs:** deterministic noise API.
-- **13. Artifacts:** перечисленные outputs в указанных files/dirs + test/review evidence; paths/hash записать в task/PR.
+- **13. Artifacts:** report/corr001_evidence.json; report/corr001_reference.npz (97580bytes, SHA-25640179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33); commands/push log in report/reproduction.md. Human review pending.
 - **14. Testing:** TEST-C01..04; TEST-U02.
 - **15. Acceptance:** Same index→same ε across6models; valid shape/range.
 - **16. DoD:** acceptance выполнен; тестовые результаты и artifacts проверены reviewer; status обновлён. Для OPTIONAL допустимо SKIPPED с причиной, без объявления PASS.

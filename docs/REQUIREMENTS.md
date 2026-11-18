@@ -50,7 +50,7 @@ freshness, submitted version и AI-policy precedence остаются pending.
 |---|---|---|---|---|---|---|---|
 | B01 | CIFAR-10 45k/5k/10k, S3 | MUST | DATA-001..003 | src/data.py, data/splits/ | Disjoint stratified indices + stats | TEST-D02..05 | Actual split/stats/clean loaders PASS; robust integration/reviewer pending |
 | B02 | Одна compact custom CNN с нуля, S3 | MUST | MODEL-001 | src/models.py | 288746 params, logits N×10 | TEST-M01..03 | Нет |
-| B03 | Noise, blur, darkening ×5 pixel-space severity, S3 | MUST | CORR-001..003 | src/corruptions.py | Severity table + example grid | TEST-C01..08 | Нет |
+| B03 | Noise, blur, darkening ×5 pixel-space severity, S3 | MUST | CORR-001..003 | src/corruptions.py | Severity table + example grid | TEST-C01..08 | CORR-001 mapping/noise/keyed CPU technical PASS; CORR-002/003 families/grid/review pending |
 | B04 | Clean vs Robust; только train policy различается, S3 | MUST | TRAIN-001..003, ROBUST-001 | configs/, src/train.py | Paired initialization/order/budget logs | TEST-S01 | Config validation PASS; runtime identity TODO |
 | B05 | Seeds 42,123,2026, S3 | MUST | CLEAN-001..003, ROBUST-002..003 | outputs/runs/, checkpoints/ | 6 complete runs | Manifest audit | Нет |
 | B06 | 16 условий/run, 96 оценок, одни test images, S3 | MUST | EVAL-002..004 | scripts/run_all_evaluations.py | 96 keys, 960000 predictions | TEST-E02 | Нет |
@@ -63,11 +63,11 @@ freshness, submitted version и AI-policy precedence остаются pending.
 
 | ID | Рекомендация / источник | Приоритет | Tasks | Файлы | Evidence | Проверка | Сейчас |
 |---|---|---|---|---|---|---|---|
-| C01 | Persist split, hashes, per-image RNG, S5 | MUST | DATA-002, CORR-001, REPRO-001 | data/splits/, src/utils.py | Manifests/hash equality | TEST-D02, C03 | DATA-002/003 identities/keyed geometry PASS; noise/general REPRO TODO |
+| C01 | Persist split, hashes, per-image RNG, S5 | MUST | DATA-002, CORR-001, REPRO-001 | data/splits/, src/utils.py | Manifests/hash equality | TEST-D02, C03 | DATA-002/003 identities/keyed geometry + CORR-001 noise technical PASS; general REPRO/review pending |
 | C02 | Validation-only checkpoint selection; test isolation, S3/S5 | MUST | PROTO-001, TRAIN-001, TEST-002 | src/train.py | clean-val selection logs | Code + provenance audit | План |
 | C03 | Tested env, version lock, CPU/GPU smoke, S5 | MUST | SETUP-002, TEST-001 | requirements-lock.txt, tests/ | pip check, import and smoke evidence | Independent run | Local env PASS; full pipeline/independent run pending |
 | C04 | Atomic best/last checkpoint and epoch-boundary resume, S5 | MUST | TRAIN-002, REPRO-001 | src/utils.py, src/train.py | Resume vs uninterrupted fixture | TEST-U03, T02 | Нет |
-| C05 | Unit/integration/scientific tests, S5 | MUST | TEST-001..003 | tests/ | Assertions and passing report | TESTING_PLAN |357offline PASS/8opt-in SKIP, separately8actual PASS; ML/scientific suite TODO |
+| C05 | Unit/integration/scientific tests, S5 | MUST | TEST-001..003 | tests/ | Assertions and passing report | TESTING_PLAN |453offline PASS/11opt-in SKIP; new CORR-001 actual3PASS; historical DATA-003 actual8PASS31.10; ML/scientific suite TODO |
 | C06 | Paired deltas, sample SD, n=3 caveat, S5 | MUST | METRIC-002, ANALYSIS-001 | src/metrics.py, report/ | All seeds included | Aggregation fixtures | Нет |
 | C07 | Predeclared ≤2 pp clean-loss interpretation, S5 | SHOULD | PROTO-001, ANALYSIS-001 | docs/EXPERIMENT_PROTOCOL.md | Threshold fixed before test | Protocol history | План |
 | C08 | Independent reproduction + backups, S5 | MUST | REPRO-002, RELEASE-001 | report/reproduction.md, manifests | Checkpoint hashes and smoke on second machine | Person 6 + reviewer | Нет |

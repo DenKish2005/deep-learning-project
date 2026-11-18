@@ -1,15 +1,16 @@
 # MASTER PROJECT PLAN — CSCI 494 Robustness to Noise
 
 **Главная точка входа для команды.** Дата:30 октября 2026, Asia/Qyzylorda.
-Обновление31.10.2026: DATA-001/002 raw loader и frozen split494 сохранены;
-DATA-003 independent technical scope PASS: train-only stats, keyed transforms/order,
-typed loaders/CLI, actual45k/5k/10k coverage и spawn2 equality. Default357PASS/8SKIP;
-отдельно8actual PASS/0SKIP. Evidence — CURRENT_STATUS/report/reproduction.md и
-report/data003_evidence.json. Full DATA-003 DoD PARTIAL: CORR-001 prerequisite,
-CORR-002 robust integration и human review pending. Следующий этап CORR-001;
-dependency graph не изменён.
-Работа/commits/push только main по указанию пользователя.
-Local environment/config acceptance PASS; training/measured results отсутствуют.
+Обновление18.11.2026: DATA-001..003 technical data acceptance сохранён.
+CORR-001 independent technical scope PASS: severity mapping, Gaussian noise и keyed
+CPU epsilon поверх existing stable_seed. Fresh default453PASS/11opt-in SKIP;
+отдельно новые actual3PASS/0SKIP, включая actual CUDA primitive. Evidence —
+[CURRENT_STATUS](CURRENT_STATUS.md), [corr001_evidence.json](../report/corr001_evidence.json).
+Raw/split/stats/config bytes+mtimes, lock/backend и protocol constants сохранены.
+Full CORR-001 DoD PARTIAL: PROTO-001/team freeze/source-policy approvals/human review.
+DATA-003 full DoD PARTIAL: CORR-002/ROBUST-001 integration/dependent acceptance и review.
+Следующий этап CORR-002; dependency graph не изменён. Работа/commits/push только main.
+Training/measured results отсутствуют; исторические snapshots ниже датированы.
 
 ## Что нужно сделать и зачем
 

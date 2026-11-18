@@ -71,7 +71,13 @@ order (`ensure_ascii=False`, separators comma/colon), UTF-8 SHA-256. Interpret t
 digest big-endian and retain low63 bits. Int42 and string"42" remain distinct;
 JSON boundaries prevent concatenation ambiguity. No global Python/NumPy/torch RNG
 is used for geometry/order/policy. This specifies encoding, not new scientific
-settings. Test-noise implementation remains CORR-001 pending.
+settings. CORR-001 implements `keyed_test_generator` / `keyed_test_epsilon` on CPU:
+require full dataset namespace `cifar10-python/original-test` and Python ID0..9999,
+translate to the existing seed alias `cifar10-test`, return a fresh local stream /
+float32 [3,32,32] epsilon. Recreate the stream for each image/condition; severity
+and model/run seed are absent. Main CPU input identity stays fixed even when a
+future model uses CUDA. Production wrapper/evaluator/condition manifests remain
+future; technical checks do not constitute PROTO-001 approval or freeze.
 
 ## 5. Training policy и процедура
 

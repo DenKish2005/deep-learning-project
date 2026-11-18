@@ -1,5 +1,34 @@
 # AI assistance record
 
+## CORR-001 — 18.11.2026
+
+По прямому запросу пользователя Codex проверил актуальные clean main/origin/docs,
+исторический Graphify без rebuild, existing env и fresh baseline357PASS/8SKIP;
+pip/raw/split/stats verification PASS. Реализованы exact severity mapping всех3
+семейств, explicit-generator Gaussian noise и original-test keyed CPU generator/
+epsilon поверх unchanged stable_seed. Добавлены96offline cases,2actual CIFAR
+cases и1actual CUDA primitive case. Default453PASS/0FAIL/11opt-in SKIP; отдельно
+новые actual3PASS/0FAIL/0SKIP. Original8actual data cases не повторялись в этом этапе.
+
+Actual17fixed train IDs проверяют geometry→noise→Normalize, epochs0/1, batch7/5,
+spawn0/2 и labels/IDs. Test IDs0/71/9999 проверяют только keyed input contract,
+без model/scientific evaluation или test-based tuning. Saved97580byte regression
+NPZ и compact evidence versioned. Все16raw/split/stats/config bytes/hashes/mtimes,
+frozen source regions, dependencies/backend и scientific settings сохранены.
+CUDA primitive реально проверен на RTX3060Laptop; canonical epsilon остаётся CPU,
+bitwise CPU/CUDA/cross-platform equality не заявлена.
+
+Commits7d47569/b73536b/f89d70f/5d12a06: полный diff, tests, explicit staged paths,
+staged diff и оба diff --check, затем отдельный commit и immediate ordinary push
+origin main PASS. Final docs/handoff публикуются отдельным блоком. Blur/darkening/
+apply_corruption остаются CORR-002, production policy ROBUST-001, visual audit
+CORR-003, full DATA-003 robust integration/dependent acceptance pending. General
+REPRO-001 не закрыта. [Evidence](corr001_evidence.json), [record](reproduction.md).
+Все implementation/review/checks выполнил агент; technical PASS/full DoD PARTIAL.
+Human understanding/review, team/protocol freeze, course policy/LMS/proposal
+confirmations и independent reproduction остаются PENDING; course compliance
+не заявляется.
+
 ## DATA-003 — 31.10.2026
 
 По прямому запросу пользователя Codex проверил main/status/fetch/docs, existing

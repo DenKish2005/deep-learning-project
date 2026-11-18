@@ -5,7 +5,8 @@ config validation в utils, оба YAML и test_utils; DATA-001 реализуе
 file/partition inspection и acquisition CLI/manifest. DATA-002 реализует persisted
 create_split/load_split, provenance/reuse/failure safety и split CLI. DATA-003
 реализует stats, keyed transforms/order, clean typed loaders и policy boundary;
-actual robust integration остаётся CORR-001/002 pending. Остальные production APIs ниже
+CORR-001 реализует severity mapping, Gaussian noise и keyed CPU epsilon.
+Full robust integration остаётся CORR-002/ROBUST-001 pending. Остальные production APIs ниже
 ещё не реализованы. Состояние: [CURRENT_STATUS.md](CURRENT_STATUS.md), уточнения
 и причины: [SETUP_DECISIONS.md](SETUP_DECISIONS.md). Протокол —
 [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md). Новые frameworks не вводятся.
@@ -120,6 +121,40 @@ format можно выбрать командой. Дополнительные 
 - `CorruptionPolicy(probabilities, max_train_severity=3)` и `__call__(x, generator) -> (Tensor, dict)`: per-image выбор; dict содержит event/severity для pilot audit, не label.
 - Нет зависимости на labels, normalization или model. Тесты TEST-C01..08; integration — unnormalized image → corruption → normalization → model. DoD: mapping, range, deterministic equality, CPU tests и визуальный grid; CUDA только если доступна.
 
+#### CORR-001 operational boundary (implemented 18.11.2026)
+
+`severity_params` returns fresh dicts: noise `sigma`, blur `sigma`/`kernel_size`,
+brightness `factor`; exact protocol tables, Python severity int1..5, invalid
+kind/type/severity → ValueError. Mapping all families does not implement blur/darken.
+
+`gaussian_noise` validates dense strided CPU/CUDA float32 RGB CHW, positive H/W,
+finite [0,1] pixels, finite nonnegative Python sigma and explicit torch.Generator
+on the exact same device. Invalid inputs fail before drawing. Sigma0 clones
+without consuming RNG. Other sigma uses torch.randn with local generator, adds
+scaled epsilon and clamps; finite sigma beyond float32 uses float64 arithmetic
+before clamp/cast. New output storage, same shape/device/dtype; no mutation or
+global RNG. Main CIFAR shape remains3×32×32; larger helper tensors support numeric tests.
+
+`keyed_test_generator(original_index, *, namespace)` returns a fresh CPU generator;
+`keyed_test_epsilon(original_index, *, namespace)` returns CPU float32 [3,32,32]
+pre-clamp N(0,1). Full namespace must equal `cifar10-python/original-test`; ID is
+Python int0..9999. The seed alias is `cifar10-test`:
+`stable_seed(100494,'cifar10-test',original_index,'gaussian_noise','v1')`.
+No model/run seed or severity argument. Each image/condition recreates its generator;
+passing a consumed stream changes the noise. Train uses the existing separate
+`train_corruption` key; test helpers reject train/val namespaces.
+
+TEST-C01/C02/C04 cover the noise subset and all-family mapping; C03/U02 seed subset
+covers common pre-clamp epsilon, batching/order/spawn/fresh processes and global RNG.
+Actual train probe checks data→noise→Normalize with frozen artifacts; it is a fixed
+test callable, not CorruptionPolicy. Actual CUDA primitive validation passed locally;
+keyed reference stays CPU and no CPU/CUDA bitwise equality is claimed.
+
+`gaussian_blur`, `darken`, `apply_corruption` remain CORR-002; `CorruptionPolicy`
+remains ROBUST-001. Production CorruptedDataset/evaluator, condition manifests,
+visual grid and full robust acceptance are future tasks. Technical PASS/full DoD
+PARTIAL; [evidence](../report/corr001_evidence.json).
+
 ### `src/data.py`
 
 - `load_cifar10(root: Path, train: bool, download=False) -> torchvision.datasets.CIFAR10`: raw RGB/PIL + labels, dataset integrity через torchvision; offline missing data → actionable error, не silent network call.
@@ -196,7 +231,7 @@ exclusive fsynced publication and verification, then stage deletion and lock las
 Missing/tampered/partial/foreign stats or interrupted diagnostics fail and remain
 preserved. Recovery: inspect/preserve them and explicitly select a new stats path;
 no automatic repair. This readiness protocol is not a power-loss transaction.
-General REPRO-001/checkpoint/backup work and CORR-001 integration remain pending.
+General REPRO-001/checkpoint/backup work and full CORR-002/ROBUST-001 integration remain pending.
 
 #### DATA-003 keyed loaders (implemented)
 
@@ -207,7 +242,8 @@ uses a CPU torch.Generator: zero pad4, two randint(0,9) crop offsets, rand()<.5
 horizontal flip, then float32 CHW/255. An optional train-only callable has
 `policy(x, generator=local_generator) -> (Tensor, dict)`. Mutation, wrong dtype,
 shape/device/nonfinite/range output fail; labels/IDs are always obtained from base.
-Policy is injected by the caller; actual corruptions are still CORR-001/002 TODO.
+Policy is injected by the caller; CORR-001 noise is implemented, while full
+CORR-002/ROBUST-001 corruption/policy integration remains pending.
 
 `EpochOrderSampler` creates a fresh local generator per iteration from
 stable_seed(run_seed, epoch, 'order'); dataset.set_epoch updates order/geometry.
