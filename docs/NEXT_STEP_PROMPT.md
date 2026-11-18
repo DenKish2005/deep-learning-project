@@ -3,16 +3,17 @@
 Обновлён18.11.2026 после ROBUST-001 independent technical PASS/full DoD PARTIAL.
 Published main:ef78e05 frozen CORR-003 replay,0c3d3ca policy/tests,d4d56b0
 train-only integration tests,01bcfb7 actual/evidence. Каждый блок сразу ordinary
-push origin main PASS, clean0ahead/behind. Final docs/handoff — отдельный commit;
-его hash и fresh-fetch final sync фиксируются в Git/chat. Сохранение этого prompt
+push origin main PASS, clean0ahead/behind. Final docs/status/ai_usage/handoff
+опубликованы в37731e4; fresh fetch подтвердил clean main=origin/main. Сохранение этого prompt
 не запускает MODEL-001 и не разрешает training.
 
 ~~~text
 Продолжи проект CSCI494 — Robustness to Noise.
-Работай, коммить и пушь только в existing exact branch main. Не создавай codex/*,
-другие branches или worktrees. Исторические branch/PR советы не применяются.
+Работай, коммить и пушь только в существующую ветку с точным именем main.
+Не создавай ветку codex, codex/*, любые другие branches или worktrees.
+Исторические branch/PR советы в документах не переопределяют это правило.
 Разрешаю самостоятельные commits и ordinary git push origin main после каждого
-проверенного небольшого блока. Без force, amend/reset, history rewrite или
+проверенного небольшого блока без повторного согласования. Без force, amend/reset, history rewrite или
 автоматического затирания divergence/conflicts. Failed push сначала расследуй;
 safe fast-forward допустим, automatic merge/conflict overwrite запрещены.
 
@@ -109,20 +110,43 @@ MODEL-001 BOUNDED TECHNICAL SCOPE
    Preserve ROBUST-001 full acceptance limitation: model init/budget/full scientific
    gate were not established by policy checks and must not be backdated.
 
-SMALL FINISHED BLOCKS И PUBLICATION
+НЕБОЛЬШИЕ ЗАВЕРШЁННЫЕ БЛОКИ И НЕМЕДЛЕННАЯ ПУБЛИКАЦИЯ
 
-Перед edits объяви current scope/ближайший блок. Ориентир: architecture/shape/
-parameter tests together; initialization/modes/state tests with implementation;
-actual CPU/optional CUDA evidence; final docs/status/ai_usage/handoff. Adapt size
-to code, no artificial cosmetic commits/stubs/known failing tests. Implementation
-и связанные tests всегда вместе. Не накапливай всё до финального commit.
+Работай самостоятельно до проверяемого технического результата MODEL-001.
+Не останавливайся после первого промежуточного commit или только плана.
+Перед edits кратко объяви текущий scope и ближайший небольшой блок.
+Ориентир для блоков, с адаптацией к фактическому размеру кода:
 
-После каждого блока STOP editing: inspect full diff/relevant tests; git diff
---check; stage only explicit task paths (no git add . / -A); inspect exact staged
-list and full staged diff; both git diff --check and git diff --cached --check;
-assert branch exactly main; separate commit; IMMEDIATE ordinary push origin main;
-verify successful push, clean worktree/empty staged list/main=origin/main; report
-checks/hash/push. Only then edit next block. No force/amend/reset/automatic merge.
+1. Законченный CompactCNN API: architecture, forward, explicit initialization
+   и непосредственно связанные shape/parameter/init tests в одном блоке.
+2. Train/eval modes, BN/dropout, finite backward и strict state_dict round trip:
+   meaningful tests вместе с необходимыми implementation fixes. Если реализация
+   уже достаточна, допустим содержательный test-only блок без косметических edits.
+3. Actual CPU и explicit opt-in CUDA checks, compact evidence и связанные tests.
+   Все тяжёлые проверки последовательно; без optimizer updates/training.
+4. Итоговые docs/status/report/ai_usage и следующий bounded prompt, с явным
+   разделением technical PASS, full DoD и открытых human/formal gates.
+
+Implementation и непосредственно связанные tests всегда коммить вместе.
+Большой блок раздели на меньшие законченные рабочие части. Не делай commits с
+заглушками, известными failing tests или искусственным косметическим дроблением.
+Не накапливай всю реализацию/tests/docs до одного финального commit.
+
+После КАЖДОГО завершённого блока останови editing:
+
+- Проверь полный diff и relevant tests, затем git diff --check.
+- Stage только явные task paths; не используй git add . или git add -A.
+- Проверь точный git diff --cached --name-only и полный git diff --cached.
+- Выполни git diff --check и git diff --cached --check.
+- Проверь, что current branch ровно main, и сделай отдельный рабочий commit.
+- СРАЗУ выполни обычный git push origin main; не откладывай push до конца этапа.
+- Проверь успешный push, clean worktree, пустой staged list и main=origin/main.
+- Сообщи checks, commit hash и результат push.
+
+Только после успешной публикации переходи к editing следующего блока.
+При failed push сначала разбери причину и прочитай remote history, до новых edits.
+Без force, amend/reset, automatic merge и автоматического затирания conflicts.
+Разрешение на commits/push действует на весь этап; повторно его не запрашивай.
 
 Never commit raw/archives/env/caches/credentials/absolute machine paths/diagnostic
 partials. End with fresh fetch, clean status, empty staged list, exact main=
