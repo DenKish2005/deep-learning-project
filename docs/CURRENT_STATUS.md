@@ -1,6 +1,44 @@
 # CURRENT PROJECT STATUS
 
-## CORR-002 — 18.11.2026
+## CORR-003 — 18.11.2026
+
+Independent technical scope **PASS**; full DoD **PARTIAL**. Actual train-only grid:
+10 classes x16 conditions, minimum original IDs29/4/6/9/3/27/0/7/8/1 among persisted
+train45k, class order0..9. CPU float32 raw [0,1], common local audit epsilon per
+image, no geometry/Normalize/auto-contrast or official-test decoding in grid.
+
+Actual [PNG](../outputs/figures/corruption_examples.png)3520x2320,
+[PDF](../outputs/figures/corruption_examples.pdf)1page,
+[source manifest](../outputs/figures/corruption_examples.source.json),
+[evidence](../report/corr003_evidence.json), [commands](../report/reproduction.md).
+Default **815PASS/0FAIL/16opt-in SKIP**; separately **2actual PASS/0FAIL/0SKIP**.
+Independent numeric160cell replay: noise/darkening bitwise, max blur NumPy2D
+error1.7881393432617188e-7. PNG/PDF480RGB samples identical, source error<1/255.
+Agent opened both exports: labels readable, progressive effects, no obvious
+edge/channel artifact. Dark cat/dog s5 difficult; visual audit is bounded, not
+human approval or a claim about model accuracy. Person5/team review **PENDING**.
+Missing/corrupt input negative controls correctly fail; no replacement/output.
+Existing14actual DATA/corruption/CUDA cases not rerun. Fresh pip/raw/split/stats/
+controlled-config CLIs PASS. All23protected files bytes/hashes/mtimes and frozen
+DATA-002/003 source regions unchanged; dependencies/configs/protocol untouched.
+
+| Task | Full DoD | Remaining |
+|---|---|---|
+| CORR-001/002/003 | PARTIAL, independent technical PASS | Independent human code/artifact/visual review, PROTO-001/team/source-policy approvals |
+| DATA-001/002 | PARTIAL, technical PASS | Independent human review |
+| DATA-003 | PARTIAL, independent technical PASS | ROBUST-001/full robust integration/dependent acceptance and formal/human gates |
+| ROBUST-001 / REPRO-001 | TODO | Policy; general identity/checkpoints/resume/backup |
+
+Published main blocks:3c7a46e pixels/tests; b57a3c7 renderer/CLI/tests;
+21ede65 actual artifacts/tests/evidence. Each reviewed/tested and immediately
+pushed origin main PASS. Final docs/handoff published separately; final hash and
+fresh-fetch clean sync in Git/chat. Next bounded technical candidate:
+[ROBUST-001 after current prerequisite review](NEXT_STEP_PROMPT.md).
+No training/models/evaluator/metrics/EDA/scientific results. General REPRO-001,
+course/source-policy/team/protocol and second-machine reproduction stay open;
+Graphify remains historical. Training readiness is not established.
+
+## Historical CORR-002 — 18.11.2026
 
 Independent technical scope **PASS**; full DoD **PARTIAL**. Implemented normalized
 separable reflect Gaussian blur, multiplicative darkening and apply_corruption.

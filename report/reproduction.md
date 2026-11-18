@@ -1,4 +1,100 @@
-# Verification record — foundation, DATA-001..003 and CORR-001/002
+# Verification record — foundation, DATA-001..003 and CORR-001/002/003
+
+## CORR-003 independent technical acceptance — 18.11.2026
+
+**PASS independent technical scope; PARTIAL full DoD.** Agent verification by
+direct user instruction; Person5/team visual review and formal gates PENDING.
+Initial fresh fetch: clean main=origin/main0490833; no applicable AGENTS.md.
+Listed docs/current source read, historical Graphify navigated without rebuild.
+Existing .venv Python3.12.10/torch2.9.0+cu126/NumPy2.5.4/matplotlib3.11.2 used
+without reinstall/update/backend changes. No training/EDA/policy/evaluation.
+
+Implemented `scripts/make_plots.py` selection/pixel preparation, reusable
+`plot_corruption_grid` and explicit bounded `--corruption-grid` CLI. Verified raw
+train and frozen split before choosing minimum original ID/class in persisted45k.
+IDs in class order: **29,4,6,9,3,27,0,7,8,1**. Conditions: clean0,noise1..5,
+blur1..5,brightness1..5. CPU float32[10,16,3,32,32], raw[0,1], no geometry/Normalize,
+no post-dispatch uint8 round trip or auto-contrast. Official test is decoded only
+by required baseline integrity CLI; never by grid/actual grid tests.
+
+Before viewing, froze audit-only key:
+`stable_seed(494,'cifar10-python/original-train/corr003-audit',original_id,'gaussian_noise','v1')`.
+Fresh CPU generator for each noise severity shares per-image epsilon. Existing
+production streams/test helpers/stable_seed unchanged. No new production seed API.
+
+| Check | Actual result |
+|---|---|
+| pip check, raw `--verify-only`, frozen `--verify-split`, normalization `--verify-only` | PASS; no writes/repair |
+| Baseline `pytest tests -q --basetemp=.venv/pytest-corr003-baseline` |777PASS/0FAIL/14SKIP,103.46s |
+| Block1 selection/pixels + dispatcher/keyed regressions |215PASS,20.781s JUnit |
+| Block2 selection/pixels + render/CLI |38PASS,68.698s JUnit |
+| Final default suite |815PASS/0FAIL/16opt-in SKIP,210.572s JUnit (console210.65s) |
+| Actual `RUN_CORR_GRID=1` |2PASS/0FAIL/0SKIP,36.945s JUnit |
+| Controlled configs CLI |PASS; preparation schema only |
+| Actual export create + reuse + verify-only |PASS; reuse/verify bytes+mtimes unchanged |
+| Missing-input opt-in negative control |Expected exit1/DataIntegrityError,1error/0SKIP; diagnostic root not created |
+| Truncated actual raw CLI negative control |Expected exit1/checksum mismatch;128byte diagnostic preserved, no output |
+| Protected files/frozen regions |23files bytes/hashes/mtimes unchanged; DATA-002/003 region hashes unchanged |
+
+38new offline cases cover minimum-ID selection/validation exclusion, condition
+order, keyed epsilon, RNG isolation, raw/range/mutation boundaries, train-only
+verification,160axes/labels, PNG colors, provenance, bad CLI, partial/conflicting
+states and exclusive publication/failure. Actual tests forbid test decode and
+download, independently decode verified train batch1, replay all160cells with
+direct randn/multiplication and float64 NumPy2D reflect oracle. Noise/darkening
+bitwise; max blur error **1.7881393432617188e-7** (atol1e-6). Pre-clamp out-of-range
+noise values per severity:155/560/1128/2049/3521 of30720; clamp exact, no wraparound.
+Existing14actual DATA/corruption/CUDA cases not rerun; previous evidence retains
+its dates. Default16skips include those14 +2new grid gates. This stage is CPU only.
+
+### Actual artifacts and visual audit
+
+| Artifact | Bytes | SHA-256 |
+|---|---:|---|
+| [PNG](../outputs/figures/corruption_examples.png) |776955 |9a056d31a97522ae5089fa1999a6b20f00df4b97a98d041802f3f0b493f776f3 |
+| [PDF](../outputs/figures/corruption_examples.pdf) |738357 |0a3fa45fcc4ded82332e0a0aeb04cd75fc528744c6c521005f4750b20962e2fa |
+| [Source manifest](../outputs/figures/corruption_examples.source.json) |7622 |f5f09446078fc53d26f8d0e5df4d057c62042ff0540de409d363f26ae2ae5854 |
+| [Evidence](corr003_evidence.json) |12271 |b093405cc6f7080e078e34e76c05520876fc52cb6c5067d090451bf0055c6d15 |
+
+Source pixels SHA-256 C-order little-endian float32 bytes:
+`3ed856ca62f960b3bdfa18807f440451fdc15ce83a9c5d56bb874baf66d711b1`.
+PNG3520x2320; PDF1.4 one unencrypted1584x1044pt page. Opened via Pillow/pdfinfo;
+Poppler pdftoppm26.07.0 rendered actual PDF at2200px for visual inspection and
+160dpi for numeric comparison. For every cell, source pixel coordinates(3,3),
+(16,16),(28,28) transformed through axes.transData give480RGB samples. PNG/PDF
+samples identical; max float-source quantization error0.9961624145507812/255.
+
+Agent viewed both exports: ten rows/sixteen columns, readable names/IDs/parameters,
+no label clipping/overlap; matching noise positions increase in amplitude; blur
+s1 nearly clean and later levels smoother, no obvious black padding frame,
+wraparound seam or channel displacement. Darkening reduces brightness while
+retaining layout/color balance; cat9/dog27 already dark, harder at s5. Reflect/
+clipping correctness rests on numeric oracles. Ten fixed images do not establish
+representativeness, universal recognizability or model accuracy monotonicity.
+No severity/policy tuning. Independent Person5/team review **PENDING**.
+
+### Commands, reruns and publication
+
+Working commands and environment overrides: [REPRODUCIBILITY](../docs/REPRODUCIBILITY.md).
+Initial export `-m scripts.make_plots --corruption-grid --root data/raw --output
+outputs/figures`; subsequent default calls verify read-only. `--verify-only`
+requires existing PNG/PDF/source manifest. Missing/partial/mismatched sets fail;
+never regenerate a mismatch. Render all files in a temporary sibling, publish
+exclusive hard links, source manifest last. Publication failure can leave partial
+outputs: preserve them and choose a new empty output directory. Later implementation
+changes intentionally invalidate strict source verification of this historical
+audit; do not silently update its manifest. Regenerated renderer bytes across
+machines/versions are not promised. This does not close general REPRO-001.
+
+Commits3c7a46e (pixels/tests),b57a3c7 (render/CLI/tests),21ede65 (actual tests/
+artifacts/evidence) each passed full diff/test/staged review and both diff --check,
+then immediately ordinary push origin main PASS;0ahead/behind and clean afterwards.
+Staged artifact blobs matched actual verified bytes. Final docs/handoff published
+separately; final hash and fresh-fetch clean sync in Git/chat. Full DATA-003 robust
+integration, ROBUST-001, general REPRO-001, PROTO-001/team/source-policy approvals,
+course policy/LMS/proposal confirmations, human review and independent second-machine
+reproduction remain open. Next bounded candidate: ROBUST-001 after prerequisite
+review, not training readiness.
 
 ## CORR-002 independent technical acceptance — 18.11.2026
 

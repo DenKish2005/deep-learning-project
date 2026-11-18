@@ -1,6 +1,33 @@
 # План тестирования и QA
 
-## CORR-002 current acceptance — 18.11.2026
+## CORR-003 current acceptance — 18.11.2026
+
+Default **815PASS/0FAIL/16opt-in SKIP**, separate grid actual **2PASS/0FAIL/0SKIP**.
+Added38offline cases (16selection/pixels/source +22render/CLI) and2actual opt-in.
+Existing14actual DATA/corruption/CUDA cases were not rerun; fresh raw/split/stats
+CLIs PASS. TEST-P01 grid subset only: actual PNG/PDF opens,160axes/order/labels,
+fixed RGB range/no auto-contrast, source IDs/provenance, invalid input/output/CLI,
+source/hash/partial conflicts, no-overwrite publication and injected failure.
+General metrics plots/TEST-P01 aggregation coverage remain future work.
+
+Selection tests exclude validation IDs and ignore candidate ordering. Numeric
+tests verify raw dtype/range/no mutation, common keyed train-only epsilon, global
+Python/NumPy/torch RNG isolation and train+split verification before selection.
+Actual tests forbid test partition decoding/downloads; independent verified train
+batch decode, direct noise/factor oracles and NumPy2D reflect blur for all160cells.
+Max blur error1.7881393432617188e-7; noise/darkening bitwise replay. Read-only
+reuse/verification preserves raw/split/reference/output bytes and mtimes.
+
+Actual PNG480RGB samples match source within one8-bit code. Separately Poppler
+26.07.0 opens/renders PDF; same480coordinates have PDF/PNG difference0 and source
+error0.9961624145507812/255. Agent opened both exports and recorded exact bounded
+observations in [evidence](../report/corr003_evidence.json). Independent Person5/
+team visual review **PENDING**; C07/ROBUST-001, formal gates/full DATA-003 dependent
+acceptance and second-machine reproduction remain open. Missing opt-in inputs
+yield expected DataIntegrityError/exit1/0SKIP; truncated actual train input causes
+checksum failure with corrupt diagnostic preserved and no output. No training/EDA.
+
+## Historical CORR-002 acceptance — 18.11.2026
 
 Default **777PASS/0FAIL/14SKIP**; separate corruption actual **6PASS/0FAIL/0SKIP**.
 Added324offline cases:77blur +71darkening +176dispatcher. Added2CIFAR/1CUDA actual

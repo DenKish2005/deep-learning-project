@@ -1,5 +1,18 @@
 # Проверка готовности foundation
 
+Обновление CORR-00318.11.2026: independent technical PASS/full DoD PARTIAL;
+[evidence](../report/corr003_evidence.json). Audit-only key frozen before viewing:
+stable_seed(494,'cifar10-python/original-train/corr003-audit',original_id,
+'gaussian_noise','v1'); fresh local CPU generator per noise level. Minimum ID/class
+among persisted train45k, raw CPU pixels, no geometry/Normalize. Это operational
+visual audit, не новая production policy/seed API. PNG/PDF/source manifest имеют
+scoped tracking и LF/binary attributes; strict source/output checks, no overwrite.
+Later source edits intentionally cause current-source mismatch for this frozen
+audit; do not silently rebaseline it. Person5/team visual review, source-policy/
+course/team/protocol approvals, full DATA-003 robust integration, general REPRO-001
+и second-machine reproduction pending. Следующий candidate ROBUST-001 после
+current prerequisite review; protocol/maps/configs/dependency edges не менялись.
+
 Обновление CORR-00218.11.2026: technical PASS/full DoD PARTIAL;
 [evidence](../report/corr002_evidence.json). Blur uses float64 normalized 1D Gaussian
 weights cast to float32, two grouped spatial convolutions with reflect padding,

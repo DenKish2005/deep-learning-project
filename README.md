@@ -13,15 +13,42 @@ integrity CLI and a versioned local manifest. DATA-002 adds the persisted strati
 DATA-003 adds train-only normalization, keyed transforms/order and deterministic
 typed loaders. CORR-001 adds exact three-family severity mapping, explicit-generator
 Gaussian noise and reusable original-test keyed CPU epsilon. CORR-002 adds reflect
-Gaussian blur, progressive darkening and `apply_corruption`. Policy, CNN, training,
-evaluation and plotting remain future work.
+Gaussian blur, progressive darkening and `apply_corruption`. CORR-003 adds the
+train-only 10x16 corruption grid, PNG/PDF, source manifest and agent visual audit.
+Policy, CNN, training, evaluation and metrics plots remain future work.
 No training has run.
 Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
 RGB32×32, all archive/file checksums and class counts pass. Current checks:
-777 offline tests pass (14 opt-in tests skipped); separately 6 corruption actual
-checks pass, including CUDA and CORR-001 regression. The original 8 actual DATA
-tests were not rerun in CORR-002; their results remain dated 31.10.2026. Raw/split/
-stats verification CLIs were freshly run on 18.11.2026.
+815 offline tests pass (16 opt-in tests skipped); separately 2 actual grid checks
+pass with no skips. The previous 14 actual DATA/corruption/CUDA cases were not
+rerun in CORR-003; earlier evidence retains its dates. Raw/split/stats verification
+CLIs were freshly run on 18.11.2026. CORR-003 technical PASS, full DoD PARTIAL:
+independent Person 5/team visual review and formal approvals remain pending.
+
+## Working train-only corruption audit (CORR-003)
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.make_plots --corruption-grid
+.\.venv\Scripts\python.exe -m scripts.make_plots --corruption-grid --verify-only
+$env:RUN_CORR_GRID='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_corruption_grid_local.py -q -s --basetemp=.venv/pytest-corr003-actual
+Remove-Item Env:RUN_CORR_GRID
+```
+
+Actual [PNG](outputs/figures/corruption_examples.png), [PDF](outputs/figures/corruption_examples.pdf),
+[source manifest](outputs/figures/corruption_examples.source.json) and
+[evidence](report/corr003_evidence.json). Minimum original ID per class in persisted
+train45k, class order:29/4/6/9/3/27/0/7/8/1. Raw CPU float32 [0,1], fixed local
+audit epsilon per image across noise levels, no geometry/Normalize/auto-contrast.
+The grid never decodes official test; the separate integrity CLI does.
+
+CLI accepts only this explicit audit: `--root`, `--split-path`, `--output` directory,
+`--verify-only`; no metrics or learning-curve API. Complete existing outputs are
+verified read-only; partial/source/implementation/hash conflicts fail without repair.
+Use a new empty output directory for a separately documented render. A publication
+failure may leave a partial set; preserve it. Implementation fingerprints make
+later source changes an intentional verification mismatch; do not rewrite this
+frozen audit to conceal it. Full commands/limits: [reproduction](report/reproduction.md).
 
 ## Working installation and checks
 
@@ -241,7 +268,7 @@ darkened = apply_corruption(pixels, 'brightness', 3)
 clean = apply_corruption(pixels, 'clean', 0)  # new storage, validated pixels
 ```
 
-Actual replay: use the CORR-001 opt-in environment above and add
+Historical CORR-002 replay: use the CORR-001 opt-in environment above and add
 `tests/test_corr002_local.py` to the pytest file list. Combined result18.11.2026:
 6PASS/0FAIL/0SKIP; default777PASS/14opt-in SKIP. Tests cover all16conditions on
 17persisted train IDs, epochs0/1, and spawn0/2 batch7/5 for clean+severity3 families.
@@ -249,7 +276,7 @@ CPU and CUDA NumPy-oracle blur error max1.78814e-7. Fixed probe callables do not
 implement the production training policy. [Evidence](report/corr002_evidence.json),
 [actual reference](report/corr002_reference.npz), [commands](report/reproduction.md).
 Full CORR-002 DoD PARTIAL pending formal approvals and independent human review;
-CORR-003 visual review, ROBUST-001 and general REPRO-001 remain open.
+CORR-003 independent human visual review, ROBUST-001 and general REPRO-001 remain open.
 
 ## Project documents and next work
 
@@ -259,10 +286,10 @@ Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
 CSR and proposal candidates; submitted version, current rubric/LMS confirmation,
 AI-policy conflict and team approvals remain pending.
 
-Next: CORR-003 train-only corruption grid and visual audit;
+Next bounded technical candidate: ROBUST-001 after current prerequisite review;
 [next-step prompt](docs/NEXT_STEP_PROMPT.md). Independent DATA-003 technical scope
 PASS; full DoD PARTIAL until ROBUST-001 integration/formal gates and independent human
 review. Full DATA-001/002 DoD also remains PARTIAL; agent checks do not replace review.
 All commits and ordinary pushes use `main`, per the user's current instruction.
 Commands in the future-pipeline section of [REPRODUCIBILITY](docs/REPRODUCIBILITY.md)
-describe planned interfaces beyond the working data/split/stats commands above.
+describe planned interfaces beyond the working data/split/stats/grid commands above.

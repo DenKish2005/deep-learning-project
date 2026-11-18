@@ -1,6 +1,54 @@
 # Воспроизводимость: проверенный setup и будущий pipeline
 
-## Работающие CORR-002 проверки — 18.11.2026
+## Работающие CORR-003 проверки — 18.11.2026
+
+Existing .venv, no installation/update/backend changes. From repository root:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip check
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-only
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-split
+.\.venv\Scripts\python.exe -m scripts.prepare_normalization --root data/raw --verify-only
+.\.venv\Scripts\python.exe -m scripts.make_plots --corruption-grid --verify-only
+.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-corr003-final --junitxml=tmp/corr003/default.xml
+$env:RUN_CORR_GRID='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_corruption_grid_local.py -q -s --basetemp=.venv/pytest-corr003-actual --junitxml=tmp/corr003/actual.xml
+Remove-Item Env:RUN_CORR_GRID
+pdfinfo outputs/figures/corruption_examples.pdf
+pdftoppm -f 1 -singlefile -scale-to 2200 -png outputs/figures/corruption_examples.pdf tmp/corr003/pdf-preview
+```
+
+Create ignored tmp/corr003 first if needed for local logs/PDF previews. Default
+815PASS/0FAIL/16SKIP; actual2PASS/0FAIL/0SKIP. Existing14actual DATA/corruption/CUDA
+cases not repeated; their earlier evidence retains its dates. Opt-in root override
+`CIFAR10_ROOT`, split-directory override `CIFAR10_SPLITS`; output is the curated
+repository grid. Missing/corrupt input fails, never skips or downloads.
+
+Initial actual creation used `-m scripts.make_plots --corruption-grid --root data/raw
+--output outputs/figures`. Complete default reruns verify actual inputs, source
+implementation, pixel hash and export hashes read-only. `--verify-only` also
+requires all three artifacts; neither path repairs partial/mismatched outputs.
+An intentional separate render requires a new empty `--output` directory. Staging
+precedes exclusive publication; failure during publication may leave a partial
+set. Preserve it for diagnosis. Only curated PNG/PDF/source files are unignored.
+JSON LF and binary attributes preserve tracked byte hashes across checkouts.
+
+Minimum train IDs/class29/4/6/9/3/27/0/7/8/1, class order0..9. Audit key:
+`stable_seed(494,'cifar10-python/original-train/corr003-audit',original_id,'gaussian_noise','v1')`.
+It was frozen before viewing; fresh CPU generator per noise level, shared epsilon.
+Raw CPU float32[10,16,3,32,32], no geometry/Normalize/auto-contrast. Source manifest
+records input/implementation/params/key/pixel/output identities. LF-normalized
+source hashes deliberately make later implementation edits a verification mismatch;
+do not regenerate this historical audit merely to pass after ROBUST-001 edits.
+
+Agent inspected PNG and rendered PDF; independent Person5/team review PENDING.
+Numeric160cell replay max blur error1.7881393432617188e-7;480RGB PDF/PNG samples
+identical, source quantization error<1/255. [Evidence](../report/corr003_evidence.json),
+[record/hashes](../report/reproduction.md). All23protected hashes/bytes/mtimes and
+frozen source regions preserved. No cross-platform/version renderer byte equality
+or independent-machine reproduction claimed; general REPRO-001 remains open.
+
+## Historical CORR-002 проверки — 18.11.2026
 
 Use existing .venv without install/update/backend changes, from repository root:
 
@@ -47,7 +95,7 @@ claim. CORR-003, ROBUST-001, full DATA-003 gates and general REPRO-001 remain op
 SETUP-002 выполнен локально 30.10.2026; config validation относится к SETUP-003.
 DATA-001 реализует raw-data loader, acquisition/verification CLI и local manifest;
 DATA-002 — persisted split494; DATA-003 — train-only stats/keyed loaders/stats CLI.
-CORR-002 current default777PASS/14SKIP; separate6actual corruption PASS/0SKIP,
+Historical CORR-002 default777PASS/14SKIP; separate6actual corruption PASS/0SKIP,
 including CUDA and CORR-001 regressions. [Evidence](../report/corr002_evidence.json).
 Original8actual DATA tests from31.10.2026 not rerun; fresh raw/split/stats CLIs PASS.
 CORR-001/002 technical PASS/full DoD PARTIAL; DATA-003 remains PARTIAL pending

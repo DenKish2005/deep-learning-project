@@ -1,5 +1,38 @@
 # AI assistance record
 
+## CORR-003 — 18.11.2026
+
+По прямому запросу пользователя Codex проверил current main/origin/history/docs,
+existing env и historical Graphify без rebuild. Initial main0490833 clean/synced;
+baseline777PASS/14SKIP, pip/raw/split/stats verification PASS. Агент реализовал
+train-only selection/pixels/keyed audit noise, reusable10x16 Figure, bounded
+PNG/PDF/source CLI;38offline cases и2actual opt-in cases. Final815PASS/0FAIL/
+16SKIP; отдельно2actual PASS/0FAIL/0SKIP. Existing14actual DATA/corruption/CUDA
+cases не повторялись; прежние даты/results не переобозначены как fresh.
+
+Ключ audit зафиксирован до просмотра actual outputs; минимальный original ID/class
+среди persisted45k, без content selection или tuning. Actual IDs29/4/6/9/3/27/0/7/8/1,
+raw pixel grid без geometry/Normalize. Official test только в baseline integrity
+CLI, никогда в grid или её actual tests. Агент создал actual PNG/PDF/source
+manifest, проверил160cells независимыми numeric oracles и480RGB export samples,
+открыл PNG и Poppler-rendered PDF. Max blur1.7881393432617188e-7, PDF/PNG sampled
+RGB difference0. Exact observations/limits, hashes и expected-failure controls:
+[evidence](corr003_evidence.json), [record](reproduction.md).
+
+Published blocks3c7a46e pixels/tests, b57a3c7 renderer/CLI/tests,21ede65 actual
+artifacts/tests/evidence. Каждый блок: full diff/relevant tests, explicit staged
+paths/list/full diff, оба diff --check, commit main и immediate ordinary push
+origin main PASS. Final docs/handoff — отдельный блок. All23protected files
+bytes/hashes/mtimes и frozen regions сохранены; dependencies/backend/protocol/
+configs не менялись. Models/training/evaluator/metrics/EDA/ROBUST-001 не реализованы.
+
+Все implementation/tests/visual checks выполнил агент. Independent Person5/team
+visual/code/artifact review **PENDING**; technical PASS/full DoD PARTIAL. Human
+understanding, unresolved course AI policy/LMS/proposal/source approvals, team/
+protocol freeze, general REPRO-001 и second-machine reproduction остаются open.
+Course compliance и training readiness не заявляются. Next bounded candidate —
+ROBUST-001 после current prerequisite review; dependency/gates не изменены.
+
 ## CORR-002 — 18.11.2026
 
 По прямому запросу пользователя Codex проверил clean main/origin/fetch/history,

@@ -6,7 +6,9 @@ file/partition inspection и acquisition CLI/manifest. DATA-002 реализуе
 create_split/load_split, provenance/reuse/failure safety и split CLI. DATA-003
 реализует stats, keyed transforms/order, clean typed loaders и policy boundary;
 CORR-001 реализует severity mapping, Gaussian noise и keyed CPU epsilon.
-CORR-002 adds reflect blur, darkening and dispatch. Full robust integration remains ROBUST-001 pending. Остальные production APIs ниже
+CORR-002 adds reflect blur, darkening and dispatch. CORR-003 implements only the
+train-only sanity grid, PNG/PDF/source manifest and bounded CLI. Independent
+Person5/team visual review and full ROBUST-001 integration remain pending. Остальные production APIs ниже
 ещё не реализованы. Состояние: [CURRENT_STATUS.md](CURRENT_STATUS.md), уточнения
 и причины: [SETUP_DECISIONS.md](SETUP_DECISIONS.md). Протокол —
 [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md). Новые frameworks не вводятся.
@@ -150,8 +152,9 @@ Actual train probe checks data→noise→Normalize with frozen artifacts; it is 
 test callable, not CorruptionPolicy. Actual CUDA primitive validation passed locally;
 keyed reference stays CPU and no CPU/CUDA bitwise equality is claimed.
 
-`CorruptionPolicy` remains ROBUST-001. CORR-002 primitives are implemented below. Production CorruptedDataset/evaluator, condition manifests,
-visual grid and full robust acceptance are future tasks. Technical PASS/full DoD
+`CorruptionPolicy` remains ROBUST-001. CORR-002 primitives are implemented below.
+Production CorruptedDataset/evaluator, condition manifests and full robust
+acceptance are future tasks; CORR-003 visual grid is implemented below. Technical PASS/full DoD
 PARTIAL; [evidence](../report/corr001_evidence.json).
 
 #### CORR-002 operational boundary (implemented 18.11.2026)
@@ -179,7 +182,7 @@ retain existing keyed_test_generator/CPU identity boundary.
 TEST-C01/C02/C05/C06/C08 numeric/contract acceptance PASS; separate actual17train
 IDs×16conditions×epochs0/1, spawn0/2 and actual CUDA tests PASS. Saved actual reference
 covers train0/1/2, clean0 and severity3 families. [Evidence](../report/corr002_evidence.json).
-CORR-003 visual audit and ROBUST-001/full DATA-003 integration remain separate.
+CORR-003 technical audit is implemented below; ROBUST-001/full DATA-003 integration remains separate.
 Full DoD PARTIAL pending formal/human review; general REPRO-001 remains TODO.
 
 ### `src/data.py`
@@ -358,6 +361,33 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 | scripts/run_experiments.py (новый) | `main`; --configs [2 paths], --seeds [3 ints], --profile core/smoke, --device, --dry-run, --resume-incomplete; шесть train_run | utils/train; sequential default, no GPU oversubscription; wrong config/duplicate ID → error | TEST-T03/S01; dry run ровно 6 core entries |
 | scripts/run_all_evaluations.py | `main`; --checkpoints-root, --device, --require-complete, --dry-run; calls evaluate; 96 entries | evaluate/utils; missing checkpoint or stale hash → nonzero; skip только verified complete result | TEST-E02; rerun idempotent |
 | scripts/make_plots.py | `load_tables(root)`, `plot_corruption_grid(...)`, `plot_learning_curves(...)`, `plot_robustness(...)`, `plot_tradeoff(...)`, `plot_per_class(...)`, `plot_confusion(...)`, `main`; --metrics, --runs, --output | metrics/data/matplotlib; missing columns/NaNs/source → error, никакой fake data | TEST-P01; figure manifest + PNG/PDF |
+
+### CORR-003 operational plotting boundary (implemented 18.11.2026)
+
+`scripts/make_plots.py` implements only `select_train_ids`, `prepare_grid_pixels`,
+`load_audit_grid`, reusable `plot_corruption_grid(pixels, rows) -> Figure`,
+`export_audit` and explicit `--corruption-grid` CLI. The general metrics interfaces
+in the table above remain planned. Raw verification and frozen split verification
+precede selection: smallest original ID/class among train45k, class order0..9.
+Only original train decoded; existing raw loader also hashes official test bytes.
+
+Grid shape[10,16,3,32,32], CPU float32 raw[0,1]; clean0, noise1..5, blur1..5,
+brightness1..5. No crop/flip/Normalize/auto-contrast. Local audit key frozen before
+viewing: stable_seed(494,'cifar10-python/original-train/corr003-audit',original_id,
+'gaussian_noise','v1'). Fresh CPU generator per noise condition shares epsilon.
+Production train/test streams and stable_seed unchanged. Matplotlib Figure/Agg,
+nearest RGB sampling,160dpi,3520x2320 PNG and22x14.5inch one-page PDF.
+
+Source JSON records inputs, split, IDs/labels/classes, key, params, pixel hash,
+LF-normalized implementation hashes, versions and PNG/PDF byte hashes. Exactly
+three curated figure files tracked; JSON LF and binary exports protected by
+scoped attributes. Complete reruns verify read-only; partial/mismatch fails.
+All exports rendered in a temporary sibling, then exclusive hard links publish
+PNG/PDF and manifest last. Publication failure can leave a partial set: preserve
+it, use a new empty directory. This is bounded audit behavior, not REPRO-001.
+Later implementation edits intentionally invalidate strict current-source
+verification of this historical artifact; never regenerate it to hide mismatch.
+Agent visual audit PASS; independent Person5/team review PENDING. [Evidence](../report/corr003_evidence.json).
 
 ## Вспомогательные Python-файлы и notebook
 

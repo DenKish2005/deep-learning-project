@@ -50,12 +50,12 @@ freshness, submitted version и AI-policy precedence остаются pending.
 |---|---|---|---|---|---|---|---|
 | B01 | CIFAR-10 45k/5k/10k, S3 | MUST | DATA-001..003 | src/data.py, data/splits/ | Disjoint stratified indices + stats | TEST-D02..05 | Actual split/stats/clean loaders PASS; robust integration/reviewer pending |
 | B02 | Одна compact custom CNN с нуля, S3 | MUST | MODEL-001 | src/models.py | 288746 params, logits N×10 | TEST-M01..03 | Нет |
-| B03 | Noise, blur, darkening ×5 pixel-space severity, S3 | MUST | CORR-001..003 | src/corruptions.py | Severity table + example grid | TEST-C01..08 | CORR-001/002 all families/dispatcher technical PASS; CORR-003 grid and formal/human review pending |
+| B03 | Noise, blur, darkening ×5 pixel-space severity, S3 | MUST | CORR-001..003 | src/corruptions.py; scripts/make_plots.py | Severity table + actual train-only PNG/PDF/source manifest | TEST-C01..08; grid tests | CORR-001/002/003 independent technical PASS; Person5/team visual review and formal approvals pending |
 | B04 | Clean vs Robust; только train policy различается, S3 | MUST | TRAIN-001..003, ROBUST-001 | configs/, src/train.py | Paired initialization/order/budget logs | TEST-S01 | Config validation PASS; runtime identity TODO |
 | B05 | Seeds 42,123,2026, S3 | MUST | CLEAN-001..003, ROBUST-002..003 | outputs/runs/, checkpoints/ | 6 complete runs | Manifest audit | Нет |
 | B06 | 16 условий/run, 96 оценок, одни test images, S3 | MUST | EVAL-002..004 | scripts/run_all_evaluations.py | 96 keys, 960000 predictions | TEST-E02 | Нет |
 | B07 | Accuracy/drop/RR/mCA/gap/F1/per-class/CM/mean±SD, S3 | MUST | METRIC-001..002 | src/metrics.py | Formula fixtures + exports | TEST-K01..04 | Нет |
-| B08 | Figures и tables из raw data, S3 | MUST | PLOT-001..003 | scripts/make_plots.py | PNG/PDF + provenance | TEST-P01 | Нет |
+| B08 | Figures и tables из raw data, S3 | MUST | PLOT-001..003 | scripts/make_plots.py | PNG/PDF + provenance | TEST-P01 | Metrics plots/tables TODO; only CORR-003 train-only sanity grid implemented, not PLOT-001..003 acceptance |
 | B09 | 6 участников понимают pipeline, S3 | MUST | TEAM-001, PRESENT-002..003 | docs/TEAM_TASKS.md, report/rehearsals.md | Review assignments, defence rehearsal | Peer explanation | План |
 | B10 | Полный пакет planning docs до кода, S3 | MUST | AUDIT-001 | docs/*.md | 14 файлов, ссылки, consistency checks | Documentation audit | Выполнено этим пакетом |
 

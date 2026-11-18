@@ -1,10 +1,11 @@
 # С чего начать
 
-Обновление18.11.2026 CORR-002: reflect blur, darkening и apply_corruption
-independent technical PASS/full DoD PARTIAL. Default777PASS/14opt-in SKIP;
-отдельно6actual corruption checks PASS/0SKIP, включая CUDA и CORR-001 regression.
-[Evidence](../report/corr002_evidence.json), [commands](../report/reproduction.md).
-Следующий этап — [CORR-003](NEXT_STEP_PROMPT.md), train-only visual audit.
+Обновление18.11.2026 CORR-003: actual train-only10x16 PNG/PDF/source manifest и
+agent visual audit — independent technical PASS/full DoD PARTIAL.
+Default815PASS/16opt-in SKIP; отдельно2actual grid PASS/0SKIP. Existing14actual
+DATA/corruption/CUDA cases not rerun. Person5/team visual review PENDING.
+[Evidence](../report/corr003_evidence.json), [commands](../report/reproduction.md).
+Следующий bounded technical candidate — [ROBUST-001 после prerequisite review](NEXT_STEP_PROMPT.md).
 ROBUST-001/full DATA-003 integration, general REPRO-001, PROTO-001/team freeze,
 source-policy approvals, independent human review/reproduction pending. Модели
 не обучены; scientific results отсутствуют.
@@ -17,7 +18,7 @@ source-policy approvals, independent human review/reproduction pending. Моде
 закрыты; у SETUP-002/003 local technical acceptance PASS, formal human review
 pending. DATA-001/002 остаются PARTIAL до independent human review. DATA-003 independent
 technical scope выполнен; dependent robust acceptance pending. Следующая реализация
-— CORR-003 после technical PASS CORR-002. Независимая
+— ROBUST-001 после сверки current prerequisites и pending gates. Независимая
 техническая подготовка не ждёт missing source/team information; full training
 начинается только после policy/protocol и smoke/scientific gates.
 

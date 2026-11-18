@@ -1,6 +1,14 @@
 # Подробный implementation roadmap
 
-Обновление CORR-00218.11.2026: independent technical PASS/full DoD PARTIAL.
+Обновление CORR-00318.11.2026: independent technical PASS/full DoD PARTIAL.
+Actual train-only grid PNG/PDF/source manifest;815default PASS/16SKIP +2actual
+PASS/0SKIP; [evidence](../report/corr003_evidence.json). Agent visual audit PASS,
+independent Person5/team visual review PENDING. Next bounded candidate ROBUST-001
+after current prerequisite review; formal gates/full DATA-003 robust integration,
+general REPRO-001 и second-machine reproduction remain open. No dependency edits.
+Work/commit/push only existing main; no training/EDA/scientific evaluation.
+
+Историческое обновление CORR-00218.11.2026: independent technical PASS/full DoD PARTIAL.
 Reflect blur/darkening/dispatcher,777offline PASS/14SKIP +6actual corruption PASS/
 0SKIP; [evidence](../report/corr002_evidence.json). Следующий этап CORR-003 visual
 audit; ROBUST-001/full DATA-003 acceptance, general REPRO-001 и formal/human gates
@@ -360,12 +368,12 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** CORR-003.
 - **2. Title:** Sanity examples и corruption audit.
 - **3. Purpose:** Проверить визуальный смысл.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — independent technical PASS18.11.2026: actual train-only10x16 PNG/PDF/source manifest,815default PASS/16SKIP +2actual grid PASS/0SKIP, agent visual audit. Independent Person5/team visual/code/artifact review and formal gates PENDING.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 2 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** CORR-002; DATA-001.
 - **8. Steps:** 1) выбрать first train ID/class; 2) export clean+15 conditions; 3) review padding/clipping/range с Person 5.
-- **9. Files:** scripts/make_plots.py; outputs/figures/corruption_examples.png.
+- **9. Files:** scripts/make_plots.py; tests/test_corruption_grid.py; tests/test_corruption_grid_cli.py; tests/test_corruption_grid_local.py; outputs/figures/corruption_examples.png; outputs/figures/corruption_examples.pdf; outputs/figures/corruption_examples.source.json; report/corr003_evidence.json; scoped .gitignore/.gitattributes; relevant docs/reproduction/ai_usage.
 - **10. Functions/classes:** plot_corruption_grid.
 - **11. Inputs:** 10fixed train images.
 - **12. Outputs:** grid PNG/PDF + source IDs.
@@ -375,7 +383,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **16. DoD:** acceptance выполнен; тестовые результаты и artifacts проверены reviewer; status обновлён. Для OPTIONAL допустимо SKIPPED с причиной, без объявления PASS.
 - **17. Effort:** 2-3 person-hours, без full-training wait time.
 - **18. Risks/common mistakes:** Принимать красивую картинку за numeric proof.
-- **19. Branch:** codex/corr-003.
+- **19. Branch:** main (current user instruction).
 - **20. Commit/PR scope:** Sanity examples и corruption audit; только файлы пункта 9, включая relevant tests/docs; один logical PR, owner Person 2.
 
 ### MODEL-001 — CompactCNN v1
