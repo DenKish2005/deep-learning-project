@@ -1,6 +1,50 @@
 # Воспроизводимость: проверенный setup и будущий pipeline
 
-## Работающие CORR-003 проверки — 18.11.2026
+## Работающие ROBUST-001 проверки — 18.11.2026
+
+Use the existing .venv, without install/update/backend changes. Run heavy pytest
+commands sequentially: overlapping processes caused NumPy MemoryError and spawn
+WinError1455; unchanged sequential reruns passed. Create ignored tmp/robust001
+if JUnit logs are desired. These commands verify inputs/policy only, not training.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip check
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-only
+.\.venv\Scripts\python.exe -m scripts.download_data --root data/raw --verify-split
+.\.venv\Scripts\python.exe -m scripts.prepare_normalization --root data/raw --verify-only
+.\.venv\Scripts\python.exe -m scripts.verify_frozen_corr003
+.\.venv\Scripts\python.exe -m src.utils --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --controlled-pair
+.\.venv\Scripts\python.exe -m pytest tests -q --basetemp=.venv/pytest-robust001-final
+$env:RUN_ROBUST_POLICY='1'
+$env:RUN_CORR_CUDA='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_policy_local.py tests/test_policy_cuda.py -q -s --basetemp=.venv/pytest-robust001-actual-serial
+Remove-Item Env:RUN_ROBUST_POLICY
+Remove-Item Env:RUN_CORR_CUDA
+$env:RUN_CIFAR_CORRUPTIONS='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_corr002_local.py::test_actual_all_conditions_before_normalize_and_saved_references -q -s --basetemp=.venv/pytest-robust001-references-serial
+Remove-Item Env:RUN_CIFAR_CORRUPTIONS
+$env:RUN_CORR_GRID='1'
+.\.venv\Scripts\python.exe -m pytest tests/test_corruption_grid_local.py -q -s --basetemp=.venv/pytest-robust001-grid-final
+Remove-Item Env:RUN_CORR_GRID
+```
+
+Actual results:914default PASS/19opt-in SKIP; separately3policy CPU/CUDA +1old
+reference +2grid PASS,0FAIL/0SKIP. Other13historical opt-ins not rerun; preserve
+their dates. CPU-only policy replay omits CUDA flag/file and yields2actual cases;
+this is not CUDA PASS. An opted-in missing/corrupt input or unavailable CUDA fails.
+Policy tests accept a repository-relative CIFAR10_ROOT override; split/stats remain
+the frozen repository paths. No download/repair or synthetic actual substitution.
+
+Frozen CORR-003 verifier extracts only4authenticated implementation blobs and
+src/__init__.py via git show at21ede652d2d1638ec69e4637f4707bcebf3c8224 into ignored
+tmp, then invokes the original strict read-only verifier on actual inputs/exports.
+No branch/worktree or copied dataset. Current `scripts.make_plots --corruption-grid
+--verify-only` intentionally exits1 with implementation mismatch after policy
+source edits; do not regenerate/rebaseline old exports to hide it. Actual grid
+tests preserve strict mismatch and full recorded-source replay simultaneously.
+[Evidence](../report/robust001_evidence.json), [record](../report/reproduction.md).
+
+## Historical CORR-003 проверки — 18.11.2026
 
 Existing .venv, no installation/update/backend changes. From repository root:
 

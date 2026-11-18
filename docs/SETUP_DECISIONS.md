@@ -1,6 +1,18 @@
 # Проверка готовности foundation
 
-Обновление CORR-00318.11.2026: independent technical PASS/full DoD PARTIAL;
+Обновление ROBUST-00118.11.2026: independent technical PASS/full DoD PARTIAL;
+[evidence](../report/robust001_evidence.json). Existing constructor/API completed
+with immutable frozen probabilities/max3. Exact operational draw order: float64
+event uniform, int64 severity for corrupted events only, float32 randn for noise
+only. Validation before draws includes H,W>4 for possible radius4 blur. Caller
+owns the existing train_corruption key; data.py/utils.py and geometry/order/test
+streams unchanged. No implicit loader policy or scientific config change.
+CORR-003 strict current-source mismatch preserved; read-only authenticated replay
+at21ede65 verifies unchanged exports. Heavy checks sequential after resource
+failures; no dependency/backend changes. Formal/human/course/team/protocol gates,
+general REPRO-001 and independent reproduction remain open. Below is history.
+
+Историческое обновление CORR-00318.11.2026: independent technical PASS/full DoD PARTIAL;
 [evidence](../report/corr003_evidence.json). Audit-only key frozen before viewing:
 stable_seed(494,'cifar10-python/original-train/corr003-audit',original_id,
 'gaussian_noise','v1'); fresh local CPU generator per noise level. Minimum ID/class

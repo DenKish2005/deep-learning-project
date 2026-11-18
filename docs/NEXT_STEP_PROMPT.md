@@ -1,176 +1,131 @@
-# Промпт следующего этапа — ROBUST-001 prerequisite review и independent technical policy
+# Промпт следующего этапа — MODEL-001 prerequisite review и bounded model API
 
-Обновлён18.11.2026 после CORR-003 independent technical PASS/full DoD PARTIAL.
-Published main:3c7a46e pixels/tests, b57a3c7 renderer/CLI/tests,
-21ede65 actual PNG/PDF/source manifest/tests/evidence. Каждый блок сразу ordinary
-push origin main PASS. Итоговые docs/status/ai_usage/handoff опубликованы в
-3af7c3b; fresh fetch подтвердил clean main=origin/main перед этим уточнением
-порядка блоков. Сохранение этого prompt не запускает ROBUST-001.
-CORR-003 Person5/team visual review PENDING.
+Обновлён18.11.2026 после ROBUST-001 independent technical PASS/full DoD PARTIAL.
+Published main:ef78e05 frozen CORR-003 replay,0c3d3ca policy/tests,d4d56b0
+train-only integration tests,01bcfb7 actual/evidence. Каждый блок сразу ordinary
+push origin main PASS, clean0ahead/behind. Final docs/handoff — отдельный commit;
+его hash и fresh-fetch final sync фиксируются в Git/chat. Сохранение этого prompt
+не запускает MODEL-001 и не разрешает training.
 
 ~~~text
 Продолжи проект CSCI494 — Robustness to Noise.
 Работай, коммить и пушь только в existing exact branch main. Не создавай codex/*,
-ветку codex, любые другие branches или worktrees. Имя ветки всегда ровно main.
-Исторические branch/PR советы в planning docs не переопределяют это правило.
-Разрешаю самостоятельные commits и ordinary git
-push origin main после каждого проверенного логического блока, без повторного
-согласования. Не используй force, amend/reset или автоматическое затирание
-remote divergence/conflicts. При failed push сначала прочитай причину/history.
+другие branches или worktrees. Исторические branch/PR советы не применяются.
+Разрешаю самостоятельные commits и ordinary git push origin main после каждого
+проверенного небольшого блока. Без force, amend/reset, history rewrite или
+автоматического затирания divergence/conflicts. Failed push сначала расследуй;
+safe fast-forward допустим, automatic merge/conflict overwrite запрещены.
 
-Следующий bounded technical candidate — ROBUST-001: сначала current prerequisite
-review, затем production CorruptionPolicy и actual train-only integration через
-existing explicit policy hook. Не объявляй formal prerequisites/reviews закрытыми
-по агентским tests. CORR-001/002/003 и DATA-003 independent technical PASS/full DoD
-PARTIAL; независимая техническая подготовка допустима, full dependent acceptance
-и human/protocol/course/source-policy approvals остаются отдельными gates.
-Не запускай обучение, модели/evaluator/metrics/EDA/новые scientific figures,
-core runs или broad general REPRO-001. Не тюнь policy/severity по final test.
+Следующий bounded technical candidate — MODEL-001: prerequisite review, затем
+CompactCNN v1 и independent synthetic model tests. Formal prerequisites PROTO-001
+и SETUP-002 имеют pending human/course/team approvals; не объявляй их закрытыми
+по агентским tests. Independent bounded technical preparation допустима, full
+dependent acceptance остаётся отдельным gate. Не запускай training/optimizer
+updates, overfit/pilot/core runs, evaluator/metrics/EDA/новые scientific figures,
+TRAIN-* или broad general REPRO-001. Unit forward/backward проверка не training run.
 
-СНАЧАЛА ПРОВЕРЬ АКТУАЛЬНЫЙ РЕПОЗИТОРИЙ
+СНАЧАЛА CURRENT REPOSITORY И PREREQUISITES
 
 Прочитай AGENTS.md при наличии, README, docs/MASTER_PROJECT_PLAN.md,
 START_HERE.md, CURRENT_STATUS.md, REQUIREMENTS.md, TECHNICAL_ARCHITECTURE.md,
-EXPERIMENT_PROTOCOL.md, IMPLEMENTATION_ROADMAP.md (ROBUST-001, CORR-001..003,
-DATA-003/004, REPRO-001), REPRODUCIBILITY.md, TESTING_PLAN.md, SETUP_DECISIONS.md,
-report/reproduction.md, report/corr001_evidence.json, corr002_evidence.json,
+EXPERIMENT_PROTOCOL.md, IMPLEMENTATION_ROADMAP.md (MODEL-001, PROTO-001,
+SETUP-002/003, ROBUST-001, DATA-003, TRAIN-001, REPRO-001), TESTING_PLAN.md,
+REPRODUCIBILITY.md, SETUP_DECISIONS.md, report/reproduction.md,
+report/robust001_evidence.json, report/corr001_evidence.json, corr002_evidence.json,
 corr003_evidence.json, report/ai_usage.md, report/course_materials/README.md,
-оба YAML, split_manifest.json и normalization.json. Проверь current source:
-CorruptionPolicy planned signature, dispatcher/explicit generators,
-IndexedCIFAR10.__getitem__ и make_loaders explicit injection gate.
-Branch/status/staged/log, fresh fetch, origin/main и remote history обязательны.
-Graphify historical pre-DATA-002 snapshot; current source governs, no rebuild.
+оба YAML, split_manifest.json и normalization.json. Current source governs;
+Graphify historical pre-DATA-002 snapshot, no rebuild.
+Проверь branch/status/staged/log, fresh fetch, exact main=origin/main/history.
+src/models.py пока placeholder. Existing data/corruption source и policy не менять.
 
-Existing .venv, без reinstall/update/global/backend changes. Перед edits:
+Existing .venv без reinstall/update/global/backend changes. Heavy checks strictly
+sequential: overlapping pytest processes в ROBUST-001 вызвали MemoryError и
+WinError1455; unchanged sequential reruns PASS. Перед edits:
 .venv/Scripts/python.exe -m pip check
-.venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-robust001-baseline
+.venv/Scripts/python.exe -m pytest tests -q --basetemp=.venv/pytest-model001-baseline
 .venv/Scripts/python.exe -m scripts.download_data --root data/raw --verify-only
 .venv/Scripts/python.exe -m scripts.download_data --root data/raw --verify-split
 .venv/Scripts/python.exe -m scripts.prepare_normalization --root data/raw --verify-only
-.venv/Scripts/python.exe -m scripts.make_plots --corruption-grid --verify-only
+.venv/Scripts/python.exe -m scripts.verify_frozen_corr003
+.venv/Scripts/python.exe -m src.utils --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --controlled-pair
 
-Сохрани raw/split/stats/configs/lock, оба CORR reference и CORR-003 exports/manifest/
-evidence bytes/hashes/mtimes. Missing/corrupt actual inputs — FAIL, не synthetic
-PASS/skip/download/repair. DATA-002 region SHA4ec051baa81ab0c70bfd2ca41f7a6750ca3b13f61930cd832b2a84dbd9244f96
-и DATA-003 normalization region SHA1cbf01e93d4b1a838daf222c7e1672316117ad65ec1559c4e3075151dae8327c
-не менять. Не менять scientific protocol/maps/configs/dependency edges.
+Сохрани raw/split/stats/configs/lock/protocol, CORR references/grid/manifest и все
+existing evidence bytes/hashes/mtimes. Actual missing/corrupt inputs — FAIL,
+без skip/download/repair/synthetic substitution. Не менять scientific settings,
+prerequisite edges, DATA-002/003 frozen regions, stable_seed или old functions.
 
-СОХРАНЁННЫЙ CORR/DATA CONTRACT
+СОХРАНЁННЫЙ ROBUST/DATA/CORR CONTRACT
 
-- CPU/CUDA dense finite float32 RGB CHW raw[0,1], positive H/W, output new storage,
-  same shape/device/dtype, no mutation. Normalize AFTER corruption.
-- apply_corruption: clean только Python int0, families только1..5; noise explicit
-  same-device Generator, deterministic families do not consume supplied generator.
-  Invalid types/values fail before draws. Exact frozen parameters:
-  noise sigma.02/.05/.08/.12/.18; blur sigma.3/.7/1.1/1.5/2 with kernels3/7/9/11/13,
-  normalized float64 weights castfloat32, reflect grouped separable convolution;
-  brightness factors.9/.8/.7/.55/.4, clip(factor*x,0,1).
-- keyed_test_generator/epsilon stay original-test namespace/seed100494 only.
-  stable_seed encoding/goldens, geometry/order and train_corruption keys unchanged.
-- Existing train hook: raw -> keyed geometry -> float32/255 -> policy(image,
-  generator=local stable_seed(run_seed,epoch,original_id,'train_corruption'))
-  -> Normalize. Policy returns (pixel Tensor, metadata dict); mutation/range/device
-  guard exists. Val/test policy rejected. make_loaders augmentation.enabled must
-  match explicitly injected callable; preserve this boundary, no implicit policy.
-- CORR-003 minimum train IDs/class29/4/6/9/3/27/0/7/8/1, raw10x16 grid;
-  audit-only seed494 namespace cifar10-python/original-train/corr003-audit, not
-  production train RNG. No geometry/Normalize/auto-contrast in the visual grid.
-- Default18.11:815PASS/0FAIL/16opt-in SKIP; separately2actual grid PASS/0SKIP.
-  Existing14DATA/corruption/CUDA opt-ins not rerun in CORR-003; dates in evidence.
-  Required baseline raw integrity CLI decodes test for integrity only; grid never does.
-- Frozen split NPZ1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284;
-  manifest8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21;
-  stats FILE332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688,
-  semantic4450836de3384df4286535985ed0b56b9a411f3033a60ecf57bbfe5edcb01877.
-- CORR-001 NPZ97580bytes40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33;
-  CORR-002 NPZ187438bytesb4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03.
-- CORR-003 PNG776955bytes9a056d31a97522ae5089fa1999a6b20f00df4b97a98d041802f3f0b493f776f3;
-  PDF738357bytes0a3fa45fcc4ded82332e0a0aeb04cd75fc528744c6c521005f4750b20962e2fa;
-  source JSON7622bytesf5f09446078fc53d26f8d0e5df4d057c62042ff0540de409d363f26ae2ae5854.
-  Strict audit verification includes whole LF-normalized implementation hashes.
-  Editing src/corruptions.py or src/data.py will intentionally cause current-source
-  mismatch. BEFORE edits plan bounded read-only replay at recorded CORR-003 source
-  revision21ede65 (e.g. source snapshot in ignored tmp, no branch/worktree), with
-  current-source mismatch covered as expected error. Preserve regression meaning;
-  do not skip/drop tests, weaken checks or regenerate old artifacts to hide drift.
-  Do not expand this necessity into a general provenance/REPRO-001 framework.
+- CorruptionPolicy принимает только probabilities[.50,.17,.17,.16], Python max3;
+  immutable settings. Один event/image, severity1..3uniform, identity0; no quotas/
+  compositions/tuning. Caller-owned explicit same-device Generator; no new seeds.
+- Draw order: float64 scalar torch.rand event intervals[0,.50),[.50,.67),
+  [.67,.84),[.84,1); только corruption int64 randint(1,4,()); только noise после
+  этого float32 randn(x.shape). Metadata event/severity audit-only. Validation
+  before draws; raw finite float32 RGB CHW, CPU/CUDA, policy H,W>4 for possibleblur.
+- Existing train hook raw→keyed geometry→float32/255→policy→Normalize; explicit
+  injection gate/val-test rejection. Geometry/order/train_corruption keys и
+  original-test seed100494 helpers unchanged. Training requests only train/val.
+- Current default914PASS/0FAIL/19opt-in SKIP; separately6actual PASS/0SKIP:
+  3new policy CPU/CUDA +1old train-only reference replay +2frozen grid. Other13
+  opt-ins not repeated, retain old dates. Actual17train IDs0..11,13..17,
+  seeds42/123/2026 epochs0/1;102conditions, spawn0/2 batch7/5seed42 PASS.
+- CORR-003 strict CURRENT source verify intentionally exits1/mismatch after
+  src/corruptions.py edits. Do not regenerate frozen artifacts or weaken checks.
+  Bounded scripts.verify_frozen_corr003 authenticates4implementation blobs at
+  recorded21ede652d2d1638ec69e4637f4707bcebf3c8224 via git show in ignored tmp,
+  then invokes original read-only verifier. No branch/worktree/data copy.
+- Evidence report/robust001_evidence.json23235bytes SHA256
+  f306f13c5b560f6ba870c4b094200945ca56049979761fa47855ab92fffaa6c4.
+  Production src/corruptions.py UTF8/LF SHA256
+  8112b736a6a2853c350fce3e77e8f35b7bffd4d03e14daf6bf97d322cf4b6e50.
+  Other frozen hashes/source-region IDs are in existing evidence; verify them.
 
-ROBUST-001 INDEPENDENT TECHNICAL SCOPE
+MODEL-001 BOUNDED TECHNICAL SCOPE
 
-1. Inspect existing planned constructor/API and config checks. Implement one
-   per-image event: identity.50, noise.17, blur.17, brightness.16; intervals
-   [0,.50),[.50,.67),[.67,.84),[.84,1). Corrupted severities uniform1..3 only,
-   identity0. No compositions, batch quotas, severity4/5 or per-run tuning.
-2. Caller owns explicit local generator/key; no global RNG fallback or seed
-   invention. Define/document exact event/severity/noise draw ordering before
-   actual checks. Use existing dispatcher. Validate args before RNG consumption;
-   reject invalid probabilities/severity/pixels/generator clearly. Keep geometry
-   and sample-order streams isolated. Metadata event/severity supports audit only.
-3. Meaningful offline tests: deterministic interval endpoints and exact oracles,
-   100000 keyed selections with frequency error<.01 and conditional severity
-   frequency error<.02; global RNG isolation, invalid/no-mutation/device/dtype/
-   range/new storage, same key replay and different keys, explicit injection gate,
-   paired geometry/order/batch/worker equality across epochs. Numeric fixtures must
-   detect wrong event, probability, range, or Normalize order; do not mirror code.
-4. Actual opt-in integration on bounded pre-fixed persisted train IDs, run seeds/
-   epochs declared before outputs. Read-only verified raw/split/stats; only
-   partitions=('train','val') as needed, no official-test decoding. Check actual
-   production policy through existing dataset/loaders, independent corruption and
-   normalization oracles, labels/IDs, batch/worker0/2 spawn invariance. Missing/
-   corrupt actual inputs FAIL, no skip. Actual whole-pipeline training not needed.
-   Recheck existing CORR reference identities and source-region hashes. Preserve
-   historical CORR-003 verification via explicit recorded-source replay.
-5. Compact actual evidence, relevant docs/status/ai_usage and bounded next prompt.
-   Technical PASS separate from full DoD. General REPRO-001, PROTO-001/team freeze/
-   course/source-policy approvals, CORR-003 Person5/team visual review, independent
-   human review and second-machine reproduction remain open. Do not claim training
-   readiness or full DATA-003 dependent acceptance solely from agent checks.
+1. Inspect protocol/model spec and config checks. Implement src/models.py
+   CompactCNN(num_classes=10,dropout=.2), forward N×3×32×32→N×10 raw logits,
+   initialize_weights (or documented internal init), architecture ID compact_cnn_v1.
+   No softmax before CrossEntropyLoss; no dataset/policy/trainer imports.
+2. Exact architecture: 2×Conv3x3+BN+ReLU at32channels→MaxPool2;
+   2×Conv+BN+ReLU at64→MaxPool2; 2×Conv+BN+ReLU at128→MaxPool2;
+   AdaptiveAvgPool2d(1)→flatten→Dropout.2→Linear128→10 biasTrue.
+   Conv stride1,padding1,biasFalse; BN eps1e-5,momentum.1,affineTrue;
+   total288746 trainable params. Stage shapes32→16→8→4; do not change capacity.
+3. Init: Conv Kaiming normal fan_out/relu, BN weight1/bias0, Linear normal std.01/
+   bias0. Define/document init timing and caller-owned model RNG before checks;
+   no hidden reseeding, seed_everything framework or test-data decisions.
+4. Meaningful independent synthetic TEST-M01..03: literal layer/parameter/shape
+   oracles for batches1/4/128, raw logits, finite CE/backward/gradients (no optimizer
+   steps), BN buffers and dropout train/eval behavior, deterministic eval,
+   repeated caller seed gives equal full initial states including buffers;
+   differing keys and paired clean/robust constructor inputs. Strict state_dict
+   round trip and incompatible classes/architecture errors as scoped model QA,
+   no new general checkpoint/trainer framework. Avoid flaky distribution assertions.
+5. CPU reference required; CUDA only explicit actual opt-in, fail if opted in and
+   unavailable; no CPU/CUDA bitwise claim. No model quality/accuracy promises.
+6. Compact evidence/relevant docs/status/ai_usage/next bounded prompt. Technical
+   PASS separate from full DoD, human understanding/review and formal approvals.
+   Preserve ROBUST-001 full acceptance limitation: model init/budget/full scientific
+   gate were not established by policy checks and must not be backdated.
 
-НЕБОЛЬШИЕ ЗАВЕРШЁННЫЕ БЛОКИ И ПУБЛИКАЦИЯ
+SMALL FINISHED BLOCKS И PUBLICATION
 
-Работай самостоятельно до проверяемого технического результата ROBUST-001.
-До editing кратко объяви текущий scope и ближайший небольшой блок. Не накапливай
-всю реализацию и tests до одного финального commit. Ориентир для блоков:
+Перед edits объяви current scope/ближайший блок. Ориентир: architecture/shape/
+parameter tests together; initialization/modes/state tests with implementation;
+actual CPU/optional CUDA evidence; final docs/status/ai_usage/handoff. Adapt size
+to code, no artificial cosmetic commits/stubs/known failing tests. Implementation
+и связанные tests всегда вместе. Не накапливай всё до финального commit.
 
-1. Bounded read-only replay frozen CORR-003 на source revision21ede65 и связанные
-   regression tests. Подготовь это ДО изменения production source fingerprints;
-   current-source mismatch должен остаться проверяемой ожидаемой ошибкой.
-   Сохрани artifacts/manifest/evidence; не ослабляй validation ради PASS.
-2. CorruptionPolicy: event/severity/draw semantics, explicit generator, metadata,
-   validation и связанные numeric/frequency/RNG tests в одном рабочем commit.
-3. Integration через existing explicit train-only hook: pairing/Normalize order,
-   batching/epochs/spawn invariance и связанные tests. Production edits только
-   при необходимости; не создавай косметический commit, если hook уже достаточен.
-4. Actual opt-in integration, независимые numeric checks, compact actual evidence
-   и связанные tests; сохранность предыдущих artifacts и честные PASS/FAIL/SKIP.
-5. Итоговые docs/status/report/ai_usage и следующий bounded prompt, с явным
-   разделением technical PASS и full DoD, human review и formal approvals.
-
-Адаптируй размер к current code: большой блок раздели на меньшие законченные
-рабочие части. Implementation и непосредственно связанные tests коммить вместе.
-Не делай commits с заглушками, известными failing tests или искусственным
-косметическим дроблением. Не переходи к editing следующего блока до успешной
-публикации текущего; промежуточный commit не завершает весь этап.
-
-После КАЖДОГО завершённого блока:
-
-- останови editing и проверь полный diff и relevant tests;
-- выполни git diff --check;
-- stage только явные task paths, без git add . / -A и без посторонних изменений;
-- проверь точный git diff --cached --name-only и полный git diff --cached;
-- выполни git diff --check и git diff --cached --check;
-- убедись, что current branch ровно main, и сделай отдельный рабочий commit;
-- СРАЗУ выполни обычный git push origin main;
-- проверь успешный push, main=origin/main и чистые worktree/staged list;
-- сообщи checks, commit hash и результат push, затем продолжи следующий блок.
-
-Разрешение на commits/push действует на весь этап: не запрашивай его повторно.
-При failed push сначала разберись с причиной и прочитай remote history, до новых
-edits. Safe fast-forward допустим; divergence/conflicts не затирай и не merge
-автоматически. Без force, amend/reset и history rewrite.
+После каждого блока STOP editing: inspect full diff/relevant tests; git diff
+--check; stage only explicit task paths (no git add . / -A); inspect exact staged
+list and full staged diff; both git diff --check and git diff --cached --check;
+assert branch exactly main; separate commit; IMMEDIATE ordinary push origin main;
+verify successful push, clean worktree/empty staged list/main=origin/main; report
+checks/hash/push. Only then edit next block. No force/amend/reset/automatic merge.
 
 Never commit raw/archives/env/caches/credentials/absolute machine paths/diagnostic
-partials. End with fresh fetch, clean status, empty staged list, exact
-main=origin/main; Russian PASS/FAIL/SKIP, actual artifacts/evidence/hashes, each
-commit/push, open gates/limits and next concrete task.
+partials. End with fresh fetch, clean status, empty staged list, exact main=
+origin/main; Russian PASS/FAIL/SKIP, actual evidence/hashes, each commit/push,
+open limits and next concrete task. Human review/formal approvals remain human.
 ~~~

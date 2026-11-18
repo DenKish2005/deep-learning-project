@@ -1,6 +1,34 @@
 # План тестирования и QA
 
-## CORR-003 current acceptance — 18.11.2026
+## ROBUST-001 current acceptance — 18.11.2026
+
+Default **914PASS/0FAIL/19opt-in SKIP**; separately **6actual PASS/0FAIL/0SKIP**.
+Added99offline cases:3frozen-source +84policy +12integration;3new actual opt-ins.
+TEST-C07:100000keyed selections, event counts49914/16835/17223/16028, errors.00223
+event/.00539976 conditional severity below.01/.02. Dispatcher replaced with clone
+only in sampling audit; full dispatcher numerics/RNG independently tested.
+
+Literal nextafter endpoints.50/.67/.84, all severities1..3, exact draw order and
+generator-state oracles, metadata, immutable config settings, invalid inputs before
+draws, new storage/no mutation, range/device/dtype, global RNG and keyed replay.
+TEST-C08 and input subset of S01: independent NumPy geometry/2D blur/direct noise/
+factor/Normalize oracles, paired order/labels/IDs, explicit injection gate and
+val/test rejection, epochs0/1, batch7/5 and actual spawn0/2. Actual17persisted train
+IDs,3seeds×2epochs=102conditions;17clean val samples; no test decode. CUDA policy
+same-device numeric/replay/wrong-generator checks PASS; no CPU/CUDA equality claim.
+
+Old train-only references544conditions replay PASS; frozen CORR-003160cells and
+480PNG RGB samples PASS under pinned21ede65 source. Current-source mismatch tested
+as expected error; no weakened hashes/artifact regeneration. All28protected files
+preserved. Other13historical actual opt-ins not rerun. Missing/corrupt negative
+controls produce DataIntegrityError/exit1/0SKIP. Initial concurrent memory failures
+and successful sequential reruns disclosed in [evidence](../report/robust001_evidence.json).
+
+No full TEST-S01/model init/optimizer budget, training readiness, human/Person5
+visual review, formal approvals, general REPRO-001 or independent reproduction
+closure. Technical PASS/full DoD PARTIAL.
+
+## Historical CORR-003 acceptance — 18.11.2026
 
 Default **815PASS/0FAIL/16opt-in SKIP**, separate grid actual **2PASS/0FAIL/0SKIP**.
 Added38offline cases (16selection/pixels/source +22render/CLI) and2actual opt-in.

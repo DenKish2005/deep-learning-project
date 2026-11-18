@@ -1,5 +1,48 @@
 # AI assistance record
 
+## ROBUST-001 — 18.11.2026
+
+По прямому запросу пользователя Codex проверил fresh main/origin/history/docs,
+prerequisites и existing .venv. Initial main de20097 clean/synced; baseline
+815PASS/16SKIP; pip/raw/split/stats/grid/config checks PASS. Historical Graphify
+прочитан как stale navigation snapshot, без rebuild. Technical preparation
+разрешена; formal prerequisites и course permission не объявлены закрытыми.
+
+Агент сначала сохранил bounded authenticated CORR-003 source replay at21ede65,
+затем реализовал CorruptionPolicy с immutable frozen settings и explicit generator.
+Draw order определён до actual outputs: float64 event, int64 severity только для
+corruption, float32 Gaussian tensor только для noise. src/data.py existing hook,
+src/utils.py/stable_seed/geometry/order/test streams и прежние8corruption functions
+не изменены. Добавлены99offline и3actual opt-in cases; CORR-003 tests сохраняют
+строгий current-source mismatch и recorded-source verification, artifacts unchanged.
+
+Actual IDs0..11,13..17, seeds42/123/2026, epochs0/1 объявлены до outputs. Numeric
+102conditions, clean val17, production make_loaders, spawn0/2 batch7/5 наseed42,
+CUDA RTX3060Laptop PASS. No test decoding в actual policy/grid/reference checks;
+official test только в required raw integrity CLI. Frequency audit100000selections
+использует production selector с dispatcher clone вместо дорогих pixels; реальные
+pixels/RNG отдельно проверены независимыми NumPy2D/direct noise/factor oracles.
+
+Default914PASS/0FAIL/19SKIP; отдельно6actual PASS/0FAIL/0SKIP. Other13historical
+opt-ins not rerun. Initial concurrent reference attempt failed NumPy MemoryError;
+first actual spawn check stopped after WinError1455. Failed logs preserved ignored;
+unchanged sequential reruns passed. Missing/corrupt negative controls expected
+DataIntegrityError/exit1/0SKIP. All28protected files bytes/hashes/mtimes preserved.
+[Evidence](robust001_evidence.json), [commands/hashes](reproduction.md).
+
+Published ef78e05 frozen replay,0c3d3ca policy/tests,d4d56b0 integration tests,
+01bcfb7 actual/evidence; each full diff/tests, explicit staged paths/list/full diff,
+оба diff checks, commit exact main и immediate ordinary push origin main PASS.
+Final docs/handoff отдельным блоком; no branches/worktrees/history rewrite.
+
+Все implementation/tests/reviews — агентские. Independent human understanding/
+code/artifact review, CORR-003 Person5/team visual review, course AI-policy conflict,
+LMS/proposal/source approvals, team/protocol freeze, general REPRO-001 и independent
+second-machine reproduction **PENDING**. ROBUST-001 technical PASS/full DoD PARTIAL;
+DATA-003 integration technically verified, formal dependent acceptance not replaced.
+No training/model/evaluator/metrics/EDA/core runs, no test tuning or training
+readiness/full scientific init/budget claim. Next candidate MODEL-001 after review.
+
 ## CORR-003 — 18.11.2026
 
 По прямому запросу пользователя Codex проверил current main/origin/history/docs,

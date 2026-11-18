@@ -1,14 +1,15 @@
 # С чего начать
 
-Обновление18.11.2026 CORR-003: actual train-only10x16 PNG/PDF/source manifest и
-agent visual audit — independent technical PASS/full DoD PARTIAL.
-Default815PASS/16opt-in SKIP; отдельно2actual grid PASS/0SKIP. Existing14actual
-DATA/corruption/CUDA cases not rerun. Person5/team visual review PENDING.
-[Evidence](../report/corr003_evidence.json), [commands](../report/reproduction.md).
-Следующий bounded technical candidate — [ROBUST-001 после prerequisite review](NEXT_STEP_PROMPT.md).
-ROBUST-001/full DATA-003 integration, general REPRO-001, PROTO-001/team freeze,
-source-policy approvals, independent human review/reproduction pending. Модели
-не обучены; scientific results отсутствуют.
+Обновление18.11.2026 ROBUST-001: production policy/train-only integration —
+independent technical PASS/full DoD PARTIAL. Default914PASS/19opt-in SKIP;
+отдельно6actual PASS/0SKIP. Other13historical opt-ins not repeated. Heavy checks
+sequential; initial memory-related failures and successful reruns disclosed.
+[Evidence](../report/robust001_evidence.json), [commands](REPRODUCIBILITY.md).
+Frozen CORR-003 replay at21ede65 PASS; current-source mismatch expected.
+Следующий bounded candidate — [MODEL-001 после prerequisite review](NEXT_STEP_PROMPT.md).
+Human/Person5 visual review, formal dependent acceptance, general REPRO-001,
+PROTO-001/team/course/source-policy approvals и independent reproduction pending.
+Training не запускался; scientific results и training readiness не заявляются.
 
 Сначала прочитайте [MASTER_PROJECT_PLAN.md](MASTER_PROJECT_PLAN.md), затем [CURRENT_STATUS.md](CURRENT_STATUS.md). Перед кодом — [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md); перед своим PR — [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md) и карточку задачи в [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md).
 
@@ -17,8 +18,8 @@ source-policy approvals, independent human review/reproduction pending. Моде
 Это reference очередь implementation phase. SETUP-001/PROTO-001/TEAM-001 частично
 закрыты; у SETUP-002/003 local technical acceptance PASS, formal human review
 pending. DATA-001/002 остаются PARTIAL до independent human review. DATA-003 independent
-technical scope выполнен; dependent robust acceptance pending. Следующая реализация
-— ROBUST-001 после сверки current prerequisites и pending gates. Независимая
+technical scope и ROBUST-001 integration проверены; formal dependent acceptance
+pending. Следующий candidate — MODEL-001 после сверки prerequisites/gates. Независимая
 техническая подготовка не ждёт missing source/team information; full training
 начинается только после policy/protocol и smoke/scientific gates.
 
@@ -38,7 +39,7 @@ technical scope выполнен; dependent robust acceptance pending. След�
 |12 CORR-002 | Reflect Gaussian blur и darkening; src/corruptions.py и tests |2 | Kernels3/7/9/11/13, exact factors, input unchanged |
 |13 DATA-003 | Train-only stats, typed loaders, keyed crop/flip/order; src/data.py, data/splits/normalization.json |2 | Paired geometry/order equal, val/test deterministic |
 |14 TRAIN-001 | Shared training/validation; src/train.py, tests/test_training.py |3 | Tiny2 epoch integration, weighted metrics, no test access |
-|15 ROBUST-001 | Per-image policy с отдельным RNG; src/corruptions.py, src/data.py, tests/test_protocol.py |4+2 | Frequencies/severity1..3 correct, global RNG unchanged |
+|15 ROBUST-001 | Production policy через existing train-only hook; src/corruptions.py, tests/test_policy*.py |4+2 | Technical PASS: frequencies/severity/RNG/pairing; formal acceptance/human review pending |
 
 Следом: TRAIN-002 checkpoint/resume → TRAIN-003 overfit/pilot; TRAIN-004 orchestrator и EVAL-001/PLOT-001 → TEST-001/002 smoke/scientific gate → core training. Не выбирать probabilities, epochs или checkpoint по test accuracy.
 

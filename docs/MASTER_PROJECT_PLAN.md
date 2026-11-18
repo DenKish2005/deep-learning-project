@@ -1,6 +1,17 @@
 # MASTER PROJECT PLAN — CSCI 494 Robustness to Noise
 
-Обновление CORR-00318.11.2026: independent technical PASS/full DoD PARTIAL.
+Обновление ROBUST-00118.11.2026: independent technical PASS/full DoD PARTIAL.
+Production policy и existing explicit train-only integration verified;
+914default PASS/19opt-in SKIP, отдельно6actual PASS/0SKIP. No training/EDA.
+[Evidence](../report/robust001_evidence.json), [current status](CURRENT_STATUS.md).
+Frozen artifacts/source regions unchanged; CORR-003 replay at recorded21ede65
+PASS, strict current-source mismatch expected. Heavy checks run sequentially.
+Independent human/Person5 visual review, formal course/source/team/protocol gates,
+full dependent acceptance, general REPRO-001 и second-machine reproduction open.
+Следующий bounded candidate — [MODEL-001 после prerequisite review](NEXT_STEP_PROMPT.md).
+Ниже — датированные historical snapshots, не текущее состояние.
+
+Историческое обновление CORR-00318.11.2026: independent technical PASS/full DoD PARTIAL.
 Actual train-only10x16 PNG/PDF/source manifest и agent visual audit опубликованы;
 815default PASS/16opt-in SKIP, отдельно2actual grid PASS/0SKIP.
 [Evidence](../report/corr003_evidence.json), [status](CURRENT_STATUS.md).

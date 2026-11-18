@@ -1,6 +1,48 @@
 # CURRENT PROJECT STATUS
 
-## CORR-003 — 18.11.2026
+## ROBUST-001 — 18.11.2026
+
+Independent technical scope **PASS**; full DoD **PARTIAL**. Production
+CorruptionPolicy and existing explicit train-only integration verified; src/data.py
+and src/utils.py unchanged. Frozen probabilities.50/.17/.17/.16, one event/image,
+uniform corrupted severity1..3, identity0; explicit caller-owned keyed generator.
+No training/models/evaluation/EDA/core runs or test-based tuning.
+
+Default **914PASS/0FAIL/19opt-in SKIP**; separately **6actual PASS/0FAIL/0SKIP**:
+3new policy CPU/CUDA cases,1old train-only reference replay,2grid regressions.
+Other13historical opt-ins not repeated (8DATA,3CIFAR corruption,2old CUDA).
+Fresh pip/raw/split/stats/config CLI checks PASS. Heavy checks run sequentially;
+first parallel reference attempt failed MemoryError and first actual spawn attempt
+was stopped after WinError1455. Both unchanged sequential reruns passed; failures
+are retained in [evidence](../report/robust001_evidence.json).
+
+100000keyed selections:49914/16835/17223/16028; max frequency error.00223,
+conditional severity error.00539976. Actual17fixed persisted train IDs,3seeds,
+epochs0/1:102conditions, correct labels/IDs and clean val17samples. NumPy2D/direct
+noise/factor oracles: max pixel1.7881393432617188e-7, normalized7.748603820800781e-7.
+Actual spawn0/2 batch7/5 equality and global RNG isolation PASS; CUDA RTX3060Laptop
+same-device replay PASS, max oracle1.1920928955078125e-7. No CPU/CUDA equality claim.
+
+All28protected files bytes/hashes/mtimes and frozen DATA-002/003 regions preserved.
+Old CORR references independently replayed; frozen CORR-003 current-source mismatch
+remains an expected error. Authenticated read-only source replay at21ede65 PASS;
+PNG/PDF/manifest/evidence unchanged. [Reproduction](../report/reproduction.md).
+
+| Task | Full DoD | Remaining |
+|---|---|---|
+| ROBUST-001 | PARTIAL; independent technical PASS | Independent human code/artifact review and formal prerequisite approvals |
+| DATA-003 | PARTIAL; production robust integration technically verified | Human review/formal dependent acceptance |
+| CORR-001/002/003 | PARTIAL; technical PASS | Human review; Person5/team visual review; protocol/course/team approvals |
+| REPRO-001 / second-machine reproduction | Open | General identity/checkpoints/resume/backup; independent reproduction |
+
+Published main blocks:ef78e05 frozen replay,0c3d3ca policy/tests,d4d56b0 integration
+tests,01bcfb7 actual/evidence; each immediately ordinary push origin main PASS.
+Final docs/handoff published separately. Next bounded candidate:
+[MODEL-001 after prerequisite review](NEXT_STEP_PROMPT.md). PROTO-001/team freeze,
+course/source-policy/LMS/proposal approvals remain pending. Training readiness and
+full scientific TEST-S01/init/budget controls are not established by policy checks.
+
+## Historical CORR-003 — 18.11.2026
 
 Independent technical scope **PASS**; full DoD **PARTIAL**. Actual train-only grid:
 10 classes x16 conditions, minimum original IDs29/4/6/9/3/27/0/7/8/1 among persisted

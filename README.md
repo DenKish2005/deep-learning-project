@@ -15,21 +15,49 @@ typed loaders. CORR-001 adds exact three-family severity mapping, explicit-gener
 Gaussian noise and reusable original-test keyed CPU epsilon. CORR-002 adds reflect
 Gaussian blur, progressive darkening and `apply_corruption`. CORR-003 adds the
 train-only 10x16 corruption grid, PNG/PDF, source manifest and agent visual audit.
-Policy, CNN, training, evaluation and metrics plots remain future work.
+ROBUST-001 adds production CorruptionPolicy through the existing explicit
+train-only hook. CNN, training, evaluation and metrics plots remain future work.
 No training has run.
 Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
 RGB32×32, all archive/file checksums and class counts pass. Current checks:
-815 offline tests pass (16 opt-in tests skipped); separately 2 actual grid checks
-pass with no skips. The previous 14 actual DATA/corruption/CUDA cases were not
-rerun in CORR-003; earlier evidence retains its dates. Raw/split/stats verification
-CLIs were freshly run on 18.11.2026. CORR-003 technical PASS, full DoD PARTIAL:
-independent Person 5/team visual review and formal approvals remain pending.
+914 offline tests pass (19 opt-in tests skipped); separately 6 actual checks pass
+with no skips: policy CPU/CUDA3, CORR references1, frozen grid2. Other13 historical
+opt-ins were not rerun; earlier evidence retains its dates. Raw/split/stats and
+config CLIs passed18.11.2026. ROBUST-001 technical PASS, full DoD PARTIAL;
+human review, Person5/team visual review and formal approvals remain pending.
+
+## Working train-only policy (ROBUST-001)
+
+`CorruptionPolicy(probabilities, max_train_severity=3)` accepts the frozen robust
+probabilities `[.50,.17,.17,.16]` only. One event/image: identity, noise, blur or
+brightness; corrupted severity uniform1..3, identity0. Caller supplies an explicit
+same-device torch.Generator. Draw order: float64 scalar event uniform; corrupted
+events only, int64 severity; noise only, float32 image-shaped Gaussian draw.
+Validation precedes draws; possible reflect blur requires H,W>4. New storage,
+no mutation/global RNG, metadata `event`/`severity`. Normalize afterward.
+
+```python
+from pathlib import Path
+from src.corruptions import CorruptionPolicy
+from src.data import make_loaders
+from src.utils import load_config
+
+cfg = load_config(Path('configs/robust_cnn.yaml'))
+policy = CorruptionPolicy(cfg['augmentation']['probabilities'])
+loaders = make_loaders(cfg, 42, 0, policy=policy, partitions=('train', 'val'))
+# Call loaders['train'].dataset.set_epoch(epoch) before each new iterator.
+```
+
+No implicit policy is created by make_loaders; clean config requires None.
+Numeric/frequency/RNG/pairing/spawn checks and actual limits:
+[evidence](report/robust001_evidence.json), [commands](docs/REPRODUCIBILITY.md).
+Run heavy checks sequentially: overlapping processes caused MemoryError/WinError1455;
+unchanged sequential reruns passed. This does not establish training readiness.
 
 ## Working train-only corruption audit (CORR-003)
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.make_plots --corruption-grid
-.\.venv\Scripts\python.exe -m scripts.make_plots --corruption-grid --verify-only
+.\.venv\Scripts\python.exe -m scripts.verify_frozen_corr003
 $env:RUN_CORR_GRID='1'
 .\.venv\Scripts\python.exe -m pytest tests/test_corruption_grid_local.py -q -s --basetemp=.venv/pytest-corr003-actual
 Remove-Item Env:RUN_CORR_GRID
@@ -49,6 +77,10 @@ Use a new empty output directory for a separately documented render. A publicati
 failure may leave a partial set; preserve it. Implementation fingerprints make
 later source changes an intentional verification mismatch; do not rewrite this
 frozen audit to conceal it. Full commands/limits: [reproduction](report/reproduction.md).
+After ROBUST-001, current-source grid verification intentionally exits1 with an
+implementation mismatch. The bounded frozen verifier authenticates source blobs
+at21ede65 in ignored tmp and verifies the unchanged exports read-only. No branch,
+worktree, artifact rewrite or relaxed source check is involved.
 
 ## Working installation and checks
 
@@ -197,7 +229,8 @@ int64 labels/IDs, drop_last=False. Train uses keyed pad/crop/flip, optional inje
 pixel-space policy, then Normalize; val/test are sequential and deterministic.
 Call `loader.dataset.set_epoch(epoch)` before iterator creation. Future training
 must request `partitions=('train','val')` to avoid decoding test. Augmentation-enabled
-config requires an explicit policy; full robust policy/integration and training readiness are pending.
+config requires an explicit policy; ROBUST-001 production integration is technically
+verified, while full DoD/formal review and training readiness remain separate gates.
 Workers0 reference and Windows spawn2 equality passed on synthetic fixtures and129
 actual train IDs across epochs/batch sizes. Full coverage45k/5k/10k and label
 alignment passed. [Contracts](docs/TECHNICAL_ARCHITECTURE.md),
@@ -225,7 +258,7 @@ epsilon = keyed_test_epsilon(71, namespace=namespace)  # CPU float32 [3,32,32]
 The full original-test namespace and Python ID0..9999 are required. The seed uses
 existing `stable_seed(100494,'cifar10-test',id,'gaussian_noise','v1')`; severity and
 model/run seed are absent. This is a primitive boundary; CorruptedDataset,
-evaluator and robust policy remain future tasks. CPU bitwise references cover
+evaluator remain future tasks. CPU bitwise references cover
 only the locked local environment. CUDA primitive PASS does not imply CPU/CUDA
 equality; canonical test epsilon stays CPU.
 
@@ -276,7 +309,8 @@ CPU and CUDA NumPy-oracle blur error max1.78814e-7. Fixed probe callables do not
 implement the production training policy. [Evidence](report/corr002_evidence.json),
 [actual reference](report/corr002_reference.npz), [commands](report/reproduction.md).
 Full CORR-002 DoD PARTIAL pending formal approvals and independent human review;
-CORR-003 independent human visual review, ROBUST-001 and general REPRO-001 remain open.
+CORR-003 independent human visual review, formal ROBUST-001 acceptance and general
+REPRO-001 remain open.
 
 ## Project documents and next work
 
@@ -286,9 +320,9 @@ Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
 CSR and proposal candidates; submitted version, current rubric/LMS confirmation,
 AI-policy conflict and team approvals remain pending.
 
-Next bounded technical candidate: ROBUST-001 after current prerequisite review;
+Next bounded technical candidate: MODEL-001 after current prerequisite review;
 [next-step prompt](docs/NEXT_STEP_PROMPT.md). Independent DATA-003 technical scope
-PASS; full DoD PARTIAL until ROBUST-001 integration/formal gates and independent human
+and ROBUST-001 integration PASS; full DoD PARTIAL pending formal gates and independent human
 review. Full DATA-001/002 DoD also remains PARTIAL; agent checks do not replace review.
 All commits and ordinary pushes use `main`, per the user's current instruction.
 Commands in the future-pipeline section of [REPRODUCIBILITY](docs/REPRODUCIBILITY.md)

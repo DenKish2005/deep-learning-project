@@ -1,4 +1,96 @@
-# Verification record — foundation, DATA-001..003 and CORR-001/002/003
+# Verification record — foundation, DATA, CORR and ROBUST-001
+
+## ROBUST-001 independent technical acceptance — 18.11.2026
+
+**PASS independent technical scope; PARTIAL full DoD.** Codex agent checks by
+direct user instruction, current docs/prerequisites/source reviewed. Initial fresh
+fetch: clean exact main=origin/main de20097. No applicable AGENTS.md. Historical
+Graphify not rebuilt. Existing .venv Python3.12.10/torch2.9.0+cu126/NumPy2.5.4,
+no reinstall/update/global/backend/protocol/config changes. No training/EDA.
+
+Implemented immutable `CorruptionPolicy(probabilities,max_train_severity=3)` using
+existing dispatcher and existing explicit train-only hook. Only frozen robust
+probabilities.50/.17/.17/.16/max3 accepted. Metadata event/severity, identity0,
+corruption severity1..3. Caller owns existing train_corruption stream; no global
+RNG fallback, seed invention, composition or batch quota. All validation before
+draws, including H,W>4 for any possible training blur. Draw order declared before
+actual checks: same-device scalar float64 uniform event at.50/.67/.84; corrupted
+events only scalar int64 randint(1,4); noise only float32 randn(x.shape). Normalize
+after policy. Old8corruption function ASTs, all data.py/utils.py unchanged.
+
+| Check | Actual result |
+|---|---|
+| Baseline default suite |815PASS/0FAIL/16SKIP,223.85s console |
+| Block1 frozen-source/render regressions |41PASS,99.851s JUnit; actual grid2PASS before policy edits |
+| Block2 policy |84PASS,31.996s; initial policy+dispatch+keyed282PASS |
+| Block3 production integration + loaders |32PASS,48.536s |
+| Final default suite |914PASS/0FAIL/19SKIP,279.989s JUnit (console280.06s) |
+| New actual policy CPU/CUDA |3PASS/0FAIL/0SKIP,70.839s |
+| Old train-only CORR reference replay |1PASS/0FAIL/0SKIP,14.683s;544conditions |
+| Final actual CORR-003 grid |2PASS/0FAIL/0SKIP,37.674s |
+| Fresh pip/raw/split/stats/config CLIs |PASS; raw integrity CLI alone decodes official test |
+| Strict current-source grid CLI |Expected exit1/source implementation mismatch |
+| Authenticated frozen grid verifier at21ede65 |PASS; actual160cells/480PNG RGB samples preserved |
+| Missing/corrupt opted-in raw inputs |Expected exit1/DataIntegrityError,1setup error each,0SKIP; no repair/download;128byte diagnostic preserved |
+| Preservation |28files bytes/hashes/mtimes, both frozen source regions, configs/lock/protocol/references/grid unchanged |
+
+The first reference check overlapped default and actual processes and failed
+NumPy MemoryError during normalization verification. The first actual attempt
+passed numeric observations but a spawn child failed WinError1455 loading torch;
+the own stalled check processes were stopped. Failed diagnostic logs remain in
+ignored tmp/robust001. Same checks then passed sequentially without source/data/
+backend changes. Run the [reproduction commands](../docs/REPRODUCIBILITY.md)
+sequentially. These failures are disclosed, not counted as successful attempts.
+
+### Actual scope, oracles and identities
+
+Predeclared persisted train IDs0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17;
+seeds42/123/2026, epochs0/1. 102image-conditions: identity53/noise16/blur22/
+brightness11. Verified raw/split/stats through actual make_loaders, only
+partitions=('train','val');17bounded clean val samples. Independent NumPy integer
+geometry, float64 NumPy2D reflect blur, direct explicit-generator noise/factors,
+then Normalize. Max pixel error1.7881393432617188e-7, normalized7.748603820800781e-7.
+Exact labels/IDs, production metadata, per-key replay; spawn0/2 batch7/5, epoch
+order changes and global RNG isolation PASS on seed42. Actual CUDA0 RTX3060Laptop,
+32fixed seeds, all4events: max oracle1.1920928955078125e-7, same-device replay/
+wrong-generator rejection/no mutation/global CPU+CUDA RNG PASS. No cross-device
+or cross-platform bitwise claim. No model init/optimizer/budget/checkpoint gate.
+
+100000synthetic keyed selections:49914/16835/17223/16028. Max event error.00223
+<.01, conditional severity.005399756<.02. Only dispatcher pixels are replaced
+with clone for that sampling test; real numeric/draw-state/isolation tests are
+separate. No policy/severity tuning against final test. Other13historical actual
+opt-ins (8DATA,3CIFAR corruption,2old CUDA) not repeated; preserve prior dates.
+
+| Identity | SHA-256 |
+|---|---|
+| [Evidence](robust001_evidence.json),23235bytes |f306f13c5b560f6ba870c4b094200945ca56049979761fa47855ab92fffaa6c4 |
+| Production src/corruptions.py UTF-8/LF |8112b736a6a2853c350fce3e77e8f35b7bffd4d03e14daf6bf97d322cf4b6e50 |
+| Actual normalized ID-order stream seed42 epoch0 |cf53b5ede2eb21d311939721f85d41dd7d86c46906adc03612330c975ea4acde |
+| Actual normalized ID-order stream seed42 epoch1 |91f440d6b323e20add9667cff824475d98d1a7ae8d68c147574f78694282a0f7 |
+
+Remaining4streams, ordered spawn streams, metadata hashes and all25scientific
+protected file identities are in evidence. Raw diagnostic/markers also checked
+for preservation but not versioned. Existing CORR NPZ identities independently
+replayed; grid PNG/PDF/source/evidence bytes/mtimes unchanged. Strict source hashes
+remain unchanged in the old manifest: current source intentionally mismatches only
+src/corruptions.py. `scripts.verify_frozen_corr003` authenticates4recorded blobs
+against that fixed manifest at21ede652d2d1638ec69e4637f4707bcebf3c8224 in ignored
+tmp and invokes original read-only export verification. No branch/worktree, hash
+relaxation or artifact regeneration; no general provenance framework added.
+
+Published checked blocks ef78e05 frozen replay,0c3d3ca policy/tests,d4d56b0
+integration tests,01bcfb7 actual/evidence. Each reviewed full diff/relevant tests,
+explicit staged paths/exact list/full diff, both diff --check, exact main commit,
+immediate ordinary push origin main PASS and clean0ahead/behind. Final docs/handoff
+published separately; final hash/fresh-fetch clean sync recorded in Git/chat.
+
+Independent human understanding/code/artifact review, CORR-003 Person5/team visual
+review, PROTO-001/team freeze, course/source-policy/LMS/proposal approvals remain
+open. Technical DATA-003 production integration verified; full dependent acceptance
+remains PARTIAL. General REPRO-001 and second-machine reproduction not closed.
+No models/training/evaluator/metrics/EDA/core runs/scientific results or training
+readiness claim. Next bounded technical candidate MODEL-001 after prerequisite review.
 
 ## CORR-003 independent technical acceptance — 18.11.2026
 

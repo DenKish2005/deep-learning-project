@@ -1,6 +1,16 @@
 # Подробный implementation roadmap
 
-Обновление CORR-00318.11.2026: independent technical PASS/full DoD PARTIAL.
+Обновление ROBUST-00118.11.2026: independent technical PASS/full DoD PARTIAL.
+Production policy/existing train-only hook verified;914default PASS/19opt-in SKIP,
+separate6actual PASS/0SKIP. [Evidence](../report/robust001_evidence.json).
+Technical DATA-003 robust integration verified; formal dependent acceptance,
+independent human/Person5 visual review, course/source/team/protocol gates remain
+open. General REPRO-001/second-machine reproduction pending. Frozen CORR-003
+replays at21ede65; strict current-source mismatch expected. No training/EDA.
+Next candidate MODEL-001 after prerequisite review; no dependency edge changes.
+Work/commit/push only existing exact main; historical branch fields do not apply.
+
+Историческое обновление CORR-00318.11.2026: independent technical PASS/full DoD PARTIAL.
 Actual train-only grid PNG/PDF/source manifest;815default PASS/16SKIP +2actual
 PASS/0SKIP; [evidence](../report/corr003_evidence.json). Agent visual audit PASS,
 independent Person5/team visual review PENDING. Next bounded candidate ROBUST-001
@@ -276,7 +286,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** DATA-003.
 - **2. Title:** Normalization и loaders.
 - **3. Purpose:** Правильный deterministic input.
-- **4. Current status:** PARTIAL — independent technical acceptance PASS: actual45k-only stats/provenance, keyed transforms/order, typed clean loaders, policy boundary и CLI;357offline PASS/8SKIP +8actual PASS/0SKIP (31.10.2026). CORR-001 technical PASS18.11.2026; formal prerequisite gates; CORR-002 primitive boundary verified18.11.2026, ROBUST-001 full robust integration/dependent acceptance и independent human review pending.
+- **4. Current status:** PARTIAL — independent technical acceptance PASS: actual45k-only stats/provenance, keyed transforms/order, typed loaders/CLI (31.10.2026); production ROBUST-001 integration technically verified18.11.2026. Formal prerequisite/dependent acceptance and independent human review pending; original8actual DATA cases retain31.10 dates.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 2 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** DATA-002; CORR-001.
@@ -621,22 +631,22 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** ROBUST-001.
 - **2. Title:** Per-image corruption-aware policy.
 - **3. Purpose:** Единственное experimental treatment.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — independent technical PASS18.11.2026: frozen production policy, explicit train-only integration,914default PASS/19opt-in SKIP +6actual PASS/0SKIP. Human review/formal prerequisite approvals pending; training/init/budget/scientific readiness not claimed.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 4 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** CORR-002; DATA-003; SETUP-003.
 - **8. Steps:** 1) policy.50/.17/.17/.16; 2) severity 1..3uniform; 3) separate keyed stream, train-only hook.
-- **9. Files:** src/corruptions.py; src/data.py; tests/test_corruptions.py; tests/test_protocol.py.
+- **9. Files:** src/corruptions.py; tests/test_policy.py; tests/test_policy_integration.py; tests/test_policy_local.py; tests/test_policy_cuda.py; scripts/verify_frozen_corr003.py; tests/test_frozen_corr003.py; tests/test_corruption_grid_local.py; report/robust001_evidence.json; .gitattributes; relevant docs/reproduction/ai_usage. Existing src/data.py hook unchanged.
 - **10. Functions/classes:** CorruptionPolicy; IndexedCIFAR10 policy hook.
 - **11. Inputs:** clean train pixels+key.
 - **12. Outputs:** robust training transform.
-- **13. Artifacts:** перечисленные outputs в указанных files/dirs + test/review evidence; paths/hash записать в task/PR.
+- **13. Artifacts:** report/robust001_evidence.json (23235bytes SHA-256f306f13c5b560f6ba870c4b094200945ca56049979761fa47855ab92fffaa6c4); frozen CORR references/grid and DATA regions preserved; reproduction record and human review pending.
 - **14. Testing:** TEST-C07; TEST-S01.
 - **15. Acceptance:** Frequency/seed isolation pass, geometry and init paired equal.
 - **16. DoD:** acceptance выполнен; тестовые результаты и artifacts проверены reviewer; status обновлён. Для OPTIONAL допустимо SKIPPED с причиной, без объявления PASS.
 - **17. Effort:** 4-5 person-hours, без full-training wait time.
 - **18. Risks/common mistakes:** Policy потребляет global RNG/меняет budget.
-- **19. Branch:** codex/robust-001.
+- **19. Branch:** main (current user instruction; no branches/worktrees).
 - **20. Commit/PR scope:** Per-image corruption-aware policy; только файлы пункта 9, включая relevant tests/docs; один logical PR, owner Person 4.
 
 ### ROBUST-002 — Robust seed 42 pilot и full run

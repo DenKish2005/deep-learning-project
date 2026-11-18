@@ -7,8 +7,9 @@ create_split/load_split, provenance/reuse/failure safety и split CLI. DATA-003
 реализует stats, keyed transforms/order, clean typed loaders и policy boundary;
 CORR-001 реализует severity mapping, Gaussian noise и keyed CPU epsilon.
 CORR-002 adds reflect blur, darkening and dispatch. CORR-003 implements only the
-train-only sanity grid, PNG/PDF/source manifest and bounded CLI. Independent
-Person5/team visual review and full ROBUST-001 integration remain pending. Остальные production APIs ниже
+train-only sanity grid, PNG/PDF/source manifest and bounded CLI.
+ROBUST-001 implements the production policy and verifies the existing explicit
+train-only integration. Human/Person5 visual review and formal acceptance remain pending. Остальные production APIs ниже
 ещё не реализованы. Состояние: [CURRENT_STATUS.md](CURRENT_STATUS.md), уточнения
 и причины: [SETUP_DECISIONS.md](SETUP_DECISIONS.md). Протокол —
 [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md). Новые frameworks не вводятся.
@@ -152,7 +153,7 @@ Actual train probe checks data→noise→Normalize with frozen artifacts; it is 
 test callable, not CorruptionPolicy. Actual CUDA primitive validation passed locally;
 keyed reference stays CPU and no CPU/CUDA bitwise equality is claimed.
 
-`CorruptionPolicy` remains ROBUST-001. CORR-002 primitives are implemented below.
+`CorruptionPolicy` is implemented in ROBUST-001 below. CORR-002 primitives follow.
 Production CorruptedDataset/evaluator, condition manifests and full robust
 acceptance are future tasks; CORR-003 visual grid is implemented below. Technical PASS/full DoD
 PARTIAL; [evidence](../report/corr001_evidence.json).
@@ -182,8 +183,37 @@ retain existing keyed_test_generator/CPU identity boundary.
 TEST-C01/C02/C05/C06/C08 numeric/contract acceptance PASS; separate actual17train
 IDs×16conditions×epochs0/1, spawn0/2 and actual CUDA tests PASS. Saved actual reference
 covers train0/1/2, clean0 and severity3 families. [Evidence](../report/corr002_evidence.json).
-CORR-003 technical audit is implemented below; ROBUST-001/full DATA-003 integration remains separate.
+CORR-003 technical audit and ROBUST-001 production integration are implemented;
+formal DATA-003 dependent acceptance remains separate.
 Full DoD PARTIAL pending formal/human review; general REPRO-001 remains TODO.
+
+#### ROBUST-001 operational policy (implemented 18.11.2026)
+
+`CorruptionPolicy(probabilities, max_train_severity=3)` copies a Python list/tuple
+to immutable settings. Only exact robust `[.50,.17,.17,.16]` and Python int3 are
+accepted, matching frozen config validation; arbitrary tuning/clean probabilities
+are rejected. Clean training injects None. No labels, model, batch quotas or
+compositions enter the policy.
+
+`policy(x, generator) -> (pixels, {'event': str, 'severity': int})` validates raw
+dense CPU/CUDA float32 RGB CHW finite[0,1], matching explicit torch.Generator and
+H,W>4 before draws. The extra spatial constraint makes every possible radius4
+training blur valid without consuming RNG on invalid input. Output new storage,
+same shape/device/dtype; input untouched. Normalize only after policy.
+
+Exact same-device draw order: scalar `torch.rand((), dtype=torch.float64)` chooses
+identity/noise/blur/brightness at literal boundaries.50/.67/.84. Identity reports
+severity0 without another draw. Each corruption draws scalar int64
+`torch.randint(1,4,())`; only noise then draws float32 `randn(x.shape)` through
+the existing dispatcher. No seed creation or global fallback. Existing hook owns
+`stable_seed(run_seed,epoch,original_id,'train_corruption')`; geometry/order and
+original-test seed helpers stay unchanged. Metadata is for audit, not labels.
+
+Offline and actual numeric/frequency/RNG/pairing/spawn acceptance PASS;
+[evidence](../report/robust001_evidence.json). No model initialization/budget,
+training readiness, general REPRO-001 or full scientific gate claim. Frozen
+CORR-003 uses authenticated read-only replay at21ede65 via
+`scripts.verify_frozen_corr003`; strict current-source mismatch remains expected.
 
 ### `src/data.py`
 
@@ -261,7 +291,7 @@ exclusive fsynced publication and verification, then stage deletion and lock las
 Missing/tampered/partial/foreign stats or interrupted diagnostics fail and remain
 preserved. Recovery: inspect/preserve them and explicitly select a new stats path;
 no automatic repair. This readiness protocol is not a power-loss transaction.
-General REPRO-001/checkpoint/backup work and full ROBUST-001 integration remain pending.
+General REPRO-001/checkpoint/backup work and formal dependent acceptance remain pending.
 
 #### DATA-003 keyed loaders (implemented)
 
@@ -273,7 +303,8 @@ horizontal flip, then float32 CHW/255. An optional train-only callable has
 `policy(x, generator=local_generator) -> (Tensor, dict)`. Mutation, wrong dtype,
 shape/device/nonfinite/range output fail; labels/IDs are always obtained from base.
 Policy is injected by the caller; CORR-001/002 primitives and fixed actual injection
-probes are verified. Full ROBUST-001 policy/integration remains pending.
+probes are verified. ROBUST-001 production policy/integration is technically
+verified; full DoD/formal dependent acceptance and human review remain pending.
 
 `EpochOrderSampler` creates a fresh local generator per iteration from
 stable_seed(run_seed, epoch, 'order'); dataset.set_epoch updates order/geometry.

@@ -2,6 +2,13 @@
 
 Дата: 30.10.2026. [Главный план](MASTER_PROJECT_PLAN.md). MUST/SHOULD/OPTIONAL обозначают приоритет **в проектном плане**, а не автоматически университетское требование.
 
+Обновление ROBUST-00118.11.2026: production policy и train-only integration имеют
+independent technical PASS/full DoD PARTIAL;914default PASS/19opt-in SKIP,
+отдельно6actual PASS/0SKIP. [Evidence](../report/robust001_evidence.json).
+Technical integration DATA-003 verified; formal/human dependent acceptance and
+course/source/team/protocol approvals pending. No training or full scientific
+paired-init/budget acceptance claim. Ниже source registry остаётся применимым.
+
 Обновление SETUP-001: найдены локальные guidelines Fall2026, CSR и две версии
 proposal. [Реестр с hashes/pages/status](../report/course_materials/README.md)
 уточняет строки A/B и разделяет source verification и implementation readiness.
@@ -29,7 +36,7 @@ freshness, submitted version и AI-policy precedence остаются pending.
 | ID | Требование / источник | Приоритет | Tasks | Файлы | Evidence завершения | Проверка | Сейчас |
 |---|---|---|---|---|---|---|---|
 | A01 | Чёткая проблема; S1a p2–7 | MUST | PROTO-001, REPORT-001 | docs/PROJECT_OVERVIEW.md, report/final_report/report.md | RQ, scope, motivation | Report review vs S1 | Local source checked; RQ draft |
-| A02 | Доступный usable dataset; S1a p2–7 | MUST | DATA-001..003 | src/data.py, data/splits/ | Checksum/counts/split/stats identities | Data tests | DATA-001/002 и independent DATA-003 technical PASS; robust integration/reviewer pending |
+| A02 | Доступный usable dataset; S1a p2–7 | MUST | DATA-001..003 | src/data.py, data/splits/ | Checksum/counts/split/stats identities | Data tests | Data/production policy integration technical PASS; formal dependent acceptance/human review pending |
 | A03 | Baseline и ≥1 NN, обученная командой; S1a p2–7 | MUST | MODEL-001, CLEAN-001..003 | src/models.py, src/train.py | Checkpoints + logs + attribution | Provenance audit | Local source checked; models TODO |
 | A04 | Controlled comparison; S1a p2–7 | MUST | PROTO-001, ROBUST-001..003, TEST-002 | configs/, src/train.py | Equality fields, paired seeds | Scientific validity tests | Config controls implemented; run controls TODO |
 | A05 | Quantitative evaluation; S1a p2–7 | MUST | EVAL-001..004, METRIC-001..002 | src/evaluate.py, src/metrics.py | 96 results + tables | Matrix audit | Local source checked; evaluation TODO |
@@ -48,10 +55,10 @@ freshness, submitted version и AI-policy precedence остаются pending.
 
 | ID | Требование / источник | Приоритет | Tasks | Файлы | Evidence | Проверка | Сейчас |
 |---|---|---|---|---|---|---|---|
-| B01 | CIFAR-10 45k/5k/10k, S3 | MUST | DATA-001..003 | src/data.py, data/splits/ | Disjoint stratified indices + stats | TEST-D02..05 | Actual split/stats/clean loaders PASS; robust integration/reviewer pending |
+| B01 | CIFAR-10 45k/5k/10k, S3 | MUST | DATA-001..003 | src/data.py, data/splits/ | Disjoint stratified indices + stats | TEST-D02..05 | Actual split/stats/loaders and ROBUST-001 integration technical PASS; formal/human gates pending |
 | B02 | Одна compact custom CNN с нуля, S3 | MUST | MODEL-001 | src/models.py | 288746 params, logits N×10 | TEST-M01..03 | Нет |
 | B03 | Noise, blur, darkening ×5 pixel-space severity, S3 | MUST | CORR-001..003 | src/corruptions.py; scripts/make_plots.py | Severity table + actual train-only PNG/PDF/source manifest | TEST-C01..08; grid tests | CORR-001/002/003 independent technical PASS; Person5/team visual review and formal approvals pending |
-| B04 | Clean vs Robust; только train policy различается, S3 | MUST | TRAIN-001..003, ROBUST-001 | configs/, src/train.py | Paired initialization/order/budget logs | TEST-S01 | Config validation PASS; runtime identity TODO |
+| B04 | Clean vs Robust; только train policy различается, S3 | MUST | TRAIN-001..003, ROBUST-001 | configs/, src/train.py | Paired initialization/order/budget logs | TEST-S01 | Config/input pairing/policy technical PASS; model init/budget/full runtime controls TODO |
 | B05 | Seeds 42,123,2026, S3 | MUST | CLEAN-001..003, ROBUST-002..003 | outputs/runs/, checkpoints/ | 6 complete runs | Manifest audit | Нет |
 | B06 | 16 условий/run, 96 оценок, одни test images, S3 | MUST | EVAL-002..004 | scripts/run_all_evaluations.py | 96 keys, 960000 predictions | TEST-E02 | Нет |
 | B07 | Accuracy/drop/RR/mCA/gap/F1/per-class/CM/mean±SD, S3 | MUST | METRIC-001..002 | src/metrics.py | Formula fixtures + exports | TEST-K01..04 | Нет |
@@ -67,7 +74,7 @@ freshness, submitted version и AI-policy precedence остаются pending.
 | C02 | Validation-only checkpoint selection; test isolation, S3/S5 | MUST | PROTO-001, TRAIN-001, TEST-002 | src/train.py | clean-val selection logs | Code + provenance audit | План |
 | C03 | Tested env, version lock, CPU/GPU smoke, S5 | MUST | SETUP-002, TEST-001 | requirements-lock.txt, tests/ | pip check, import and smoke evidence | Independent run | Local env PASS; full pipeline/independent run pending |
 | C04 | Atomic best/last checkpoint and epoch-boundary resume, S5 | MUST | TRAIN-002, REPRO-001 | src/utils.py, src/train.py | Resume vs uninterrupted fixture | TEST-U03, T02 | Нет |
-| C05 | Unit/integration/scientific tests, S5 | MUST | TEST-001..003 | tests/ | Assertions and passing report | TESTING_PLAN |777offline PASS/14opt-in SKIP; CORR-002 actual6PASS incl CORR-001 regressions; DATA actual8PASS31.10 historical; ML/scientific suite TODO |
+| C05 | Unit/integration/scientific tests, S5 | MUST | TEST-001..003 | tests/ | Assertions and passing report | TESTING_PLAN |914offline PASS/19opt-in SKIP; separately6actual policy/reference/grid PASS18.11; other13opt-ins historical; ML/scientific suite TODO |
 | C06 | Paired deltas, sample SD, n=3 caveat, S5 | MUST | METRIC-002, ANALYSIS-001 | src/metrics.py, report/ | All seeds included | Aggregation fixtures | Нет |
 | C07 | Predeclared ≤2 pp clean-loss interpretation, S5 | SHOULD | PROTO-001, ANALYSIS-001 | docs/EXPERIMENT_PROTOCOL.md | Threshold fixed before test | Protocol history | План |
 | C08 | Independent reproduction + backups, S5 | MUST | REPRO-002, RELEASE-001 | report/reproduction.md, manifests | Checkpoint hashes and smoke on second machine | Person 6 + reviewer | Нет |
