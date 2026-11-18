@@ -3,14 +3,17 @@
 Обновлён18.11.2026 после CORR-003 independent technical PASS/full DoD PARTIAL.
 Published main:3c7a46e pixels/tests, b57a3c7 renderer/CLI/tests,
 21ede65 actual PNG/PDF/source manifest/tests/evidence. Каждый блок сразу ordinary
-push origin main PASS. Итоговые docs/status/ai_usage/handoff — отдельный commit;
-его hash и final fresh-fetch clean sync в Git/chat. Сохранение этого prompt
-не запускает ROBUST-001. CORR-003 Person5/team visual review PENDING.
+push origin main PASS. Итоговые docs/status/ai_usage/handoff опубликованы в
+3af7c3b; fresh fetch подтвердил clean main=origin/main перед этим уточнением
+порядка блоков. Сохранение этого prompt не запускает ROBUST-001.
+CORR-003 Person5/team visual review PENDING.
 
 ~~~text
 Продолжи проект CSCI494 — Robustness to Noise.
 Работай, коммить и пушь только в existing exact branch main. Не создавай codex/*,
-feature branches или worktrees. Разрешаю самостоятельные commits и ordinary
+ветку codex, любые другие branches или worktrees. Имя ветки всегда ровно main.
+Исторические branch/PR советы в planning docs не переопределяют это правило.
+Разрешаю самостоятельные commits и ordinary git
 push origin main после каждого проверенного логического блока, без повторного
 согласования. Не используй force, amend/reset или автоматическое затирание
 remote divergence/conflicts. При failed push сначала прочитай причину/history.
@@ -123,20 +126,48 @@ ROBUST-001 INDEPENDENT TECHNICAL SCOPE
    human review and second-machine reproduction remain open. Do not claim training
    readiness or full DATA-003 dependent acceptance solely from agent checks.
 
-SMALL BLOCKS AND PUBLICATION
+НЕБОЛЬШИЕ ЗАВЕРШЁННЫЕ БЛОКИ И ПУБЛИКАЦИЯ
 
-Choose working logical blocks, implementation and related tests together:
-policy/event semantics; loader/invariance integration; actual tests/evidence;
-final docs/handoff. Adapt size to current code, no stub or cosmetic-only commits.
-After EACH complete block stop editing, inspect full diff and relevant tests,
-git diff --check; stage explicit task paths only, never git add . / -A. Check exact
-git diff --cached --name-only and full staged diff, then both diff --check and
-diff --cached --check. Commit in main and IMMEDIATELY ordinary git push origin
-main; verify push success/main=origin/main/clean staged/worktree and report tests,
-commit hash and push result. Only then edit next block. Continue autonomously
-through bounded technical result, no repeat permission request. Failed push:
-inspect cause/history first; safe fast-forward allowed, no automatic overwrite/
-merge of divergence/conflicts and no force/amend/reset/history rewrite.
+Работай самостоятельно до проверяемого технического результата ROBUST-001.
+До editing кратко объяви текущий scope и ближайший небольшой блок. Не накапливай
+всю реализацию и tests до одного финального commit. Ориентир для блоков:
+
+1. Bounded read-only replay frozen CORR-003 на source revision21ede65 и связанные
+   regression tests. Подготовь это ДО изменения production source fingerprints;
+   current-source mismatch должен остаться проверяемой ожидаемой ошибкой.
+   Сохрани artifacts/manifest/evidence; не ослабляй validation ради PASS.
+2. CorruptionPolicy: event/severity/draw semantics, explicit generator, metadata,
+   validation и связанные numeric/frequency/RNG tests в одном рабочем commit.
+3. Integration через existing explicit train-only hook: pairing/Normalize order,
+   batching/epochs/spawn invariance и связанные tests. Production edits только
+   при необходимости; не создавай косметический commit, если hook уже достаточен.
+4. Actual opt-in integration, независимые numeric checks, compact actual evidence
+   и связанные tests; сохранность предыдущих artifacts и честные PASS/FAIL/SKIP.
+5. Итоговые docs/status/report/ai_usage и следующий bounded prompt, с явным
+   разделением technical PASS и full DoD, human review и formal approvals.
+
+Адаптируй размер к current code: большой блок раздели на меньшие законченные
+рабочие части. Implementation и непосредственно связанные tests коммить вместе.
+Не делай commits с заглушками, известными failing tests или искусственным
+косметическим дроблением. Не переходи к editing следующего блока до успешной
+публикации текущего; промежуточный commit не завершает весь этап.
+
+После КАЖДОГО завершённого блока:
+
+- останови editing и проверь полный diff и relevant tests;
+- выполни git diff --check;
+- stage только явные task paths, без git add . / -A и без посторонних изменений;
+- проверь точный git diff --cached --name-only и полный git diff --cached;
+- выполни git diff --check и git diff --cached --check;
+- убедись, что current branch ровно main, и сделай отдельный рабочий commit;
+- СРАЗУ выполни обычный git push origin main;
+- проверь успешный push, main=origin/main и чистые worktree/staged list;
+- сообщи checks, commit hash и результат push, затем продолжи следующий блок.
+
+Разрешение на commits/push действует на весь этап: не запрашивай его повторно.
+При failed push сначала разберись с причиной и прочитай remote history, до новых
+edits. Safe fast-forward допустим; divergence/conflicts не затирай и не merge
+автоматически. Без force, amend/reset и history rewrite.
 
 Never commit raw/archives/env/caches/credentials/absolute machine paths/diagnostic
 partials. End with fresh fetch, clean status, empty staged list, exact
