@@ -1,13 +1,19 @@
 # Промпт следующего этапа — CORR-002
 
-Обновлён18.11.2026 после CORR-001 independent technical PASS/full DoD PARTIAL.
+Обновлён 18.11.2026 после CORR-001 independent technical PASS/full DoD PARTIAL.
+Повторный fresh fetch подтвердил clean main=origin/main на da63fa2.
 Implementation/evidence опубликованы в main7d47569/b73536b/f89d70f/5d12a06;
-финальный documentation commit — в Git history. Каждый блок сразу push origin main PASS.
+documentation — da63fa2. Каждый блок сразу push origin main PASS.
 Ниже handoff, он не запускает CORR-002 сам по себе. Counts — actual18.11.2026;
 original8DATA opt-in checks здесь не повторялись (их31.10evidence historical).
 
 ```text
 Продолжи проект CSCI494 — Robustness to Noise.
+Работай, коммить и пушь всегда только в существующую ветку main.
+Не создавай codex/*, другие feature branches или worktrees.
+Разрешаю самостоятельные commits и обычный git push origin main после каждого
+проверенного блока без повторного согласования. Это постоянное правило этапа.
+
 Выполни независимый технический объём CORR-002: reflect Gaussian blur, progressive
 darkening и apply_corruption поверх existing CORR-001. Работай самостоятельно до
 проверяемого результата с actual artifacts, tests и evidence. Не обучай модели,
@@ -111,10 +117,20 @@ compatibility/migration evidence; validation не обходить.
 
 НЕБОЛЬШИЕ ЗАВЕРШЁННЫЕ БЛОКИ
 
-Ориентир: blur+numeric tests; darken+tests; dispatcher+all-family tests;
-actual checks/artifacts/evidence; final docs/handoff. Тесно связанные implementation
-и tests коммить вместе. Без заглушек/падающих tests/cosmetic commits ради количества.
-После каждого finished block commit и СРАЗУ push, затем продолжай до завершения.
+Раздели этап на небольшие завершённые логические блоки. Ориентир:
+1. Gaussian blur вместе с numeric/contract tests.
+2. Darkening вместе с exact-factor/identity/error tests.
+3. apply_corruption вместе с dispatcher/all-family/RNG regression tests.
+4. Actual opt-in checks, проверенные reference artifacts/evidence и связанные tests.
+5. Итоговые docs/status/ai_usage и промпт следующего этапа.
+
+Адаптируй границы к коду: слишком большой блок раздели на меньшие рабочие части;
+тесно связанные implementation и tests коммить вместе. Не делай commits с
+заглушками, падающими tests или искусственными косметическими частями ради количества.
+Закончил блок — останови editing, проверь и опубликуй его, только затем начинай
+следующий. Не накапливай всю реализацию до одного финального commit и не оставляй
+промежуточные commits без push. После каждого успешного push продолжай самостоятельно
+до завершения CORR-002; промежуточный commit не является завершением задачи.
 Scientific protocol/maps/budget/probabilities и оба YAML identities неизменны.
 Без models/training/evaluator/metrics/EDA/plots/policy/new services.
 
@@ -132,7 +148,8 @@ GIT — ПОСТОЯННОЕ ПРАВИЛО
 - git diff --cached --name-only, ПОЛНЫЙ git diff --cached,
   git diff --cached --check; exact staged list без посторонних files;
 - отдельный рабочий commit в main; СРАЗУ ordinary git push origin main;
-- проверь push/sync и сообщи block/checks/hash/push, продолжай самостоятельно.
+- проверь успешный push и sync main/origin/main; сообщи block/checks/hash/push,
+  затем продолжай следующий блок без повторного согласования.
 Не копи всё в финальный commit. Failed push разбери до дальнейших edits; remote
 changes сначала прочитай. Safe fast-forward допустим; divergence/conflicts не
 затирай и не merge автоматически. Без force/amend/reset/history rewrite.
