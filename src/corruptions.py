@@ -1,4 +1,4 @@
-"""Pixel-space corruption primitives. Blur/darkening/policy await later tasks."""
+"""Pixel-space noise, reflect blur, darkening and dispatch; policy is separate."""
 
 import math
 
@@ -72,8 +72,7 @@ def darken(x: torch.Tensor, factor: float) -> torch.Tensor:
 def severity_params(kind: str, severity: int) -> dict:
     """Exact protocol-v1 parameters; clean is separate from levels 1..5.
 
-    Return a fresh dict so callers cannot change the frozen mapping. Mapping
-    blur/brightness parameters does not implement those corruption families.
+    Return a fresh dict so callers cannot change the frozen mapping.
     """
     if type(kind) is not str or kind not in ('gaussian_noise', 'gaussian_blur', 'brightness'):
         raise ValueError('kind must be gaussian_noise, gaussian_blur or brightness')
@@ -120,6 +119,34 @@ def gaussian_noise(x: torch.Tensor, sigma: float, generator: torch.Generator) ->
     if sigma > torch.finfo(torch.float32).max:
         return (x.double() + sigma * epsilon.double()).clamp(0, 1).to(x.dtype)
     return (x + sigma * epsilon).clamp(0, 1)
+
+
+def apply_corruption(x: torch.Tensor, kind: str, severity: int,
+                     generator: torch.Generator | None = None) -> torch.Tensor:
+    """Dispatch clean0 or one protocol family at severity1..5 before Normalize.
+
+    Noise requires an explicit same-device generator; there is no global fallback
+    or seed assignment. Clean/blur/brightness accept None or a torch.Generator
+    on any device and leave it untouched (unused, hence no device constraint).
+    Wrong generator types are rejected for every family. Clean validates pixels
+    and Python integer severity0, then clones. Invalid arguments never draw RNG.
+    """
+    if type(kind) is str and kind == 'clean':
+        if type(severity) is not int or severity != 0:
+            raise ValueError('clean severity must be the Python integer 0')
+        params = None
+    else:
+        params = severity_params(kind, severity)
+    if generator is not None and not isinstance(generator, torch.Generator):
+        raise ValueError('generator must be None or an explicit torch.Generator')
+    if kind == 'clean':
+        _validate_pixels(x)
+        return x.clone()
+    if kind == 'gaussian_noise':
+        return gaussian_noise(x, **params, generator=generator)
+    if kind == 'gaussian_blur':
+        return gaussian_blur(x, **params)
+    return darken(x, **params)
 
 
 def keyed_test_generator(original_index: int, *, namespace: str) -> torch.Generator:
