@@ -53,6 +53,22 @@ def gaussian_blur(x: torch.Tensor, sigma: float, kernel_size: int) -> torch.Tens
     return y.squeeze(0).clamp(0, 1)
 
 
+def darken(x: torch.Tensor, factor: float) -> torch.Tensor:
+    """clip(factor*x,0,1) for a finite Python factor in [0,1], without mutation.
+
+    Factor1 returns equal pixels in new storage; factor0 returns black. Larger
+    factors are rejected: this helper only darkens. No generator/RNG is used.
+    """
+    _validate_pixels(x)
+    try:
+        valid = type(factor) in (int, float) and math.isfinite(factor) and 0 <= factor <= 1
+    except OverflowError:
+        valid = False
+    if not valid:
+        raise ValueError('factor must be a finite Python number in [0,1] (not bool)')
+    return (x * factor).clamp(0, 1)
+
+
 def severity_params(kind: str, severity: int) -> dict:
     """Exact protocol-v1 parameters; clean is separate from levels 1..5.
 
