@@ -1,5 +1,9 @@
 # Промпт следующего этапа — METRIC-001 prerequisite review и bounded metrics API
 
+METRIC-001 is ready for review. See the [current status](CURRENT_STATUS.md) and
+[verification record](../report/reproduction.md). The original implementation
+prompt is retained below for reference.
+
 Обновлён18.11.2026 после MODEL-001 synthetic technical PASS/full DoD PARTIAL.
 Published main:489eb04 model API/tests,11cffd5 modes/strict identity,6dad624 devices/
 evidence; каждый immediately ordinary push origin main PASS, fresh fetch clean0/0.

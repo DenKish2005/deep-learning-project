@@ -10,6 +10,7 @@ CORR-002 adds reflect blur, darkening and dispatch. CORR-003 implements only the
 train-only sanity grid, PNG/PDF/source manifest and bounded CLI.
 ROBUST-001 implements the production policy and verifies the existing explicit
 train-only integration. MODEL-001 implements CompactCNN and synthetic model QA.
+METRIC-001 implements classification and per-run robustness metrics.
 Human/Person5 visual review and formal acceptance remain pending. Остальные production APIs ниже
 ещё не реализованы. Состояние: [CURRENT_STATUS.md](CURRENT_STATUS.md), уточнения
 и причины: [SETUP_DECISIONS.md](SETUP_DECISIONS.md). Протокол —
@@ -392,11 +393,27 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 
 ### `src/metrics.py`
 
-- `confusion_counts(y_true: np.ndarray, y_pred: np.ndarray, num_classes=10) -> np.ndarray[10,10]` int64; rows=true.
-- `classification_metrics(y_true, y_pred, num_classes=10) -> dict`; `robustness_metrics(results: pd.DataFrame) -> pd.DataFrame`; `aggregate_seeds(results) -> dict[str,pd.DataFrame]`.
-- `validate_matrix(results, expected_seeds=(42,123,2026)) -> None`; `main(argv=None)` flags `--input outputs/metrics --output outputs/metrics/aggregate`.
-- Sample counts positive, labels 0..9, empty/missing/duplicate condition → error. Accuracy stored fractions; drops/gaps additionally pp. RR zero denominator → null + flag. No implicit averaging of missing values. Optional ECE separate explicit path.
-- Tests TEST-K01..04 with hand fixtures; integration evaluation JSONs → tables. DoD: 96 input rows, six complete mCA, 32 condition aggregates, three paired seed deltas, readable schema metadata.
+- `confusion_counts(y_true, y_pred, num_classes=10)` accepts aligned nonempty 1-D
+  integer NumPy arrays, lists or tuples. Class IDs must be in `[0, num_classes)`.
+  Returns an `int64` square matrix with true classes as rows.
+- `classification_metrics(...)` returns `confusion_matrix`, `n_samples`,
+  `n_correct`, `accuracy`, `per_class_accuracy` (recall), and `macro_f1`.
+  Scores are fractions. Recall for unsupported classes and F1 with a zero
+  denominator are zero. Macro-F1 includes every configured class.
+- `robustness_metrics(results: pd.DataFrame) -> pd.DataFrame` requires one run
+  with `corruption`, `severity`, `n_samples`, `n_correct`, and `accuracy`.
+  An optional `run_id` must identify the same run in every row. The 16 unique
+  keys are `clean:0` and levels 1–5 for `gaussian_noise`, `gaussian_blur`, and
+  `brightness` (darkening). Counts must be valid and sample totals equal.
+  Accuracy must match `n_correct / n_samples` within `1e-7` relative tolerance.
+- The returned copy preserves input rows and columns and adds `accuracy_drop_pp`,
+  `relative_robustness`, `relative_robustness_reason`, and `family_mca` for corrupted
+  rows. `mca` and `robustness_gap_pp` are repeated on all rows. A zero clean
+  accuracy yields missing relative robustness and `zero_clean_accuracy` as the
+  reason. Invalid inputs raise `ValueError`. Synthetic tests cover TEST-K01/K02/K04.
+- Planned METRIC-002 interfaces are `aggregate_seeds`, `validate_matrix`, and
+  the aggregate CLI. TEST-K03 covers 96 rows, 32 condition groups, and three
+  paired seed deltas. Optional calibration is scoped to METRIC-003.
 
 ### Скрипты
 

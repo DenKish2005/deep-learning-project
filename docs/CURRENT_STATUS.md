@@ -1,6 +1,21 @@
 # CURRENT PROJECT STATUS
 
-## MODEL-001 — 18.11.2026
+## METRIC-001 — 19.11.2026 · ready for review
+
+Classification and per-run robustness metrics are implemented in
+[`src/metrics.py`](../src/metrics.py). All 57 synthetic metrics tests passed.
+The full suite passed with **1,007 passed, 20 opt-in skips, and 0 failures**.
+Raw data, split, normalization, and controlled configs passed read-only checks.
+Strict frozen CORR-003 replay failed on this runtime. The recorded Python version
+and recomputed pixel hash differ, and all 36 protected files match their original
+size, SHA-256, and mtime. [Verification record](../report/reproduction.md)
+
+Full METRIC-001 acceptance is pending human review and formal PROTO-001 and
+SETUP-002 sign-off. For review, check confusion-matrix orientation and absent-class
+behavior, the 16-condition input contract, and fraction versus percentage-point
+units. Training, evaluation, and seed aggregation remain open.
+
+## Historical MODEL-001 — 18.11.2026
 
 MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
 full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired

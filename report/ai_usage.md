@@ -1,5 +1,15 @@
 # AI assistance record
 
+## METRIC-001 — 19.11.2026
+
+At the user's request, Codex planned and implemented the classification and
+per-run robustness metrics, wrote and ran synthetic tests, reviewed the changes,
+and documented the APIs and verification results. Codex diagnosed a strict frozen
+CORR-003 replay failure that occurred before code changes. The verification record
+lists the mismatch and the matching hashes for the frozen files. Human review and
+formal prerequisite sign-off are pending.
+[Verification record](reproduction.md)
+
 ## MODEL-001 — 18.11.2026
 
 По прямому запросу пользователя Codex прочитал current repo/saved prompt/docs,

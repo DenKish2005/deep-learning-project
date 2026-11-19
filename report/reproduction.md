@@ -1,4 +1,32 @@
-# Verification record — foundation, DATA, CORR and ROBUST-001
+# Verification record
+
+## METRIC-001 technical verification — 19.11.2026
+
+Baseline was clean local `main` at `58abc4b`. Checks ran sequentially in the
+existing Linux `.venv` with Python 3.14.4, NumPy 2.5.4, pandas 3.1.0, and pytest
+9.2.0. For the full suite, use `OMP_NUM_THREADS=1`, `MKL_NUM_THREADS=1`, and
+`MPLCONFIGDIR="$PWD/.venv/mplconfig"` as process-local settings.
+
+| Check | Outcome |
+|---|---|
+| `python -m pip check` | PASS |
+| Baseline `python -m pytest tests -q` | 950 passed, 20 opt-in skips, 49.38 s |
+| Raw data, saved split, normalization, and controlled configs | PASS, read-only |
+| `python -m scripts.verify_frozen_corr003` | FAIL before edits, strict source record mismatch |
+| `python -m pytest tests/test_metrics.py -q` | 57 passed, 0 skipped, 0.25 s |
+| Final `python -m pytest tests -q` | 1,007 passed, 20 opt-in skips, 48.71 s |
+| Frozen inputs and prior evidence | All 36 protected files matched byte size, SHA-256, and mtime |
+
+The CORR-003 diagnostic authenticated the source at `21ede65` and checked the
+existing exports. PNG and PDF sizes and hashes matched. The only source record
+differences were Python 3.14.4 versus recorded 3.12.10 and the float32 pixel
+hash (`0c99e74c…` versus `3ed856ca…`). The strict replay failure remains open.
+
+The metrics tests cover hand-calculated confusion counts and F1, zero-support
+classes, the complete 16-condition matrix, and error cases. For the synthetic
+`0.80` clean and `0.60` corrupted fixture, the observed drop was 20 percentage
+points, relative robustness was `0.75`, and mCA was `0.60`. Human review and formal
+prerequisite sign-off are pending.
 
 ## MODEL-001 synthetic technical acceptance — 18.11.2026
 
