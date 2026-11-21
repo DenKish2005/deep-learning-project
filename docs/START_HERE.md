@@ -1,5 +1,16 @@
 # С чего начать
 
+## Текущее состояние — 21.11.2026
+
+Person 5: технические части METRIC-001/002 добавлены в `main`; 62 синтетических
+теста метрик проходят. Реального оценщика, обученных чекпойнтов и CIFAR-10 в Git
+пока нет, поэтому настоящие 96 оценок не запускались. Следующая задача Person 5 —
+EVAL-001 и тесты на синтетических данных; для реального запуска нужны чекпойнты
+от Person 3/4 и тестовые данные от Person 2. Смотрите [текущий статус](CURRENT_STATUS.md)
+и [план оценщика](NEXT_STEP_PROMPT.md).
+
+Ниже сохранён исторический порядок задач от 18.11.2026.
+
 MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
 full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired
 initial states42/123/2026, BN/dropout/modes/backward/strict state_dict verified.
@@ -10,7 +21,7 @@ Human understanding/review, PROTO-001/SETUP-002/003 formal approvals, course/sou
 team gates and independent reproduction pending. Paired-init constructor QA does
 not establish optimizer budget/full TEST-S01 or training readiness.
 [Evidence](../report/model001_evidence.json), [current status](CURRENT_STATUS.md).
-Next bounded candidate: [METRIC-001 after prerequisite review](NEXT_STEP_PROMPT.md).
+Historical next candidate: METRIC-001; the current next task is EVAL-001 as noted above.
 Earlier updates below are historical snapshots.
 
 Обновление18.11.2026 ROBUST-001: production policy/train-only integration —

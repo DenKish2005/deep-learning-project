@@ -17,8 +17,10 @@ Gaussian blur, progressive darkening and `apply_corruption`. CORR-003 adds the
 train-only 10x16 corruption grid, PNG/PDF, source manifest and agent visual audit.
 ROBUST-001 adds production CorruptionPolicy through the existing explicit
 train-only hook. MODEL-001 adds CompactCNN v1 and independent synthetic model tests.
-Training, evaluation and metrics plots remain future work.
-No training has run.
+Classification, per-run robustness metrics, and synthetic 96-row seed aggregation
+are implemented. Training, single-condition inference, the 96 real test evaluations,
+and final result plots remain future work. No model training or real test evaluation
+has run.
 Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
 RGB32×32, all archive/file checksums and class counts pass. Historical ROBUST-001 checks:
 914 offline tests pass (19 opt-in tests skipped); separately 6 actual checks pass
@@ -51,7 +53,10 @@ No training or CIFAR model inference. Backend flags unchanged; same-device repea
 eval only, no cross-device equality/training determinism/quality claim. Previous
 19actual opt-ins not rerun. Human review/formal prerequisites and course approvals
 pending; full scientific paired budget and general REPRO-001 remain open.
-Next bounded candidate: [METRIC-001 after review](docs/NEXT_STEP_PROMPT.md).
+METRIC-001/002 technical implementations are now in `main`; full acceptance still
+needs formal protocol/environment review and real EVAL-004 results. Next Person 5
+work is [EVAL-001 evaluator implementation](docs/NEXT_STEP_PROMPT.md), coordinated
+with Person 2's verified test data and Person 3/4's checkpoint contract.
 
 ## Working train-only policy (ROBUST-001)
 

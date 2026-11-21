@@ -21,6 +21,13 @@ and scientific output tables have not been generated. The repository's pinned
 course environment is Python 3.12 and needs its own verification. Formal
 PROTO-001/SETUP-002 review remains pending.
 
+An additional compatible CPU subset covering models, corruptions, policy, utils,
+and metrics produced 717 passes and 2 opt-in skips. Its spawn-worker test passed
+when rerun individually outside the sandbox; the initial suite attempt was blocked
+by the sandbox's shared-memory restriction. Full test collection is unavailable
+on this host because `torchvision` is not installed; the host runtime also differs
+from the pinned project environment.
+
 ## METRIC-001 — 19.11.2026 · ready for review
 
 Classification and per-run robustness metrics are implemented in

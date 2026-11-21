@@ -1,5 +1,15 @@
 # Подробный implementation roadmap
 
+## Current update — 21.11.2026
+
+Person 5 has implemented METRIC-001/002 technical APIs and synthetic matrix
+aggregation. Real evaluation remains TODO: `src/evaluate.py`, `src/train.py`, and
+`scripts/run_all_evaluations.py` are empty; Git contains no raw CIFAR-10 files or
+checkpoints. Next Person 5 task is EVAL-001 synthetic evaluator implementation,
+coordinated with Person 3/4 on the TRAIN-002 checkpoint schema and Person 2 on
+verified test-data availability. See [current status](CURRENT_STATUS.md) and the
+[next-step prompt](NEXT_STEP_PROMPT.md). Dated summaries below are historical.
+
 MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
 full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired
 initial states42/123/2026, BN/dropout/modes/backward/strict state_dict verified.
@@ -9,7 +19,8 @@ opt-ins not rerun. No training/optimizer steps, CIFAR model inference or EDA.
 Human understanding/review, PROTO-001/SETUP-002/003 formal approvals, course/source/
 team gates and independent reproduction pending. Paired-init constructor QA does
 not establish optimizer budget/full TEST-S01 or training readiness.
-[Evidence](../report/model001_evidence.json); next candidate [METRIC-001](NEXT_STEP_PROMPT.md).
+[Evidence](../report/model001_evidence.json); historical next candidate was
+METRIC-001, now implemented as recorded in the current update above.
 Prerequisite edges unchanged; historical updates/cards below retain dated scope.
 
 Обновление ROBUST-00118.11.2026: independent technical PASS/full DoD PARTIAL.
@@ -827,7 +838,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** METRIC-001.
 - **2. Title:** Classification и robustness metrics.
 - **3. Purpose:** Правильные формулы и единицы.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — technical implementation and synthetic fixtures complete; formal review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 5 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** PROTO-001; SETUP-002.
@@ -850,7 +861,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** METRIC-002.
 - **2. Title:** Seed aggregation и result tables.
 - **3. Purpose:** Ответить RQ с uncertainty.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — validator, paired aggregation, CLI, and synthetic fixtures implemented; EVAL-004 real inputs and formal review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 5 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** EVAL-004; METRIC-001.

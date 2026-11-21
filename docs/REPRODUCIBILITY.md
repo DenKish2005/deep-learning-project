@@ -435,9 +435,13 @@ python -m scripts.run_all_evaluations --checkpoints-root outputs/checkpoints --r
 python -m scripts.run_all_evaluations --checkpoints-root outputs/checkpoints --device cpu --require-complete
 
 # METRIC-002 и PLOT-001..003
-python -m src.metrics --input outputs/metrics --output outputs/metrics/aggregate
+python -m src.metrics --input outputs/metrics/results.csv --output-dir outputs/metrics/aggregate/core-v1
 python -m scripts.make_plots --metrics outputs/metrics/aggregate --runs outputs/runs --output outputs/figures
 ```
+
+Для metrics CLI нужен заранее собранный полный core `results.csv`; этот файл
+появится только после реализации evaluator и EVAL-004. Каталог `core-v1` должен
+быть новым, CLI существующие результаты не перезаписывает.
 
 `--profile debug` explicitly выключает geometry/corruption/dropout только для 64-image diagnostic; manifest содержит overrides, mode и max_steps; core validator rejects debug. `test_smoke` создаёт temporary outputs, profile smoke,2models×1 seed×16 conditions на 100 test images,1 epoch; full validator считает только core.
 

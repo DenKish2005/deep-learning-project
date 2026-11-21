@@ -39,7 +39,7 @@ freshness, submitted version и AI-policy precedence остаются pending.
 | A02 | Доступный usable dataset; S1a p2–7 | MUST | DATA-001..003 | src/data.py, data/splits/ | Checksum/counts/split/stats identities | Data tests | Data/production policy integration technical PASS; formal dependent acceptance/human review pending |
 | A03 | Baseline и ≥1 NN, обученная командой; S1a p2–7 | MUST | MODEL-001, CLEAN-001..003 | src/models.py, src/train.py | Checkpoints + logs + attribution | Provenance audit | Model synthetic technical PASS/full DoD PARTIAL; team-trained NN still TODO |
 | A04 | Controlled comparison; S1a p2–7 | MUST | PROTO-001, ROBUST-001..003, TEST-002 | configs/, src/train.py | Equality fields, paired seeds | Scientific validity tests | Config controls implemented; run controls TODO |
-| A05 | Quantitative evaluation; S1a p2–7 | MUST | EVAL-001..004, METRIC-001..002 | src/evaluate.py, src/metrics.py | 96 results + tables | Matrix audit | Local source checked; evaluation TODO |
+| A05 | Quantitative evaluation; S1a p2–7 | MUST | EVAL-001..004, METRIC-001..002 | src/evaluate.py, src/metrics.py | 96 results + tables | Matrix audit | Metric formulas and synthetic matrix aggregation implemented; real evaluator/results TODO |
 | A06 | Честное обсуждение successes/failures/limitations; S1a p2–7 | MUST | ANALYSIS-001, REPORT-002 | report/final_report/report.md | Все RQ, uncertainty, negative results | Evidence review | Local source checked; discussion TODO |
 | A07 | Final presentation; S1a p16 | MUST | PRESENT-001..003 | report/presentation/ | Slides + 2 rehearsal logs | Rubric + rehearsal | Week14 указан; slot pending |
 | A08 | Final report; S1a p16 | MUST | REPORT-001..003 | report/final_report/ | Export PDF + source | Rubric/completeness | Local source checked; report TODO |
@@ -61,7 +61,7 @@ freshness, submitted version и AI-policy precedence остаются pending.
 | B04 | Clean vs Robust; только train policy различается, S3 | MUST | TRAIN-001..003, ROBUST-001 | configs/, src/train.py | Paired initialization/order/budget logs | TEST-S01 | Config/input pairing/policy technical PASS; paired model-constructor init technical PASS; budget/full runtime controls TODO |
 | B05 | Seeds 42,123,2026, S3 | MUST | CLEAN-001..003, ROBUST-002..003 | outputs/runs/, checkpoints/ | 6 complete runs | Manifest audit | Нет |
 | B06 | 16 условий/run, 96 оценок, одни test images, S3 | MUST | EVAL-002..004 | scripts/run_all_evaluations.py | 96 keys, 960000 predictions | TEST-E02 | Нет |
-| B07 | Accuracy/drop/RR/mCA/gap/F1/per-class/CM/mean±SD, S3 | MUST | METRIC-001..002 | src/metrics.py | Formula fixtures + exports | TEST-K01..04 | Нет |
+| B07 | Accuracy/drop/RR/mCA/gap/F1/per-class/CM/mean±SD, S3 | MUST | METRIC-001..002 | src/metrics.py | Formula fixtures + exports | TEST-K01..04 | Synthetic formula/matrix checks pass; full DoD waits on real exports and formal review |
 | B08 | Figures и tables из raw data, S3 | MUST | PLOT-001..003 | scripts/make_plots.py | PNG/PDF + provenance | TEST-P01 | Metrics plots/tables TODO; only CORR-003 train-only sanity grid implemented, not PLOT-001..003 acceptance |
 | B09 | 6 участников понимают pipeline, S3 | MUST | TEAM-001, PRESENT-002..003 | docs/TEAM_TASKS.md, report/rehearsals.md | Review assignments, defence rehearsal | Peer explanation | План |
 | B10 | Полный пакет planning docs до кода, S3 | MUST | AUDIT-001 | docs/*.md | 14 файлов, ссылки, consistency checks | Documentation audit | Выполнено этим пакетом |
@@ -75,10 +75,10 @@ freshness, submitted version и AI-policy precedence остаются pending.
 | C03 | Tested env, version lock, CPU/GPU smoke, S5 | MUST | SETUP-002, TEST-001 | requirements-lock.txt, tests/ | pip check, import and smoke evidence | Independent run | Local env PASS; full pipeline/independent run pending |
 | C04 | Atomic best/last checkpoint and epoch-boundary resume, S5 | MUST | TRAIN-002, REPRO-001 | src/utils.py, src/train.py | Resume vs uninterrupted fixture | TEST-U03, T02 | Нет |
 | C05 | Unit/integration/scientific tests, S5 | MUST | TEST-001..003 | tests/ | Assertions and passing report | TESTING_PLAN |914offline PASS/19opt-in SKIP; separately6actual policy/reference/grid PASS18.11; other13opt-ins historical; ML/scientific suite TODO |
-| C06 | Paired deltas, sample SD, n=3 caveat, S5 | MUST | METRIC-002, ANALYSIS-001 | src/metrics.py, report/ | All seeds included | Aggregation fixtures | Нет |
+| C06 | Paired deltas, sample SD, n=3 caveat, S5 | MUST | METRIC-002, ANALYSIS-001 | src/metrics.py, report/ | All seeds included | Aggregation fixtures | Synthetic paired deltas and ddof=1 aggregation implemented; real-seed analysis TODO |
 | C07 | Predeclared ≤2 pp clean-loss interpretation, S5 | SHOULD | PROTO-001, ANALYSIS-001 | docs/EXPERIMENT_PROTOCOL.md | Threshold fixed before test | Protocol history | План |
 | C08 | Independent reproduction + backups, S5 | MUST | REPRO-002, RELEASE-001 | report/reproduction.md, manifests | Checkpoint hashes and smoke on second machine | Person 6 + reviewer | Нет |
-| C09 | Versioned PR/code review workflow, S5 | SHOULD | TEAM-001 | docs/TEAM_TASKS.md | Review evidence + checks | PR review | План |
+| C09 | Versioned code review workflow, S5 | SHOULD | TEAM-001 | docs/TEAM_TASKS.md | Review evidence + checks | Reviewer evidence | Project instruction uses small commits directly on `main`; no PR/branch workflow adopted, independent human review remains pending |
 
 ## D. Optional extensions
 

@@ -1,5 +1,17 @@
 # MASTER PROJECT PLAN — CSCI 494 Robustness to Noise
 
+## Current update — 21.11.2026
+
+Person 5's METRIC-001/002 technical APIs are implemented in `src/metrics.py`,
+including complete-matrix validation and paired seed aggregation. Synthetic metric
+tests pass; no checkpoints, raw CIFAR-10 files, training runs, or real evaluations
+are present in the Git repository. Next Person 5 step: EVAL-001 evaluator code and
+synthetic integration coverage, coordinated with the checkpoint schema from Person
+3/4 and verified test data from Person 2. See [current status](CURRENT_STATUS.md)
+and the refreshed [next-step prompt](NEXT_STEP_PROMPT.md).
+
+The dated MODEL-001 and earlier updates below are historical snapshots.
+
 MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
 full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired
 initial states42/123/2026, BN/dropout/modes/backward/strict state_dict verified.
@@ -10,7 +22,8 @@ Human understanding/review, PROTO-001/SETUP-002/003 formal approvals, course/sou
 team gates and independent reproduction pending. Paired-init constructor QA does
 not establish optimizer budget/full TEST-S01 or training readiness.
 [Evidence](../report/model001_evidence.json), [current status](CURRENT_STATUS.md).
-Next bounded candidate: [METRIC-001 after prerequisite review](NEXT_STEP_PROMPT.md).
+Historical next candidate was METRIC-001; it has since been implemented as recorded
+in the current update above.
 Earlier updates below are historical snapshots.
 
 Обновление ROBUST-00118.11.2026: independent technical PASS/full DoD PARTIAL.
