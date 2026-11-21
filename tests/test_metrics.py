@@ -1,221 +1,349 @@
-şŠmş&yºŞÃòân¶«Ëñè™æë{Ü™ßì…éez{ì†X§{_?n)ÿ¦Ã©z¶­Š‰ç¢Ú^®h­µçZ[\Ü[\H\Èœš[\Ü[™\È\Èš[\Ü]\İ‚™œ›ÛHÜ˜Ë›Y]šXÜÈ[\Ü
-ˆYÙÜ™YØ]WÜÙYYËÛ\ÜÚYšXØ][Û—ÛY]šXÜËÛÛ™\Ú[Û—ØÛİ[Ë›Ø\İ™\Ü×ÛY]šXÜËˆXZ[ˆ\ÈY]šXÜ×ÛXZ[‹˜[Y]WÛX]š^ŠB‚‚™Yˆ\İÚÛ›İÛ—ØÛ\ÜÚYšXØ][Û—ÛY]šXÜÊ
-N‚ˆYHHÌKWBˆ™YXİYH
-KKJBˆ^XİYHœ˜\œ˜^JÖÌKWKÌ—WK\O[œš[
-B‚ˆÛİ[ÈHÛÛ™\Ú[Û—ØÛİ[ÊYK™YXİY[WØÛ\ÜÙ\ÏLŠBˆY]šXÜÈHÛ\ÜÚYšXØ][Û—ÛY]šXÜÊYK™YXİY[WØÛ\ÜÙ\ÏLŠB‚ˆœ\İ[™Ë˜\ÜÙ\Ø\œ˜^WÙ\]X[
-Ûİ[Ë^XİYİšXİUYJBˆœ\İ[™Ë˜\ÜÙ\Ø\œ˜^WÙ\]X[
-Y]šXÜÖÉØÛÛ™\Ú[Û—ÛX]š^	×K^XİYİšXİUYJBˆ\ÜÙ\Y]šXÜÖÉÛ—ÜØ[\\É×HOHˆ\ÜÙ\Y]šXÜÖÉÛ—ØÛÜœ™Xİ	×HOHÂˆ\ÜÙ\Y]šXÜÖÉØXØİ\˜XŞI×HOHÍBˆœ\İ[™Ë˜\ÜÙ\Ø\œ˜^WÙ\]X[
-Y]šXÜÖÉÜ\—ØÛ\Ü×ØXØİ\˜XŞI×KÌKKŒJBˆ\ÜÙ\Y]šXÜÖÉÛXXÜ›×ÙŒI×HOH]\İ˜\›Ş
+import numpy as np
+import pandas as pd
+import pytest
 
-ˆÈÈ
-È
-HÈŠB‚‚™Yˆ\İÙš^Yİ[—ØÛ\ÜÙ\×İÚ]ÛZ\ÜÚ[™×Üİ\Ü
+from src.metrics import (
+    aggregate_seeds, classification_metrics, confusion_counts, robustness_metrics,
+    main as metrics_main, validate_matrix,
+)
 
-N‚ˆYHHœ˜\œ˜^JÌ×K\O[œZ[
-Bˆ™YXİYHœ˜\œ˜^JÌ‹WK\O[œš[MŠBˆYKœÙ]›YÜÊÜš]OQ˜[ÙJBˆ™YXİYœÙ]›YÜÊÜš]OQ˜[ÙJB‚ˆY]šXÜÈHÛ\ÜÚYšXØ][Û—ÛY]šXÜÊYK™YXİY
-B‚ˆÛİ[ÈHY]šXÜÖÉØÛÛ™\Ú[Û—ÛX]š^	×Bˆ\ÜÙ\Ûİ[ËœÚ\HOH
-LL
-Bˆ\ÜÙ\Ûİ[Ëœİ[J
-HOHY]šXÜÖÉÛ—ÜØ[\\É×HOHÂˆœ\İ[™Ë˜\ÜÙ\Ø\œ˜^WÙ\]X[
-Ûİ[Ëœİ[J^\ÏLJKÌ‹KJBˆ\ÜÙ\Ûİ[ÖÌ—HOHÛİ[ÖÌËWHOHBˆœ\İ[™Ë˜\ÜÙ\Ø\œ˜^WÙ\]X[
-Y]šXÜÖÉÜ\—ØÛ\Ü×ØXØİ\˜XŞI×KÌWH
-ÈÌŒH
-ˆJBˆ\ÜÙ\Y]šXÜÖÉÛXXÜ›×ÙŒI×HOH]\İ˜\›Ş
 
-ˆÈÊHÈL
-Bˆœ\İ[™Ë˜\ÜÙ\Ø\œ˜^WÙ\]X[
-YKÌ×JBˆœ\İ[™Ë˜\ÜÙ\Ø\œ˜^WÙ\]X[
-™YXİYÌ‹WJB‚‚]\İ›X\šËœ\˜[Y]š^™J
-	Ü™YXİY	Ë	ÜØÛÜ™IÊKÊÌK—KKŒ
-K
-ÌK‹KŒ
-WJB™Yˆ\İØ[ØÛÜœ™XİÛÜ—Ø[İÜ›Û™Ê™YXİYØÛÜ™JN‚ˆY]šXÜÈHÛ\ÜÚYšXØ][Û—ÛY]šXÜÊÌK—K™YXİY[WØÛ\ÜÙ\ÏLÊB‚ˆ\ÜÙ\Y]šXÜÖÉØXØİ\˜XŞI×HOHY]šXÜÖÉÛXXÜ›×ÙŒI×HOHØÛÜ™Bˆœ\İ[™Ë˜\ÜÙ\Ø\œ˜^WÙ\]X[
-Y]šXÜÖÉÜ\—ØÛ\Ü×ØXØİ\˜XŞI×KÜØÛÜ™WH
-ˆÊB‚‚]\İ›X\šËœ\˜[Y]š^™J
-	İYIË	Ü™YXİY	Ë	ÙXYÛ›ÜİXÉÊKÂˆ
-×K×K	Û›Û™[\IÊKˆ
-ÌWKÌK	ÜØ[YH[™İ	ÊKˆ
-œ˜\œ˜^JÖÌWWJKÌWK	ÛÛ™KY[Y[œÚ[Û˜[	ÊKˆ
-œ˜\œ˜^JÌŒKŒJKÌWK	Ú[YÙ\‰ÊKˆ
-œ˜\œ˜^JÌWK\O[Øš™Xİ
-KÌWK	Ú[YÙ\‰ÊKˆ
-ÌYWKÌWK	Ú[YÙ\‰ÊKˆ
-Ìœ˜›ÛÛÊYJWKÌWK	Ú[YÙ\‰ÊKˆ
-Ìœ[YY[M
-K	Ñ	ÊWKÌWK	Ú[YÙ\‰ÊKˆ
-ÌWKÌ	ÌI×K	ŞWÜ™Y	ÊKˆ
-ÌWKÌœ›˜[—K	ŞWÜ™Y	ÊKˆ
-ÌWKÌœš[™—K	ŞWÜ™Y	ÊKˆ
-ÌWKÌLWK	ŞWÜ™Y	ÊKˆ
-Ì—KÌWK	ŞWİYIÊKˆ
-ÌL
-ŠŒLKÌWK	ŞWİYIÊKˆ
-œ˜\œ˜^JÌŠŠHWK\O[œZ[
-KÌWK	ŞWİYIÊK—JB™Yˆ\İÚ[˜[YÛX™[Ú[œ]ÊYK™YXİYXYÛ›ÜİXÊN‚ˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚYXYÛ›ÜİXÊN‚ˆÛ\ÜÚYšXØ][Û—ÛY]šXÜÊYK™YXİY[WØÛ\ÜÙ\ÏLŠB‚‚]\İ›X\šËœ\˜[Y]š^™J	Û[WØÛ\ÜÙ\ÉËÌLKYKœ˜›ÛÛÊYJK‹Œ	Ì‰×JB™Yˆ\İÚ[˜[YÛ[X™\—ÛÙ—ØÛ\ÜÙ\Ê[WØÛ\ÜÙ\ÊN‚ˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÛ[WØÛ\ÜÙ\ÉÊN‚ˆÛÛ™\Ú[Û—ØÛİ[ÊÌKÌK[WØÛ\ÜÙ\Ï[[WØÛ\ÜÙ\ÊB‚‚]\İ™š^\™B™YˆÛÛ™][Û—Ü™\İ[Ê
-N‚ˆÛÛ™][ÛœÈHÊ	ØÛX[‰Ë
-WH
-ÈÂˆ
-˜[Z[KÙ]™\š]KŒ
-Bˆ›Üˆ˜[Z[H[ˆ
-	ÙØ]\ÜÚX[—Û›Ú\ÙIË	ÙØ]\ÜÚX[—Ø›\‰Ë	ØœšYÚ™\ÜÉÊBˆ›ÜˆÙ]™\š]H[ˆ˜[™ÙJKŠBˆBˆ™]\›ˆ‘]Qœ˜[YJÂˆÉÜ[—ÚY	Îˆ	ÜŞ[]XË\[‰Ë	ØÛÜœ\[Û‰Îˆ˜[Z[K	ÜÙ]™\š]IÎˆÙ]™\š]Kˆ	Û—ÜØ[\\ÉÎˆL	Û—ØÛÜœ™Xİ	ÎˆÛÜœ™Xİ	ØXØİ\˜XŞIÎˆÛÜœ™XİÈLBˆ›Üˆ˜[Z[KÙ]™\š]KÛÜœ™Xİ[ˆÛÛ™][ÛœÂˆJB‚‚™Yˆ\İÜ›Ø\İ™\Ü×İ[š]×Ø[™Ù[›ÛZ[˜]ÜœÊÛÛ™][Û—Ü™\İ[ÊN‚ˆ™\İ[ÈHÛÛ™][Û—Ü™\İ[Ë˜\ÜÚYÛŠ^˜WÛY]Y]OIÙš^\™IÊKœØ[\Jœ˜XÏLK˜[™ÛWÜİ]OMJBˆÈ]˜[X][Ûˆ™XÛÜ™ÈX^H™HÛÛ˜Ø][˜]YÚ]İ]™\Ù][™ÈH[™^‚ˆ™\İ[Ëš[™^H’[™^
-ÌNWH
-ˆ[Š™\İ[ÊJBˆÜšYÚ[˜[H™\İ[Ë˜ÛÜJY\UYJB‚ˆØÛÜ™YH›Ø\İ™\Ü×ÛY]šXÜÊ™\İ[ÊB‚ˆ\İ[™Ë˜\ÜÙ\Ùœ˜[YWÙ\]X[
-™\İ[ËÜšYÚ[˜[
-Bˆ\İ[™Ë˜\ÜÙ\Ùœ˜[YWÙ\]X[
-ØÛÜ™YÜ™\İ[Ë˜ÛÛ[[œ×KÜšYÚ[˜[
-BˆÛÜœ\YHØÛÜ™YÉØÛÜœ\[Û‰×HOH	ØÛX[‰Âˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™Y›ØÖØÛÜœ\Y	ØXØİ\˜XŞWÙ›ÜÜ	×KŒŒ
-Bˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™Y›ØÖØÛÜœ\Y	Ü™[]]™WÜ›Ø\İ™\ÜÉ×KÍJBˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™Y›ØÖØÛÜœ\Y	Ù˜[Z[WÛXØI×KŒ
-Bˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™YÉÛXØI×KŒ
-Bˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™YÉÜ›Ø\İ™\Ü×ÙØ\Ü	×KŒŒ
-Bˆ\ÜÙ\ØÛÜ™Y›ØÖß˜ÛÜœ\YÉØXØİ\˜XŞWÙ›ÜÜ	Ë	Ü™[]]™WÜ›Ø\İ™\ÜÉËˆ	Ù˜[Z[WÛXØI×WKš\Û˜J
-K˜[
+def test_known_classification_metrics():
+    true = [0, 0, 1, 1]
+    predicted = (0, 1, 1, 1)
+    expected = np.array([[1, 1], [0, 2]], dtype=np.int64)
 
-K˜[
+    counts = confusion_counts(true, predicted, num_classes=2)
+    metrics = classification_metrics(true, predicted, num_classes=2)
 
-Bˆ\ÜÙ\ØÛÜ™YÉÜ™[]]™WÜ›Ø\İ™\Ü×Ü™X\ÛÛ‰×Kš\Û˜J
-K˜[
+    np.testing.assert_array_equal(counts, expected, strict=True)
+    np.testing.assert_array_equal(metrics['confusion_matrix'], expected, strict=True)
+    assert metrics['n_samples'] == 4
+    assert metrics['n_correct'] == 3
+    assert metrics['accuracy'] == 0.75
+    np.testing.assert_array_equal(metrics['per_class_accuracy'], [0.5, 1.0])
+    assert metrics['macro_f1'] == pytest.approx((2 / 3 + 0.8) / 2)
 
-B‚‚™Yˆ\İÙ˜[Z[WÛYX[œ×ØÛX[—Ù^Û\Ú[Û—Ø[™Û™YØ]]™WÙ›Ü
-ÛÛ™][Û—Ü™\İ[ÊN‚ˆØÛÜ™\ÈHÎŒÌLŒŒÌLLLLLLLBˆÛÛ™][Û—Ü™\İ[ÖÉÛ—ØÛÜœ™Xİ	×HHØÛÜ™\ÂˆÛÛ™][Û—Ü™\İ[ÖÉØXØİ\˜XŞI×HHœ˜\œ˜^JØÛÜ™\ÊHÈL‚ˆØÛÜ™YH›Ø\İ™\Ü×ÛY]šXÜÊÛÛ™][Û—Ü™\İ[ÊB‚ˆ›Üˆ˜[Z[KYX[ˆ[ˆÊ	ÙØ]\ÜÚX[—Û›Ú\ÙIË
-K
-	ÙØ]\ÜÚX[—Ø›\‰Ë
-K
-	ØœšYÚ™\ÜÉËJWN‚ˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™Y›ØÖÜØÛÜ™YÉØÛÜœ\[Û‰×HOH˜[Z[K	Ù˜[Z[WÛXØI×KYX[ŠBˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™YÉÛXØI×KMÈÈÌ
-Bˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™YÉÜ›Ø\İ™\Ü×ÙØ\Ü	×KÌÈÊBˆ\ÜÙ\ØÛÜ™Y˜]ÌL	ØXØİ\˜XŞWÙ›ÜÜ	×HOH]\İ˜\›Ş
-LŒ
-Bˆ\ÜÙ\ØÛÜ™Y˜]ÌL	Ü™[]]™WÜ›Ø\İ™\ÜÉ×HOH]\İ˜\›Ş
-KŒJB‚‚™Yˆ\İŞ™\›×ØÛX[—ØXØİ\˜XŞWÜ›ÙXÙ\×ÛZ\ÜÚ[™×Ü™[]]™WÜ›Ø\İ™\ÜÊÛÛ™][Û—Ü™\İ[ÊN‚ˆÛÛ™][Û—Ü™\İ[Ë›ØÖÌÉÛ—ØÛÜœ™Xİ	Ë	ØXØİ\˜XŞI×WHHÌŒB‚ˆØÛÜ™YH›Ø\İ™\Ü×ÛY]šXÜÊÛÛ™][Û—Ü™\İ[ÊB‚ˆ\ÜÙ\ØÛÜ™YÉÜ™[]]™WÜ›Ø\İ™\ÜÉ×Kš\Û˜J
-K˜[
 
-Bˆ\ÜÙ\š\Û˜JØÛÜ™Y˜]Ì	Ü™[]]™WÜ›Ø\İ™\Ü×Ü™X\ÛÛ‰×JBˆ\ÜÙ\
-ØÛÜ™Y›ØÖÌN‹	Ü™[]]™WÜ›Ø\İ™\Ü×Ü™X\ÛÛ‰×HOH	Ş™\›×ØÛX[—ØXØİ\˜XŞIÊK˜[
+def test_fixed_ten_classes_with_missing_support():
+    true = np.array([0, 0, 3], dtype=np.uint8)
+    predicted = np.array([0, 2, 9], dtype=np.int16)
+    true.setflags(write=False)
+    predicted.setflags(write=False)
 
-Bˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™Y›ØÖÌN‹	ØXØİ\˜XŞWÙ›ÜÜ	×KMŒŒ
-Bˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™YÉÜ›Ø\İ™\Ü×ÙØ\Ü	×KMŒŒ
-B‚‚™Yˆ\İÙ›Ø]Ì—ØXØİ\˜XŞWØ[™Ü›İÜ×İÚ]İ]Ü[—ÚY
-ÛÛ™][Û—Ü™\İ[ÊN‚ˆ™\İ[ÈHÛÛ™][Û—Ü™\İ[Ë™›Ü
-ÛÛ[[œÏIÜ[—ÚY	ÊBˆ™\İ[ÖÉØXØİ\˜XŞI×HH™\İ[ÖÉØXØİ\˜XŞI×K˜\İ\Jœ™›Ø]ÌŠB‚ˆØÛÜ™YH›Ø\İ™\Ü×ÛY]šXÜÊ™\İ[ÊB‚ˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJØÛÜ™YÉÛXØI×KŒ
-B‚‚]\İ›X\šËœ\˜[Y]š^™J
-	Ü›İÉË	ØÛÛ[[‰Ë	İ˜[YIË	ÙXYÛ›ÜİXÉÊKÂˆ
-K	ØÛÜœ\[Û‰Ë	Ù\šÙ[š[™ÉË	ØÛÜœ\[Û‰ÊKˆ
-K	ØÛÜœ\[Û‰Ë›Û™K	ØÛÜœ\[Û‰ÊKˆ
-K	ÜÙ]™\š]IË	ÜÙ]™\š]IÊKˆ
-K	ÜÙ]™\š]IË‹	ÜÙ]™\š]IÊKˆ
-	ÜÙ]™\š]IËK	ÜÙ]™\š]IÊKˆ
-K	ÜÙ]™\š]IËYK	ÜÙ]™\š]IÊKˆ
-K	ÜÙ]™\š]IËKŒ	ÜÙ]™\š]IÊKˆ
-K	Û—ÜØ[\\ÉË	Û—ÜØ[\\ÉÊKˆ
-K	Û—ÜØ[\\ÉËYK	Û—ÜØ[\\ÉÊKˆ
-K	Û—ÜØ[\\ÉËLŒ	Û—ÜØ[\\ÉÊKˆ
-K	Û—ØÛÜœ™Xİ	ËLK	Û—ØÛÜœ™Xİ	ÊKˆ
-K	Û—ØÛÜœ™Xİ	ËLK	Û—ØÛÜœ™Xİ	ÊKˆ
-K	Û—ØÛÜœ™Xİ	ËŒŒ	Û—ØÛÜœ™Xİ	ÊKˆ
-K	ØXØİ\˜XŞIËLŒK	ØXØİ\˜XŞIÊKˆ
-K	ØXØİ\˜XŞIËKŒK	ØXØİ\˜XŞIÊKˆ
-K	ØXØİ\˜XŞIËœ›˜[‹	ØXØİ\˜XŞIÊKˆ
-K	ØXØİ\˜XŞIËœš[™‹	ØXØİ\˜XŞIÊKˆ
-K	ØXØİ\˜XŞIË	Ì‰Ë	ØXØİ\˜XŞIÊKˆ
-K	ØXØİ\˜XŞIË˜[ÙK	ØXØİ\˜XŞIÊKˆ
-K	ØXØİ\˜XŞIËK	Û—ØÛÜœ™XİÈ—ÜØ[\\ÉÊKˆ
-K	Ü[—ÚY	Ë	Ûİ\‹\[‰Ë	Ü[—ÚY	ÊKˆ
-K	Ü[—ÚY	Ë›Û™K	Ü[—ÚY	ÊK—JB™Yˆ\İÚ[˜[YØÛÛ™][Û—İ˜[YJÛÛ™][Û—Ü™\İ[Ë›İËÛÛ[[‹˜[YKXYÛ›ÜİXÊN‚ˆÛÛ™][Û—Ü™\İ[ÖØÛÛ[[—HHÛÛ™][Û—Ü™\İ[ÖØÛÛ[[—K˜\İ\JØš™Xİ
-BˆÛÛ™][Û—Ü™\İ[Ë˜]Ü›İËÛÛ[[—HH˜[YB‚ˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚYXYÛ›ÜİXÊN‚ˆ›Ø\İ™\Ü×ÛY]šXÜÊÛÛ™][Û—Ü™\İ[ÊB‚‚]\İ›X\šËœ\˜[Y]š^™J	ÛZ\ÜÚ[™×Ü›İÉËÌWJB™Yˆ\İÛZ\ÜÚ[™×ØÛÛ™][ÛŠÛÛ™][Û—Ü™\İ[ËZ\ÜÚ[™×Ü›İÊN‚ˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÛZ\ÜÚ[™ÈÛÛ™][ÛœÉÊN‚ˆ›Ø\İ™\Ü×ÛY]šXÜÊÛÛ™][Û—Ü™\İ[Ë™›Ü
-[™^[Z\ÜÚ[™×Ü›İÊJB‚‚]\İ›X\šËœ\˜[Y]š^™J	Ù\XØ]WÜ›İÉËÌWJB™Yˆ\İÙ\XØ]WØÛÛ™][ÛŠÛÛ™][Û—Ü™\İ[Ë\XØ]WÜ›İÊN‚ˆ\XØ]HH˜ÛÛ˜Ø]
-ØÛÛ™][Û—Ü™\İ[ËÛÛ™][Û—Ü™\İ[Ëš[ØÖÖÙ\XØ]WÜ›İ×WWJB‚ˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÙ\XØ]HÛÛ™][Û‰ÊN‚ˆ›Ø\İ™\Ü×ÛY]šXÜÊ\XØ]JB‚‚™Yˆ\İÛZ\ÛX]ÚYÜØ[\Wİİ[ÊÛÛ™][Û—Ü™\İ[ÊN‚ˆÛÛ™][Û—Ü™\İ[Ë›ØÖÌKÉÛ—ÜØ[\\ÉË	Û—ØÛÜœ™Xİ	×WHHÍLÌB‚ˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÜØ[YH—ÜØ[\\ÉÊN‚ˆ›Ø\İ™\Ü×ÛY]šXÜÊÛÛ™][Û—Ü™\İ[ÊB‚‚™Yˆ\İÚ[˜[YÜ›Ø\İ™\Ü×Ú[œ]ÜİXİ\™JÛÛ™][Û—Ü™\İ[ÊN‚ˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÑ]Qœ˜[YIÊN‚ˆ›Ø\İ™\Ü×ÛY]šXÜÊÛÛ™][Û—Ü™\İ[Ë×ÙXİ
-	Ü™XÛÜ™ÉÊJBˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÜ™\]Z\™YÛÛ[[œËŠ˜XØİ\˜XŞIÊN‚ˆ›Ø\İ™\Ü×ÛY]šXÜÊÛÛ™][Û—Ü™\İ[Ë™›Ü
-ÛÛ[[œÏIØXØİ\˜XŞIÊJBˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÙ\XØ]HÛÛ[[œÉÊN‚ˆ›Ø\İ™\Ü×ÛY]šXÜÊ˜ÛÛ˜Ø]
-ØÛÛ™][Û—Ü™\İ[ËÛÛ™][Û—Ü™\İ[ÖÖÉØXØİ\˜XŞI×WWK^\ÏLJJBˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÛZ\ÜÚ[™ÈÛÛ™][ÛœÉÊN‚ˆ›Ø\İ™\Ü×ÛY]šXÜÊÛÛ™][Û—Ü™\İ[Ëš[ØÖÎŒJB‚‚]\İ™š^\™B™YˆÛÜ™WÛX]š^
+    metrics = classification_metrics(true, predicted)
 
-N‚ˆ[\Ü\ÚX‚‚ˆœ›ÛHÜ˜Ë›Y]šXÜÈ[\ÜÛ\ÜÚYšXØ][Û—ÛY]šXÜÂ‚ˆÛÛ™][ÛœÈHÊ	ØÛX[‰Ë
-WH
-ÈÂˆ
-˜[Z[KÙ]™\š]JBˆ›Üˆ˜[Z[H[ˆ
-	ÙØ]\ÜÚX[—Û›Ú\ÙIË	ÙØ]\ÜÚX[—Ø›\‰Ë	ØœšYÚ™\ÜÉÊBˆ›ÜˆÙ]™\š]H[ˆ˜[™ÙJKŠBˆBˆ›İÜÈH×Bˆ›Üˆ[Ù[Ú[™^[Ù[[ˆ[[Y\˜]J
-	ØÛX[—ØÛ›‰Ë	Ü›Ø\İØÛ›‰ÊJN‚ˆ›ÜˆÙYYÚ[™^ÙYY[ˆ[[Y\˜]J
-‹LŒËŒŠJN‚ˆ[—ÚYH‰ŞÛ[Ù[K\ŞÜÙYYIÂˆ›ÜˆÛÜœ\[Û‹Ù]™\š]H[ˆÛÛ™][ÛœÎ‚ˆ˜\Ù[[™HHŒYˆÛÜœ\[ÛˆOH	ØÛX[‰È[ÙHÌˆÛÜœ™XİÜ\—ØÛ\ÜÈH˜\Ù[[™H
-ÈÙYYÚ[™^
-ˆL
-È[Ù[Ú[™^
-ˆLˆÛÛ™\Ú[ÛˆHœ™\›ÜÊ
-LL
-K\O[œš[
-Bˆ›ÜˆÛ\Ü×ÚY[ˆ˜[™ÙJL
-N‚ˆÛÛ™\Ú[Û–ØÛ\Ü×ÚYÛ\Ü×ÚYHHÛÜœ™XİÜ\—ØÛ\ÜÂˆÛÛ™\Ú[Û–ØÛ\Ü×ÚY
-Û\Ü×ÚY
-ÈJH	HLHHLHÛÜœ™XİÜ\—ØÛ\ÜÂˆİ]ÈHÛ\ÜÚYšXØ][Û—ÛY]šXÜÊˆœœ™\X]
-œ˜\˜[™ÙJL
-KL
-Kˆœ˜\œ˜^JÜ™YXİ[Ûˆ›Üˆ][ˆ˜[™ÙJL
-Bˆ›Üˆ™YXİ[Ûˆ[ˆ
-İ]H
-ˆÛÜœ™XİÜ\—ØÛ\ÜÂˆ
-ÈÊ]
-ÈJH	HLH
-ˆ
-LHÛÜœ™XİÜ\—ØÛ\ÜÊJWJKˆ
-BˆÛÛ™][Û—Ú\ÚH\ÚX‹œÚLMŠˆ‰ŞØÛÜœ\[ÛŸNÜÙ]™\š]_Nœ›İØÛÛ]ŒIË™[˜ÛÙJ
-JKš^YÙ\İ
+    counts = metrics['confusion_matrix']
+    assert counts.shape == (10, 10)
+    assert counts.sum() == metrics['n_samples'] == 3
+    np.testing.assert_array_equal(counts.sum(axis=1), [2, 0, 0, 1, 0, 0, 0, 0, 0, 0])
+    assert counts[0, 2] == counts[3, 9] == 1
+    np.testing.assert_array_equal(metrics['per_class_accuracy'], [0.5] + [0.0] * 9)
+    assert metrics['macro_f1'] == pytest.approx((2 / 3) / 10)
+    np.testing.assert_array_equal(true, [0, 0, 3])
+    np.testing.assert_array_equal(predicted, [0, 2, 9])
 
-Bˆ›İÜË˜\[™
-Âˆ	Ü[—ÚY	Îˆ[—ÚY	Û[Ù[Û˜[YIÎˆ[Ù[	ÜÙYY	ÎˆÙYYˆ	Ü›Ùš[IÎˆ	ØÛÜ™IË	Üİ]\ÉÎˆ	ØÛÛ\]IË	Ù]\Ù]	Îˆ	ØÚY˜\ŒL]\İ]ŒIËˆ	ØÛÜœ\[Û‰ÎˆÛÜœ\[Û‹	ÜÙ]™\š]IÎˆÙ]™\š]Kˆ	Û—ÜØ[\\ÉÎˆLÌ	Û—ØÛÜœ™Xİ	Îˆ[
-œ˜XÙJÛÛ™\Ú[ÛŠJKˆ	ØXØİ\˜XŞIÎˆ›Ø]
-œ˜XÙJÛÛ™\Ú[ÛŠHÈLÌ
-Kˆ	ÛXXÜ›×ÙŒIÎˆİ]ÖÉÛXXÜ›×ÙŒI×Kˆ	Ü\—ØÛ\Ü×ØXØİ\˜XŞIÎˆİ]ÖÉÜ\—ØÛ\Ü×ØXØİ\˜XŞI×KÛ\İ
 
-Kˆ	ØÛÛ™\Ú[Û—ÛX]š^	ÎˆÛÛ™\Ú[Û‹Û\İ
+@pytest.mark.parametrize(('predicted', 'score'), [([0, 1, 2], 1.0), ([1, 2, 0], 0.0)])
+def test_all_correct_or_all_wrong(predicted, score):
+    metrics = classification_metrics([0, 1, 2], predicted, num_classes=3)
 
-Kˆ	ØÚXÚÜÚ[ÜÚLM‰Îˆ\ÚX‹œÚLMŠ[—ÚY™[˜ÛÙJ
-JKš^YÙ\İ
+    assert metrics['accuracy'] == metrics['macro_f1'] == score
+    np.testing.assert_array_equal(metrics['per_class_accuracy'], [score] * 3)
 
-Kˆ	ØÛÛ™šY×Ú\Ú	Îˆ\ÚX‹œÚLMŠ[Ù[™[˜ÛÙJ
-JKš^YÙ\İ
 
-Kˆ	ØÛÛ™][Û—Ú\Ú	ÎˆÛÛ™][Û—Ú\Ú	Ù]˜[ÜÙYY	ÎˆLMˆ	ÜÜ]Ú\Ú	Îˆ	ØIÈ
-ˆ	Û›Ü›X[^˜][Û—Ú\Ú	Îˆ	Ø‰È
-ˆˆJBˆ\ÜÙ\[Š›İÜÊHOHM‚ˆ™]\›ˆ‘]Qœ˜[YJ›İÜÊB‚‚™Yˆ\İİ˜[Y]WØÛÛ\]WØÛÜ™WÛX]š^Ø[™ÚY[]JÛÜ™WÛX]š^
-N‚ˆ˜[Y]YH˜[Y]WÛX]š^
-ÛÜ™WÛX]š^
-B‚ˆ\ÜÙ\[Š˜[Y]Y
-HOHM‚ˆ\ÜÙ\˜[Y]Y™Ü›İ\JÉÛ[Ù[Û˜[YIË	ÜÙYY	×JKœÚ^™J
-K™\JMŠK˜[
+@pytest.mark.parametrize(('true', 'predicted', 'diagnostic'), [
+    ([], [], 'nonempty'),
+    ([0, 1], [0], 'same length'),
+    (np.array([[0, 1]]), [0, 1], 'one-dimensional'),
+    (np.array([0.0, 1.0]), [0, 1], 'integer'),
+    (np.array([0, 1], dtype=object), [0, 1], 'integer'),
+    ([0, True], [0, 1], 'integer'),
+    ([0, np.bool_(True)], [0, 1], 'integer'),
+    ([0, np.timedelta64(1, 'D')], [0, 1], 'integer'),
+    ([0, 1], [0, '1'], 'y_pred'),
+    ([0, 1], [0, np.nan], 'y_pred'),
+    ([0, 1], [0, np.inf], 'y_pred'),
+    ([0, 1], [0, -1], 'y_pred'),
+    ([0, 2], [0, 1], 'y_true'),
+    ([0, 10**100], [0, 1], 'y_true'),
+    (np.array([0, 2**64 - 1], dtype=np.uint64), [0, 1], 'y_true'),
+])
+def test_invalid_label_inputs(true, predicted, diagnostic):
+    with pytest.raises(ValueError, match=diagnostic):
+        classification_metrics(true, predicted, num_classes=2)
 
-Bˆ\ÜÙ\˜[Y]Y™Ü›İ\JÉØÛÜœ\[Û‰Ë	ÜÙ]™\š]I×JVÉØÛÛ™][Û—Ú\Ú	×K›[š\]YJ
-K™\JJK˜[
 
-Bˆ\ÜÙ\˜[Y]Yš[ØÖÌVÉØÛÜœ\[Û‰×HOH	ØÛX[‰Âˆ\ÜÙ\˜[Y]Yš[ØÖÌWVÉØÛÜœ\[Û‰×HOH	ÙØ]\ÜÚX[—Û›Ú\ÙIÂˆ\İ[™Ë˜\ÜÙ\Ùœ˜[YWÙ\]X[
-ÛÜ™WÛX]š^ÛÜ™WÛX]š^˜ÛÜJ
-JB‚‚™Yˆ\İİ˜[Y]WÛX]š^Ü™Z™Xİ×ÛZ\ÜÚ[™×Ù\XØ]WÚ\ÚÛZ\ÛX]ÚØ[™ÜÛ[ÚÙJÛÜ™WÛX]š^
-N‚ˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÙ^XİHM‰ÊN‚ˆ˜[Y]WÛX]š^
-ÛÜ™WÛX]š^š[ØÖÎ‹LWJBˆ\XØ]HH˜ÛÛ˜Ø]
-ØÛÜ™WÛX]š^š[ØÖÎ‹LWKÛÜ™WÛX]š^š[ØÖÖÌWWKYÛ›Ü™WÚ[™^UYJBˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÙ\XØ]IÊN‚ˆ˜[Y]WÛX]š^
-\XØ]JBˆÚ[™ÙYÚ\ÚHÛÜ™WÛX]š^˜ÛÜJ
-BˆÚ[™ÙYÚ\Ú˜]ÌK	ØÛÛ™][Û—Ú\Ú	×HH	ØÉÈ
-ˆˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIØÛÛ™][Û—Ú\ÚY™™\œÉÊN‚ˆ˜[Y]WÛX]š^
-Ú[™ÙYÚ\Ú
-BˆÛ[ÚÙHHÛÜ™WÛX]š^˜ÛÜJ
-BˆÛ[ÚÙK˜]Ì	Ü›Ùš[I×HH	ÜÛ[ÚÙIÂˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÜ›Ùš[OXÛÜ™IÊN‚ˆ˜[Y]WÛX]š^
-Û[ÚÙJBˆ[™\œÚ^™YHÛÜ™WÛX]š^˜ÛÜJ
-Bˆ[™\œÚ^™Y˜]Ì	Û—ÜØ[\\É×HHLˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIÙ^XİHL	ÊN‚ˆ˜[Y]WÛX]š^
-[™\œÚ^™Y
-B‚‚™Yˆ\İİ˜[Y]WÛX]š^Ü™Z™Xİ×Ú[˜ÛÛœÚ\İ[ØÛÛ™\Ú[Û—Üİ[[X\JÛÜ™WÛX]š^
-N‚ˆ[˜[YHÛÜ™WÛX]š^˜ÛÜJ
-Bˆ[˜[Y˜]Ì	Û—ØÛÜœ™Xİ	×HOHBˆ[˜[Y˜]Ì	ØXØİ\˜XŞI×HH[˜[Y˜]Ì	Û—ØÛÜœ™Xİ	×HÈ[˜[Y˜]Ì	Û—ÜØ[\\É×BˆÚ]]\İœ˜Z\Ù\Ê˜[YQ\œ›Ü‹X]ÚIØÛÛ™\Ú[Û—ÛX]š^	ÊN‚ˆ˜[Y]WÛX]š^
-[˜[Y
-B‚‚™Yˆ\İØYÙÜ™YØ]WÜÙYY×İ\Ù\×ÜZ\™YÜÙYY×Ø[™ÜØ[\WÜÙ
-ÛÜ™WÛX]š^
-N‚ˆX›\ÈHYÙÜ™YØ]WÜÙYYÊÛÜ™WÛX]š^
-B‚ˆ\ÜÙ\Ù]
-X›\ÊHOHÂˆ	Ü™\İ[ÉË	Ü[—Üİ[[X\IË	ØÛÛ™][Û—Üİ[[X\IË	Û[Ù[Üİ[[X\IËˆ	ÜZ\™YÙ[\ÉË	ÜZ\™YÜİ[[X\IË	Ü\—ØÛ\Ü×Üİ[[X\IËˆBˆ\ÜÙ\[ŠX›\ÖÉÜ[—Üİ[[X\I×JHOH‚ˆ\ÜÙ\[ŠX›\ÖÉØÛÛ™][Û—Üİ[[X\I×JHOHÌ‚ˆ\ÜÙ\[ŠX›\ÖÉÛ[Ù[Üİ[[X\I×JHOH‚ˆ\ÜÙ\X›\ÖÉÛ[Ù[Üİ[[X\I×VÉÛ‰×KÛ\İ
+@pytest.mark.parametrize('num_classes', [0, -1, True, np.bool_(True), 2.0, '2'])
+def test_invalid_number_of_classes(num_classes):
+    with pytest.raises(ValueError, match='num_classes'):
+        confusion_counts([0], [0], num_classes=num_classes)
 
-HOHÌË×Bˆ\ÜÙ\[ŠX›\ÖÉÜZ\™YÙ[\É×JHOHÂˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJX›\ÖÉÜZ\™YÙ[\É×VÉÛXØWÚ[\›İ™[Y[Ü	×KLŒ
-Bˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJX›\ÖÉÜZ\™YÜİ[[X\I×VÉÛXØWÚ[\›İ™[Y[ÜÜØ[\WÜÙ	×KŒˆ]ÛLYKLLŠBˆÛX[—Ü›İÜÈHX›\ÖÉØÛÛ™][Û—Üİ[[X\I×Kœ]Y\Jˆ›[Ù[Û˜[YHOH	ØÛX[—ØÛ›‰È[™ÛÜœ\[ÛˆOH	ØÛX[‰ÈŠBˆœ\İ[™Ë˜\ÜÙ\Ø[ÛÜÙJÛX[—Ü›İÜÖÉÜØ[\WÜÙ	×KŒJBˆ\ÜÙ\[ŠX›\ÖÉÜ\—ØÛ\Ü×Üİ[[X\I×JHOHˆ
-ˆMˆ
-ˆLˆ\ÜÙ\X›\ÖÉÜ\—ØÛ\Ü×Üİ[[X\I×VÉÛ‰×K™\JÊK˜[
 
-B‚‚™Yˆ\İÛY]šXÜ×ØÛWÜX›\Ú\×ØÛÛ\]WİX›\×Ø[™Ü™Y\Ù\×Ûİ™\Üš]JÛÜ™WÛX]š^\Ü]
-N‚ˆ[\ÜœÛÛ‚‚ˆœ›ÛHÜ˜Ë›Y]šXÜÈ[\ÜØÜİ—ÜØY™B‚ˆÛİ\˜ÙHH\Ü]È	Ü™\İ[Ë˜Üİ‰Âˆİ]]H\Ü]È	ØYÙÜ™YØ]IÂˆØÜİ—ÜØY™JÛÜ™WÛX]š^
-K×ØÜİŠÛİ\˜ÙK[™^Q˜[ÙJB‚ˆ\ÜÙ\Y]šXÜ×ÛXZ[ŠÉËKZ[œ]	ËİŠÛİ\˜ÙJK	ËK[İ]]Y\‰ËİŠİ]]
-WJHOHˆ\ÜÙ\Ü]›˜[YH›Üˆ][ˆİ]]š]\™\Š
-_HOHÂˆ	Ü™\İ[Ë˜Üİ‰Ë	Ü[—Üİ[[X\K˜Üİ‰Ë	ØÛÛ™][Û—Üİ[[X\K˜Üİ‰Ë	Û[Ù[Üİ[[X\K˜Üİ‰Ëˆ	ÜZ\™YÙ[\Ë˜Üİ‰Ë	ÜZ\™YÜİ[[X\K˜Üİ‰Ë	Ü\—ØÛ\Ü×Üİ[[X\K˜Üİ‰ËˆBˆØ]™YHœ™XYØÜİŠİ]]È	Ü™\İ[Ë˜Üİ‰ÊBˆ\ÜÙ\[ŠØ]™Y
-HOHM‚ˆ\ÜÙ\[Šœ™XYØÜİŠİ]]È	ØÛÛ™][Û—Üİ[[X\K˜Üİ‰ÊJHOHÌ‚ˆ\ÜÙ\[Šœ™XYØÜİŠİ]]È	ÜZ\™YÙ[\Ë˜Üİ‰ÊJHOHÂˆ\ÜÙ\[ŠœÛÛ‹›ØYÊØ]™Yš[ØÖÌVÉØÛÛ™\Ú[Û—ÛX]š^	×JJHOHLˆÚ]]\İœ˜Z\Ù\Êš[Q^\İÑ\œ›Ü‹X]ÚIØ[™XYH^\İÉÊN‚ˆY]šXÜ×ÛXZ[ŠÂˆ	ËKZ[œ]	ËİŠÛİ\˜ÙJK	ËK[İ]]Y\‰ËİŠİ]]
-KˆJB
+@pytest.fixture
+def condition_results():
+    conditions = [('clean', 0, 80)] + [
+        (family, severity, 60)
+        for family in ('gaussian_noise', 'gaussian_blur', 'brightness')
+        for severity in range(1, 6)
+    ]
+    return pd.DataFrame([
+        {'run_id': 'synthetic-run', 'corruption': family, 'severity': severity,
+         'n_samples': 100, 'n_correct': correct, 'accuracy': correct / 100}
+        for family, severity, correct in conditions
+    ])
+
+
+def test_robustness_units_and_denominators(condition_results):
+    results = condition_results.assign(extra_metadata='fixture').sample(frac=1, random_state=5)
+    # Evaluation records may be concatenated without resetting the index.
+    results.index = pd.Index([19] * len(results))
+    original = results.copy(deep=True)
+
+    scored = robustness_metrics(results)
+
+    pd.testing.assert_frame_equal(results, original)
+    pd.testing.assert_frame_equal(scored[results.columns], original)
+    corrupted = scored['corruption'] != 'clean'
+    np.testing.assert_allclose(scored.loc[corrupted, 'accuracy_drop_pp'], 20.0)
+    np.testing.assert_allclose(scored.loc[corrupted, 'relative_robustness'], 0.75)
+    np.testing.assert_allclose(scored.loc[corrupted, 'family_mca'], 0.60)
+    np.testing.assert_allclose(scored['mca'], 0.60)
+    np.testing.assert_allclose(scored['robustness_gap_pp'], 20.0)
+    assert scored.loc[~corrupted, ['accuracy_drop_pp', 'relative_robustness',
+                                   'family_mca']].isna().all().all()
+    assert scored['relative_robustness_reason'].isna().all()
+
+
+def test_family_means_clean_exclusion_and_negative_drop(condition_results):
+    scores = [80, 20, 30, 40, 50, 60, 60, 70, 80, 90, 100, 50, 50, 50, 50, 50]
+    condition_results['n_correct'] = scores
+    condition_results['accuracy'] = np.array(scores) / 100
+
+    scored = robustness_metrics(condition_results)
+
+    for family, mean in [('gaussian_noise', 0.4), ('gaussian_blur', 0.8), ('brightness', 0.5)]:
+        np.testing.assert_allclose(scored.loc[scored['corruption'] == family, 'family_mca'], mean)
+    np.testing.assert_allclose(scored['mca'], 17 / 30)
+    np.testing.assert_allclose(scored['robustness_gap_pp'], 70 / 3)
+    assert scored.at[10, 'accuracy_drop_pp'] == pytest.approx(-20)
+    assert scored.at[10, 'relative_robustness'] == pytest.approx(1.25)
+
+
+def test_zero_clean_accuracy_produces_missing_relative_robustness(condition_results):
+    condition_results.loc[0, ['n_correct', 'accuracy']] = [0, 0.0]
+
+    scored = robustness_metrics(condition_results)
+
+    assert scored['relative_robustness'].isna().all()
+    assert pd.isna(scored.at[0, 'relative_robustness_reason'])
+    assert (scored.loc[1:, 'relative_robustness_reason'] == 'zero_clean_accuracy').all()
+    np.testing.assert_allclose(scored.loc[1:, 'accuracy_drop_pp'], -60.0)
+    np.testing.assert_allclose(scored['robustness_gap_pp'], -60.0)
+
+
+def test_float32_accuracy_and_rows_without_run_id(condition_results):
+    results = condition_results.drop(columns='run_id')
+    results['accuracy'] = results['accuracy'].astype(np.float32)
+
+    scored = robustness_metrics(results)
+
+    np.testing.assert_allclose(scored['mca'], 0.60)
+
+
+@pytest.mark.parametrize(('row', 'column', 'value', 'diagnostic'), [
+    (1, 'corruption', 'darkening', 'corruption'),
+    (1, 'corruption', None, 'corruption'),
+    (1, 'severity', 0, 'severity'),
+    (1, 'severity', 6, 'severity'),
+    (0, 'severity', 1, 'severity'),
+    (1, 'severity', True, 'severity'),
+    (1, 'severity', 1.0, 'severity'),
+    (1, 'n_samples', 0, 'n_samples'),
+    (1, 'n_samples', True, 'n_samples'),
+    (1, 'n_samples', 100.0, 'n_samples'),
+    (1, 'n_correct', -1, 'n_correct'),
+    (1, 'n_correct', 101, 'n_correct'),
+    (1, 'n_correct', 60.0, 'n_correct'),
+    (1, 'accuracy', -0.1, 'accuracy'),
+    (1, 'accuracy', 1.1, 'accuracy'),
+    (1, 'accuracy', np.nan, 'accuracy'),
+    (1, 'accuracy', np.inf, 'accuracy'),
+    (1, 'accuracy', '0.6', 'accuracy'),
+    (1, 'accuracy', False, 'accuracy'),
+    (1, 'accuracy', 0.5, 'n_correct / n_samples'),
+    (1, 'run_id', 'other-run', 'run_id'),
+    (1, 'run_id', None, 'run_id'),
+])
+def test_invalid_condition_value(condition_results, row, column, value, diagnostic):
+    condition_results[column] = condition_results[column].astype(object)
+    condition_results.at[row, column] = value
+
+    with pytest.raises(ValueError, match=diagnostic):
+        robustness_metrics(condition_results)
+
+
+@pytest.mark.parametrize('missing_row', [0, 1])
+def test_missing_condition(condition_results, missing_row):
+    with pytest.raises(ValueError, match='missing conditions'):
+        robustness_metrics(condition_results.drop(index=missing_row))
+
+
+@pytest.mark.parametrize('duplicate_row', [0, 1])
+def test_duplicate_condition(condition_results, duplicate_row):
+    duplicate = pd.concat([condition_results, condition_results.iloc[[duplicate_row]]])
+
+    with pytest.raises(ValueError, match='duplicate condition'):
+        robustness_metrics(duplicate)
+
+
+def test_mismatched_sample_totals(condition_results):
+    condition_results.loc[1, ['n_samples', 'n_correct']] = [50, 30]
+
+    with pytest.raises(ValueError, match='same n_samples'):
+        robustness_metrics(condition_results)
+
+
+def test_invalid_robustness_input_structure(condition_results):
+    with pytest.raises(ValueError, match='DataFrame'):
+        robustness_metrics(condition_results.to_dict('records'))
+    with pytest.raises(ValueError, match='required columns.*accuracy'):
+        robustness_metrics(condition_results.drop(columns='accuracy'))
+    with pytest.raises(ValueError, match='duplicate columns'):
+        robustness_metrics(pd.concat([condition_results, condition_results[['accuracy']]], axis=1))
+    with pytest.raises(ValueError, match='missing conditions'):
+        robustness_metrics(condition_results.iloc[:0])
+
+
+@pytest.fixture
+def core_matrix():
+    import hashlib
+
+    from src.metrics import classification_metrics
+
+    conditions = [('clean', 0)] + [
+        (family, severity)
+        for family in ('gaussian_noise', 'gaussian_blur', 'brightness')
+        for severity in range(1, 6)
+    ]
+    rows = []
+    for model_index, model in enumerate(('clean_cnn', 'robust_cnn')):
+        for seed_index, seed in enumerate((42, 123, 2026)):
+            run_id = f'{model}-s{seed}'
+            for corruption, severity in conditions:
+                baseline = 600 if corruption == 'clean' else 300
+                correct_per_class = baseline + seed_index * 100 + model_index * 100
+                confusion = np.zeros((10, 10), dtype=np.int64)
+                for class_id in range(10):
+                    confusion[class_id, class_id] = correct_per_class
+                    confusion[class_id, (class_id + 1) % 10] = 1000 - correct_per_class
+                stats = classification_metrics(
+                    np.repeat(np.arange(10), 1000),
+                    np.array([prediction for truth in range(10)
+                              for prediction in ([truth] * correct_per_class
+                                                 + [(truth + 1) % 10] * (1000 - correct_per_class))]),
+                )
+                condition_hash = hashlib.sha256(
+                    f'{corruption}:{severity}:protocol-v1'.encode()).hexdigest()
+                rows.append({
+                    'run_id': run_id, 'model_name': model, 'seed': seed,
+                    'profile': 'core', 'status': 'complete', 'dataset': 'cifar10-test-v1',
+                    'corruption': corruption, 'severity': severity,
+                    'n_samples': 10_000, 'n_correct': int(np.trace(confusion)),
+                    'accuracy': float(np.trace(confusion) / 10_000),
+                    'macro_f1': stats['macro_f1'],
+                    'per_class_accuracy': stats['per_class_accuracy'].tolist(),
+                    'confusion_matrix': confusion.tolist(),
+                    'checkpoint_sha256': hashlib.sha256(run_id.encode()).hexdigest(),
+                    'config_hash': hashlib.sha256(model.encode()).hexdigest(),
+                    'condition_hash': condition_hash, 'eval_seed': 100494,
+                    'split_hash': 'a' * 64, 'normalization_hash': 'b' * 64,
+                })
+    assert len(rows) == 96
+    return pd.DataFrame(rows)
+
+
+def test_validate_complete_core_matrix_and_identity(core_matrix):
+    validated = validate_matrix(core_matrix)
+
+    assert len(validated) == 96
+    assert validated.groupby(['model_name', 'seed']).size().eq(16).all()
+    assert validated.groupby(['corruption', 'severity'])['condition_hash'].nunique().eq(1).all()
+    assert validated.iloc[0]['corruption'] == 'clean'
+    assert validated.iloc[1]['corruption'] == 'gaussian_noise'
+    pd.testing.assert_frame_equal(core_matrix, core_matrix.copy())
+
+
+def test_validate_matrix_rejects_missing_duplicate_hash_mismatch_and_smoke(core_matrix):
+    with pytest.raises(ValueError, match='exactly 96'):
+        validate_matrix(core_matrix.iloc[:-1])
+    duplicate = pd.concat([core_matrix.iloc[:-1], core_matrix.iloc[[0]]], ignore_index=True)
+    with pytest.raises(ValueError, match='duplicate'):
+        validate_matrix(duplicate)
+    changed_hash = core_matrix.copy()
+    changed_hash.at[1, 'condition_hash'] = 'c' * 64
+    with pytest.raises(ValueError, match='condition_hash differs'):
+        validate_matrix(changed_hash)
+    smoke = core_matrix.copy()
+    smoke.at[0, 'profile'] = 'smoke'
+    with pytest.raises(ValueError, match='profile=core'):
+        validate_matrix(smoke)
+    undersized = core_matrix.copy()
+    undersized.at[0, 'n_samples'] = 100
+    with pytest.raises(ValueError, match='exactly 10000'):
+        validate_matrix(undersized)
+
+
+def test_validate_matrix_rejects_inconsistent_confusion_summary(core_matrix):
+    invalid = core_matrix.copy()
+    invalid.at[0, 'n_correct'] -= 1
+    invalid.at[0, 'accuracy'] = invalid.at[0, 'n_correct'] / invalid.at[0, 'n_samples']
+    with pytest.raises(ValueError, match='confusion_matrix'):
+        validate_matrix(invalid)
+
+
+def test_aggregate_seeds_uses_paired_seeds_and_sample_sd(core_matrix):
+    tables = aggregate_seeds(core_matrix)
+
+    assert set(tables) == {
+        'results', 'run_summary', 'condition_summary', 'model_summary',
+        'paired_deltas', 'paired_summary', 'per_class_summary',
+    }
+    assert len(tables['run_summary']) == 6
+    assert len(tables['condition_summary']) == 32
+    assert len(tables['model_summary']) == 2
+    assert tables['model_summary']['n'].tolist() == [3, 3]
+    assert len(tables['paired_deltas']) == 3
+    np.testing.assert_allclose(tables['paired_deltas']['mca_improvement_pp'], 10.0)
+    np.testing.assert_allclose(tables['paired_summary']['mca_improvement_pp_sample_sd'], 0.0,
+                               atol=1e-12)
+    clean_rows = tables['condition_summary'].query(
+        "model_name == 'clean_cnn' and corruption == 'clean'")
+    np.testing.assert_allclose(clean_rows['sample_sd'], 0.1)
+    assert len(tables['per_class_summary']) == 2 * 16 * 10
+    assert tables['per_class_summary']['n'].eq(3).all()
+
+
+def test_metrics_cli_publishes_complete_tables_and_refuses_overwrite(core_matrix, tmp_path):
+    import json
+
+    from src.metrics import _csv_safe
+
+    source = tmp_path / 'results.csv'
+    output = tmp_path / 'aggregate'
+    _csv_safe(core_matrix).to_csv(source, index=False)
+
+    assert metrics_main(['--input', str(source), '--output-dir', str(output)]) == 0
+    assert {path.name for path in output.iterdir()} == {
+        'results.csv', 'run_summary.csv', 'condition_summary.csv', 'model_summary.csv',
+        'paired_deltas.csv', 'paired_summary.csv', 'per_class_summary.csv',
+    }
+    saved = pd.read_csv(output / 'results.csv')
+    assert len(saved) == 96
+    assert len(pd.read_csv(output / 'condition_summary.csv')) == 32
+    assert len(pd.read_csv(output / 'paired_deltas.csv')) == 3
+    assert len(json.loads(saved.iloc[0]['confusion_matrix'])) == 10
+    with pytest.raises(FileExistsError, match='already exists'):
+        metrics_main([
+            '--input', str(source), '--output-dir', str(output),
+        ])

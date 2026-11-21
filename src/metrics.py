@@ -1,300 +1,467 @@
-şŠmş&yºŞÃòân¶«Ëñè™æë{Ü™ßì…éez{ì†X§{_?n)ÿ¦Ã©z¶­Š‰ç¢Ú^®h­µçHˆˆÛ\ÜÚYšXØ][Ûˆ[™\‹\[ˆ›Ø\İ™\ÜÈY]šXÜÈ›ÜˆHÒQT‹LL›İØÛÛˆˆˆ‚‚š[\Ü\™Ü\œÙBš[\ÜœÛÛ‚š[\ÜX]š[\ÜÜÂ™œ›ÛH]Xˆ[\Ü]š[\Ü[\š[B‚š[\Ü[\H\Èœš[\Ü[™\È\È‚‚—ĞÓÔ”•TQÑSRSQTÈH
-	ÙØ]\ÜÚX[—Û›Ú\ÙIË	ÙØ]\ÜÚX[—Ø›\‰Ë	ØœšYÚ™\ÜÉÊB—ĞÓÓ‘USÓ”ÈHÊ	ØÛX[‰Ë
-_HÂˆ
-˜[Z[KÙ]™\š]JH›Üˆ˜[Z[H[ˆĞÓÔ”•TQÑSRSQTÈ›ÜˆÙ]™\š]H[ˆ˜[™ÙJKŠBŸB—Ô‘TÕSĞÓÓSS”ÈH
-	ØÛÜœ\[Û‰Ë	ÜÙ]™\š]IË	Û—ÜØ[\\ÉË	Û—ØÛÜœ™Xİ	Ë	ØXØİ\˜XŞIÊB—ÓSÑSÈH
-	ØÛX[—ØÛ›‰Ë	Ü›Ø\İØÛ›‰ÊB—ÔÑQQÈH
-‹LŒËŒŠB—ÒQS•UWĞÓÓSS”ÈH
-	Ù]\Ù]	Ë	ÜÜ]Ú\Ú	Ë	Û›Ü›X[^˜][Û—Ú\Ú	Ë	Ù]˜[ÜÙYY	ÊB—ÔÒLM—ĞÓÓSS”ÈH
-	ØÚXÚÜÚ[ÜÚLM‰Ë	ØÛÛ™šY×Ú\Ú	Ë	ØÛÛ™][Û—Ú\Ú	Ëˆ	ÜÜ]Ú\Ú	Ë	Û›Ü›X[^˜][Û—Ú\Ú	ÊB‚‚™YˆÚ\×Ú[YÙ\Š˜[YJHOˆ›ÛÛ‚ˆYˆ\Ú[œİ[˜ÙJ˜[YKœš[YÙ\ŠN‚ˆ™]\›ˆ˜[YK™\KšÚ[™[ˆ	Ú]IÂˆ™]\›ˆ\Ú[œİ[˜ÙJ˜[YK[
-H[™›İ\Ú[œİ[˜ÙJ˜[YK›ÛÛ
-B‚‚™YˆÛX™[ÚYÊX™[Ë˜[YNˆİ‹[WØÛ\ÜÙ\Îˆ[
-HOˆœ›™\œ˜^N‚ˆYˆ\Ú[œİ[˜ÙJX™[Ëœ›™\œ˜^JN‚ˆYˆX™[Ë›™[HOHHÜˆX™[Ë™\KšÚ[™›İ[ˆ	Ú]IÎ‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÛ˜[Y_H]\İ™HHÛ™KY[Y[œÚ[Û˜[[YÙ\ˆ\œ˜^IÊBˆ[—Ü˜[™ÙHHœ˜[
+"""Classification and per-run robustness metrics for the CIFAR-10 protocol."""
 
-X™[ÈH
-H	ˆ
-X™[È[WØÛ\ÜÙ\ÊJBˆ[Yˆ\Ú[œİ[˜ÙJX™[Ë
-\İ\JJN‚ˆYˆ›İ[
-Ú\×Ú[YÙ\ŠX™[
-H›ÜˆX™[[ˆX™[ÊN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÛ˜[Y_H]\İÛÛZ[ˆÛ›H[YÙ\ˆÛ\ÜÈQÉÊBˆ[—Ü˜[™ÙHH[
-H[
-X™[
-H[WØÛ\ÜÙ\È›ÜˆX™[[ˆX™[ÊBˆ[ÙN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÛ˜[Y_H]\İ™HHÛ™KY[Y[œÚ[Û˜[[YÙ\ˆ\œ˜^K\İÜˆ\IÊBˆYˆ[ŠX™[ÊHOH‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÛ˜[Y_H]\İ™H›Û™[\IÊBˆYˆ›İ[—Ü˜[™ÙN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÛ˜[Y_HÛ\ÜÈQÈ]\İ™H[ˆÌÛ[WØÛ\ÜÙ\ÈH_WIÊBˆ™]\›ˆœ˜\Ø\œ˜^JX™[Ë\O[œš[
-B‚‚™YˆÛÛ™\Ú[Û—ØÛİ[ÊWİYKWÜ™Y[WØÛ\ÜÙ\Îˆ[HL
-HOˆœ›™\œ˜^N‚ˆˆˆÛİ[[YÙ\ˆÛ\ÜÈQÈ[ˆHš^Y[X]š^Ú]YHÛ\ÜÙ\È\È›İÜËˆˆˆ‚ˆYˆ›İÚ\×Ú[YÙ\Š[WØÛ\ÜÙ\ÊHÜˆ[WØÛ\ÜÙ\ÈN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Û[WØÛ\ÜÙ\È]\İ™HHÜÚ]]™H[YÙ\‰ÊBˆ[WØÛ\ÜÙ\ÈH[
-[WØÛ\ÜÙ\ÊBˆYHHÛX™[ÚYÊWİYK	ŞWİYIË[WØÛ\ÜÙ\ÊBˆ™YXİYHÛX™[ÚYÊWÜ™Y	ŞWÜ™Y	Ë[WØÛ\ÜÙ\ÊBˆYˆ[ŠYJHOH[Š™YXİY
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ŞWİYH[™WÜ™Y]\İ]™HHØ[YH[™İ	ÊB‚ˆÛİ[ÈHœ™\›ÜÊ
-[WØÛ\ÜÙ\Ë[WØÛ\ÜÙ\ÊK\O[œš[
-Bˆœ˜Y˜]
-Ûİ[Ë
-YK™YXİY
-KJBˆ™]\›ˆÛİ[Â‚‚™YˆÛ\ÜÚYšXØ][Û—ÛY]šXÜÊWİYKWÜ™Y[WØÛ\ÜÙ\Îˆ[HL
-HOˆXİ‚ˆˆˆ”™]\›ˆÛİ[ËXØİ\˜XŞK\‹XÛ\ÜÈ™XØ[[™XXÜ›ËQŒH›ÜˆÛ™HÛÛ™][Û‹‚‚ˆXØİ\˜XŞK\—ØÛ\Ü×ØXØİ\˜XŞH
-™XØ[
-K[™XXÜ›×ÙŒH\™Hœ˜Xİ[ÛœËˆ™XØ[ˆ\È™\›È›ÜˆÛ\ÜÙ\ÈÚ]İ]YH^[\\ËˆXXÜ›ËQŒH]™\˜YÙ\Èİ™\ˆ]™\BˆÛÛ™šYİ\™YÛ\ÜËÚ][™Yš[™YÛ\ÜÈŒHÛÛšX][™È™\›Ë‚ˆˆˆ‚ˆÛİ[ÈHÛÛ™\Ú[Û—ØÛİ[ÊWİYKWÜ™Y[WØÛ\ÜÙ\ÊBˆYWÜÜÚ]]™\ÈHÛİ[Ë™XYÛÛ˜[
+import argparse
+import json
+import math
+import os
+from pathlib import Path
+import tempfile
 
-Bˆİ\ÜHÛİ[Ëœİ[J^\ÏLJBˆŒWÙ[›ÛZ[˜]ÜˆHİ\Ü
-ÈÛİ[Ëœİ[J^\ÏL
-Bˆ\—ØÛ\Ü×ØXØİ\˜XŞHHœ™]šYJYWÜÜÚ]]™\Ëİ\Üˆİ][œ™\›ÜÊ[ŠÛİ[ÊJKÚ\™O\İ\Üˆ
-Bˆ\—ØÛ\Ü×ÙŒHHœ™]šYJˆ
-ˆYWÜÜÚ]]™\ËŒWÙ[›ÛZ[˜]Ü‹ˆİ][œ™\›ÜÊ[ŠÛİ[ÊJKÚ\™OYŒWÙ[›ÛZ[˜]Üˆˆ
-Bˆ—ÜØ[\\ÈH[
-İ\Üœİ[J
-JBˆ—ØÛÜœ™XİH[
-YWÜÜÚ]]™\Ëœİ[J
-JBˆ™]\›ˆÂˆ	ØÛÛ™\Ú[Û—ÛX]š^	ÎˆÛİ[Ëˆ	Û—ÜØ[\\ÉÎˆ—ÜØ[\\Ëˆ	Û—ØÛÜœ™Xİ	Îˆ—ØÛÜœ™Xİˆ	ØXØİ\˜XŞIÎˆ—ØÛÜœ™XİÈ—ÜØ[\\Ëˆ	Ü\—ØÛ\Ü×ØXØİ\˜XŞIÎˆ\—ØÛ\Ü×ØXØİ\˜XŞKˆ	ÛXXÜ›×ÙŒIÎˆ›Ø]
-\—ØÛ\Ü×ÙŒK›YX[Š
-JKˆB‚‚™Yˆİ˜[Y]YØÛÛ™][Û—ÜØÛÜ™\Ê™\İ[Îˆ‘]Qœ˜[YJHOˆXİİ\VÜİ‹[K›Ø]N‚ˆYˆ›İ\Ú[œİ[˜ÙJ™\İ[Ë‘]Qœ˜[YJN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ü™\İ[È]\İ™HH[™\È]Qœ˜[YIÊBˆYˆ›İ™\İ[Ë˜ÛÛ[[œËš\×İ[š\]YN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ü™\İ[È]\İ›İÛÛZ[ˆ\XØ]HÛÛ[[œÉÊBˆZ\ÜÚ[™×ØÛÛ[[œÈHÙ]
-Ô‘TÕSĞÓÓSS”ÊK™Y™™\™[˜ÙJ™\İ[Ë˜ÛÛ[[œÊBˆYˆZ\ÜÚ[™×ØÛÛ[[œÎ‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰Ü™\İ[È\ÈZ\ÜÚ[™È™\]Z\™YÛÛ[[œÎˆÜÛÜY
-Z\ÜÚ[™×ØÛÛ[[œÊ_IÊBˆYˆ	Ü[—ÚY	È[ˆ™\İ[Î‚ˆ[—ÚYÈH™\İ[ÖÉÜ[—ÚY	×BˆYˆ›İ[
-\Ú[œİ[˜ÙJ[—ÚYİŠH[™[—ÚYœİš\
+import numpy as np
+import pandas as pd
 
-H›Üˆ[—ÚY[ˆ[—ÚYÊN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ü[—ÚY]\İÛÛZ[ˆ›Û™[\Hİš[™ÜÉÊBˆYˆ[—ÚYË›[š\]YJ
-HˆN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ü™\İ[È]\İÛÛZ[ˆHÚ[™ÛH[—ÚY	ÊB‚ˆØÛÜ™\ÈHßBˆØ[\Wİİ[ÈHÙ]
 
-Bˆ›İÜÈH™\İ[ÖÛ\İ
-Ô‘TÕSĞÓÓSS”ÊWKš]\\\Ê[™^Q˜[ÙK˜[YOS›Û™JBˆ›Üˆ›İ×Û[X™\‹
-ÛÜœ\[Û‹Ù]™\š]K—ÜØ[\\Ë—ØÛÜœ™XİXØİ\˜XŞJH[ˆ[[Y\˜]J›İÜÊN‚ˆ›İÈH‰Ü™\İ[È›İÈÜ›İ×Û[X™\ŸIÂˆYˆ›İ\Ú[œİ[˜ÙJÛÜœ\[Û‹İŠHÜˆÛÜœ\[Ûˆ›İ[ˆ
-	ØÛX[‰Ë
-—ĞÓÔ”•TQÑSRSQTÊN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÜ›İßNˆ[šÛ›İÛˆÛÜœ\[ÛˆØÛÜœ\[Ûˆ\ŸIÊBˆYˆ›İÚ\×Ú[YÙ\ŠÙ]™\š]JHÜˆ
-ÛÜœ\[Û‹[
-Ù]™\š]JJH›İ[ˆĞÓÓ‘USÓ”Î‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÜ›İßNˆ[˜[YÙ]™\š]HÜÙ]™\š]H\ŸH›ÜˆØÛÜœ\[ÛŸIÊBˆÛÛ™][ÛˆH
-ÛÜœ\[Û‹[
-Ù]™\š]JJBˆYˆÛÛ™][Ûˆ[ˆØÛÜ™\Î‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÜ›İßNˆ\XØ]HÛÛ™][ÛˆØÛÛ™][Ûˆ\ŸIÊBˆYˆ›İÚ\×Ú[YÙ\Š—ÜØ[\\ÊHÜˆ[
-—ÜØ[\\ÊHH‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÜ›İßNˆ—ÜØ[\\È]\İ™HHÜÚ]]™H[YÙ\‰ÊBˆYˆ›İÚ\×Ú[YÙ\Š—ØÛÜœ™Xİ
-HÜˆ›İH[
-—ØÛÜœ™Xİ
-HH[
-—ÜØ[\\ÊN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÜ›İßNˆ—ØÛÜœ™Xİ]\İ™H[ˆ[YÙ\ˆ[ˆÌ—ÜØ[\\×IÊBˆYˆ
-›İ
-Ú\×Ú[YÙ\ŠXØİ\˜XŞJHÜˆ\Ú[œİ[˜ÙJXØİ\˜XŞK
-›Ø]œ™›Ø][™ÊJJBˆÜˆ›İHXØİ\˜XŞHHJN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÜ›İßNˆXØİ\˜XŞH]\İ™HHš[š]Hœ˜Xİ[Ûˆ[ˆÌWIÊBˆXØİ\˜XŞHH›Ø]
-XØİ\˜XŞJBˆÈXØÙ\›Ø]Ìˆ›İ[™[™ÈÚ[H™\]Z\š[™ÈH™\›ÈÛİ[ÈZY[^Xİ™\›Ë‚ˆYˆ›İX]š\ØÛÜÙJXØİ\˜XŞK[
-—ØÛÜœ™Xİ
-HÈ[
-—ÜØ[\\ÊK™[İÛLYKMËXœ×İÛLŒ
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞÜ›İßNˆXØİ\˜XŞH]\İYÜ™YHÚ]—ØÛÜœ™XİÈ—ÜØ[\\ÉÊBˆØÛÜ™\ÖØÛÛ™][Û—HHXØİ\˜XŞBˆØ[\Wİİ[Ë˜Y
-[
-—ÜØ[\\ÊJB‚ˆZ\ÜÚ[™ÈHĞÓÓ‘USÓ”Ë™Y™™\™[˜ÙJØÛÜ™\ÊBˆYˆZ\ÜÚ[™Î‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰Ü™\İ[È\ÈZ\ÜÚ[™ÈÛÛ™][ÛœÎˆÜÛÜY
-Z\ÜÚ[™Ê_IÊBˆYˆ[ŠØ[\Wİİ[ÊHOHN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ø[ÛÛ™][ÛœÈ]\İ]™HHØ[YH—ÜØ[\\ÉÊBˆ™]\›ˆØÛÜ™\Â‚‚™Yˆ›Ø\İ™\Ü×ÛY]šXÜÊ™\İ[Îˆ‘]Qœ˜[YJHOˆ‘]Qœ˜[YN‚ˆˆˆ[››İ]HHMˆÛÛ™][Ûˆ›İÜÈ›ÜˆÛ™H[ˆÚ]İ]Ú[™Ú[™ÈH[œ]‚‚ˆ\‹XÛÛ™][Ûˆ[™˜[Z[HY]šXÜÈ\™HZ\ÜÚ[™ÈÛˆHÛX[ˆ›İËˆXØH[™ˆ›Ø\İ™\Ü×ÙØ\Ü\™H[‹[]™[˜[Y\È™\X]YÛˆ]™\H›İËˆXØİ\˜XŞH[™ˆPĞH\™Hœ˜Xİ[ÛœË™[]]™H›Ø\İ™\ÜÈ\ÈH˜][Ë[™
-—ÜšY[È\™Bˆ\˜Ù[YÙHÚ[Ëˆ™[]]™H›Ø\İ™\ÜÈ\ÈZ\ÜÚ[™ÈÚ]H™X\ÛÛˆÚ[ˆBˆÛX[ˆXØİ\˜XŞH\È™\›Ë‚ˆˆˆ‚ˆØÛÜ™\ÈHİ˜[Y]YØÛÛ™][Û—ÜØÛÜ™\Ê™\İ[ÊBˆÛX[—ØXØİ\˜XŞHHØÛÜ™\ÖÉØÛX[‰ËB‚ˆØÛÜ™YH™\İ[Ë˜ÛÜJ
-Bˆ˜[Z[Y\ÈHØÛÜ™YÉØÛÜœ\[Û‰×K×Û[\J
-BˆXØİ\˜XÚY\ÈHØÛÜ™YÉØXØİ\˜XŞI×K×Û[\J\O[œ™›Ø]
-BˆÛÜœ\YH˜[Z[Y\ÈOH	ØÛX[‰ÂˆÛÜœ\YØXØİ\˜XÚY\ÈHXØİ\˜XÚY\ÖØÛÜœ\YB‚ˆ›ÜÈH˜\œ˜^JÓ›Û™WH
-ˆ[ŠØÛÜ™Y
-K\OIÑ›Ø]	ÊBˆ›ÜÖØÛÜœ\YHHL
-ˆ
-ÛX[—ØXØİ\˜XŞHHÛÜœ\YØXØİ\˜XÚY\ÊBˆ™[]]™HH˜\œ˜^JÓ›Û™WH
-ˆ[ŠØÛÜ™Y
-K\OIÑ›Ø]	ÊBˆ™[]]™WÜ™X\ÛÛˆH˜\œ˜^JÓ›Û™WH
-ˆ[ŠØÛÜ™Y
-K\OIÜİš[™ÉÊBˆYˆÛX[—ØXØİ\˜XŞHˆ‚ˆ™[]]™VØÛÜœ\YHHÛÜœ\YØXØİ\˜XÚY\ÈÈÛX[—ØXØİ\˜XŞBˆ[ÙN‚ˆ™[]]™WÜ™X\ÛÛ–ØÛÜœ\YHH	Ş™\›×ØÛX[—ØXØİ\˜XŞIÂ‚ˆ˜[Z[WÛXØHH˜\œ˜^JÓ›Û™WH
-ˆ[ŠØÛÜ™Y
-K\OIÑ›Ø]	ÊBˆ›Üˆ˜[Z[H[ˆĞÓÔ”•TQÑSRSQTÎ‚ˆ[—Ù˜[Z[HH˜[Z[Y\ÈOH˜[Z[Bˆ˜[Z[WÛXØVÚ[—Ù˜[Z[WHHXØİ\˜XÚY\ÖÚ[—Ù˜[Z[WK›YX[Š
-B‚ˆXØHH›Ø]
-ÛÜœ\YØXØİ\˜XÚY\Ë›YX[Š
-JBˆØÛÜ™YÉØXØİ\˜XŞWÙ›ÜÜ	×HH›ÜÂˆØÛÜ™YÉÜ™[]]™WÜ›Ø\İ™\ÜÉ×HH™[]]™BˆØÛÜ™YÉÜ™[]]™WÜ›Ø\İ™\Ü×Ü™X\ÛÛ‰×HH™[]]™WÜ™X\ÛÛ‚ˆØÛÜ™YÉÙ˜[Z[WÛXØI×HH˜[Z[WÛXØBˆØÛÜ™YÉÛXØI×HHXØBˆØÛÜ™YÉÜ›Ø\İ™\Ü×ÙØ\Ü	×HHL
-ˆ
-ÛX[—ØXØİ\˜XŞHHXØJBˆ™]\›ˆØÛÜ™Y‚‚™Yˆ˜[Y]WÛX]š^
-™\İ[Îˆ‘]Qœ˜[YJHOˆ‘]Qœ˜[YN‚ˆˆˆ•˜[Y]HHÛÛ\]H‹[[Ù[0åÈË\ÙYY0åÈM‹XÛÛ™][ÛˆÛÜ™HX]š^‚‚ˆXXÚ[œ]›İÈ\ÈHÛÛ\]Y[Ù[ÜÙYYØÛÛ™][Ûˆ]˜[X][Ûˆİ[[X\KˆBˆ™]\›™YÛÜH\ÈÛÜY[È›İØÛÛÜ™\‹ˆÛÛ™][Û—Ú\Ú\È™\]Z\™YˆÛÈ]™\H[Ù[\È›İ™[ˆÈ]™H™XÙZ]™YHØ[YH[™^Y\İ[œ]È›Ü‚ˆXXÚÛÛ™][Û‹ˆÜ[Û˜[]\Ù]ÜÜ]Û›Ü›X[^˜][Û‹Ù]˜[Y[]HÛÛ[[œËˆÚ[ˆ™\Ù[]\İ[ÛÈ™HÛÛœİ[›İYÚİ]HX]š^‚ˆˆˆ‚ˆ™\]Z\™YHÂˆ	Ü[—ÚY	Ë	Û[Ù[Û˜[YIË	ÜÙYY	Ë	Ü›Ùš[IË	Üİ]\ÉË	Ù]\Ù]	Ëˆ	ØÚXÚÜÚ[ÜÚLM‰Ë	ØÛÛ™šY×Ú\Ú	Ë	ØÛÛ™][Û—Ú\Ú	Ë	Ù]˜[ÜÙYY	Ëˆ	ÜÜ]Ú\Ú	Ë	Û›Ü›X[^˜][Û—Ú\Ú	Ë	ÛXXÜ›×ÙŒIË	Ü\—ØÛ\Ü×ØXØİ\˜XŞIËˆ	ØÛÛ™\Ú[Û—ÛX]š^	Ë
-—Ô‘TÕSĞÓÓSS”ËˆBˆYˆ›İ\Ú[œİ[˜ÙJ™\İ[Ë‘]Qœ˜[YJN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ü™\İ[È]\İ™HH[™\È]Qœ˜[YIÊBˆYˆ›İ™\İ[Ë˜ÛÛ[[œËš\×İ[š\]YN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ü™\İ[È]\İ›İÛÛZ[ˆ\XØ]HÛÛ[[œÉÊBˆZ\ÜÚ[™ÈH™\]Z\™Y™Y™™\™[˜ÙJ™\İ[Ë˜ÛÛ[[œÊBˆYˆZ\ÜÚ[™Î‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰Ü™\İ[È\ÈZ\ÜÚ[™È™\]Z\™YÛÛ[[œÎˆÜÛÜY
-Z\ÜÚ[™Ê_IÊBˆYˆ[Š™\İ[ÊHOH[ŠÓSÑSÊH
-ˆ[ŠÔÑQQÊH
-ˆ[ŠĞÓÓ‘USÓ”ÊN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ØÛÜ™HX]š^]\İÛÛZ[ˆ^XİHMˆ›İÜÉÊB‚ˆœ˜[YHH™\İ[Ë˜ÛÜJ
-BˆYˆœ˜[YVÉÛ[Ù[Û˜[YI×Kš\Û˜J
-K˜[J
-HÜˆ›İœ˜[YVÉÛ[Ù[Û˜[YI×Kš\Ú[ŠÓSÑSÊK˜[
+_CORRUPTED_FAMILIES = ('gaussian_noise', 'gaussian_blur', 'brightness')
+_CONDITIONS = {('clean', 0)} | {
+    (family, severity) for family in _CORRUPTED_FAMILIES for severity in range(1, 6)
+}
+_RESULT_COLUMNS = ('corruption', 'severity', 'n_samples', 'n_correct', 'accuracy')
+_MODELS = ('clean_cnn', 'robust_cnn')
+_SEEDS = (42, 123, 2026)
+_IDENTITY_COLUMNS = ('dataset', 'split_hash', 'normalization_hash', 'eval_seed')
+_SHA256_COLUMNS = ('checkpoint_sha256', 'config_hash', 'condition_hash',
+                   'split_hash', 'normalization_hash')
 
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰Û[Ù[Û˜[YH˜[Y\È]\İ™H^XİH×ÓSÑSßIÊBˆYˆœ˜[YVÉÜÙYY	×Kš\Û˜J
-K˜[J
-HÜˆ›İœ˜[YVÉÜÙYY	×K›X\
-Ú\×Ú[YÙ\ŠK˜[
 
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ÜÙYY˜[Y\È]\İ™H[YÙ\ˆ›İØÛÛÙYYÉÊBˆœ˜[YVÉÜÙYY	×HHœ˜[YVÉÜÙYY	×K˜\İ\J	Ú[	ÊBˆYˆÙ]
-œ˜[YVÉÜÙYY	×JHOHÙ]
-ÔÑQQÊN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ÜÙYY˜[Y\È]\İ™H^XİH×ÔÑQQßIÊBˆYˆœ˜[YVÉØÛÛ™][Û—Ú\Ú	×K›X\
-[X™Hˆ›İ\Ú[œİ[˜ÙJİŠHÜˆ›İœİš\
+def _is_integer(value) -> bool:
+    if isinstance(value, np.integer):
+        return value.dtype.kind in 'iu'
+    return isinstance(value, int) and not isinstance(value, bool)
 
-JK˜[J
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ØÛÛ™][Û—Ú\Ú]\İÛÛZ[ˆ›Û™[\Hİš[™ÜÉÊBˆYˆ›İ
-œ˜[YVÉÜİ]\É×HOH	ØÛÛ\]IÊK˜[
 
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ø[ÛÜ™H]˜[X][Ûˆ›İÜÈ]\İ]™Hİ]\ÏXÛÛ\]IÊBˆYˆ›İ
-œ˜[YVÉÜ›Ùš[I×HOH	ØÛÜ™IÊK˜[
+def _label_ids(labels, name: str, num_classes: int) -> np.ndarray:
+    if isinstance(labels, np.ndarray):
+        if labels.ndim != 1 or labels.dtype.kind not in 'iu':
+            raise ValueError(f'{name} must be a one-dimensional integer array')
+        in_range = np.all((labels >= 0) & (labels < num_classes))
+    elif isinstance(labels, (list, tuple)):
+        if not all(_is_integer(label) for label in labels):
+            raise ValueError(f'{name} must contain only integer class IDs')
+        in_range = all(0 <= int(label) < num_classes for label in labels)
+    else:
+        raise ValueError(f'{name} must be a one-dimensional integer array, list or tuple')
+    if len(labels) == 0:
+        raise ValueError(f'{name} must be nonempty')
+    if not in_range:
+        raise ValueError(f'{name} class IDs must be in [0, {num_classes - 1}]')
+    return np.asarray(labels, dtype=np.int64)
 
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ÛÛ›H›Ùš[OXÛÜ™H›İÜÈX^H[\ˆHÛÜ™HX]š^	ÊBˆ›ÜˆÛÛ[[ˆ[ˆ
-	Ü[—ÚY	Ë	Ù]\Ù]	ÊN‚ˆYˆœ˜[YVØÛÛ[[—K›X\
-[X™Hˆ›İ\Ú[œİ[˜ÙJİŠHÜˆ›İœİš\
 
-JK˜[J
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞØÛÛ[[ŸH]\İÛÛZ[ˆ›Û™[\Hİš[™ÜÉÊBˆ›ÜˆÛÛ[[ˆ[ˆÔÒLM—ĞÓÓSS”Î‚ˆYˆœ˜[YVØÛÛ[[—K›X\
-[X™Hˆ›İ\Ú[œİ[˜ÙJİŠBˆÜˆ[Š
-HOHˆÜˆ[JÈ›İ[ˆ	ÌLŒÍMÎXX˜ÙY‰È›ÜˆÈ[ˆ
-JK˜[J
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞØÛÛ[[ŸH]\İÛÛZ[ˆİÙ\˜Ø\ÙHÒKLMˆ^YÙ\İÉÊBˆYˆ›İœ˜[YVÉÙ]˜[ÜÙYY	×K›X\
-Ú\×Ú[YÙ\ŠK˜[
+def confusion_counts(y_true, y_pred, num_classes: int = 10) -> np.ndarray:
+    """Count integer class IDs in a fixed int64 matrix with true classes as rows."""
+    if not _is_integer(num_classes) or num_classes < 1:
+        raise ValueError('num_classes must be a positive integer')
+    num_classes = int(num_classes)
+    true = _label_ids(y_true, 'y_true', num_classes)
+    predicted = _label_ids(y_pred, 'y_pred', num_classes)
+    if len(true) != len(predicted):
+        raise ValueError('y_true and y_pred must have the same length')
 
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ù]˜[ÜÙYY]\İÛÛZ[ˆ[YÙ\ˆ˜[Y\ÉÊBˆYˆ›İ
-œ˜[YVÉÛXXÜ›×ÙŒI×K›X\
-ˆ[X™Hˆ
-Ú\×Ú[YÙ\Š
-HÜˆ\Ú[œİ[˜ÙJ
-›Ø]œ™›Ø][™ÊJJBˆ[™X]š\Ùš[š]J›Ø]
-
-JH[™H›Ø]
-
-HHJJK˜[
+    counts = np.zeros((num_classes, num_classes), dtype=np.int64)
+    np.add.at(counts, (true, predicted), 1)
+    return counts
 
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ÛXXÜ›×ÙŒH]\İÛÛZ[ˆš[š]Hœ˜Xİ[ÛœÈ[ˆÌWIÊB‚ˆÙ^WØÛÛ[[œÈHÉÛ[Ù[Û˜[YIË	ÜÙYY	Ë	ØÛÜœ\[Û‰Ë	ÜÙ]™\š]I×BˆYˆœ˜[YK™\XØ]Y
-Ù^WØÛÛ[[œÊK˜[J
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ØÛÜ™HX]š^ÛÛZ[œÈ\XØ]H[Ù[ÜÙYYØÛÛ™][ÛˆÙ^\ÉÊBˆ^XİYÚÙ^\ÈHÂˆ
-[Ù[ÙYYÛÜœ\[Û‹Ù]™\š]JBˆ›Üˆ[Ù[[ˆÓSÑSÈ›ÜˆÙYY[ˆÔÑQQÂˆ›ÜˆÛÜœ\[Û‹Ù]™\š]H[ˆĞÓÓ‘USÓ”ÂˆBˆXİX[ÚÙ^\ÈHÙ]
-œ˜[YVÚÙ^WØÛÛ[[œ×Kš]\\\Ê[™^Q˜[ÙK˜[YOS›Û™JJBˆYˆXİX[ÚÙ^\ÈOH^XİYÚÙ^\Î‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ØÛÜ™HX]š^\ÈZ\ÜÚ[™ÈÜˆ\È[™^XİY[Ù[ÜÙYYØÛÛ™][ÛˆÙ^\ÉÊB‚ˆYˆ›İ
-œ˜[YVÉÛ—ÜØ[\\É×HOHLÌ
-K˜[
 
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ù]™\HÛÜ™HÛÛ™][Ûˆ]\İÛÛZ[ˆ^XİHLØ[\\ÉÊBˆ[—ÚYÈH×Bˆ›Üˆ
-ËÊKÜ›İ\[ˆœ˜[YK™Ü›İ\JÉÛ[Ù[Û˜[YIË	ÜÙYY	×KÛÜQ˜[ÙJN‚ˆİ˜[Y]YØÛÛ™][Û—ÜØÛÜ™\ÊÜ›İ\
-BˆYˆÜ›İ\ÉÜ[—ÚY	×K›[š\]YJ
-HOHHÜˆÜ›İ\ÉØÚXÚÜÚ[ÜÚLM‰×K›[š\]YJ
-HOHHˆÜˆÜ›İ\ÉØÛÛ™šY×Ú\Ú	×K›[š\]YJ
-HOHN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ü[—ÚYÚXÚÜÚ[ÜÚLMˆ[™ÛÛ™šY×Ú\Ú]\İ™HİX›HÚ][ˆH[‰ÊBˆ[—ÚYË˜\[™
-Ü›İ\ÉÜ[—ÚY	×Kš[ØÖÌJBˆYˆ[ŠÙ]
-[—ÚYÊJHOH‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ÙXXÚ[Ù[ÜÙYYZ\ˆ]\İ]™HH[š\]YH[—ÚY	ÊB‚ˆ›Üˆ›İÈ[ˆœ˜[YKš]\\\Ê[™^Q˜[ÙJN‚ˆX]š^Hœ˜\Ø\œ˜^J›İË˜ÛÛ™\Ú[Û—ÛX]š^
-BˆYˆ
-X]š^œÚ\HOH
-LL
-HÜˆX]š^™\KšÚ[™›İ[ˆ	Ú]IÂˆÜˆœ˜[JX]š^
-HÜˆ[
-X]š^œİ[J
-JHOH[
-›İË›—ÜØ[\\ÊBˆÜˆ›İœ˜\œ˜^WÙ\]X[
-X]š^œİ[J^\ÏLJKœ™[
-LL\O[X]š^™\JJBˆÜˆ[
-œ˜XÙJX]š^
-JHOH[
-›İË›—ØÛÜœ™Xİ
-JN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠˆ	ØÛÛ™\Ú[Û—ÛX]š^]\İ™H›Û›™YØ]]™H[LLÚ]L\İX™[È\ˆÛ\ÜÈ	Âˆ	Ø[™Ûİ[ÈX]Ú[™ÈH›İÈİ[[X\IÊBˆİ\ÜHX]š^œİ[J^\ÏLJBˆ™XØ[ÈHœ™]šYJœ™XYÊX]š^
-Kİ\Üİ][œ™\›ÜÊL\O[œ™›Ø]
-KˆÚ\™O\İ\Üˆ
-BˆŒWÙ[›ÛZ[˜]ÜˆHİ\Ü
-ÈX]š^œİ[J^\ÏL
-BˆŒHHœ™]šYJˆ
-ˆœ™XYÊX]š^
-KŒWÙ[›ÛZ[˜]Ü‹ˆİ][œ™\›ÜÊL\O[œ™›Ø]
-KÚ\™OYŒWÙ[›ÛZ[˜]Üˆˆ
-BˆİÜ™YÜ™XØ[ÈHœ˜\Ø\œ˜^J›İËœ\—ØÛ\Ü×ØXØİ\˜XŞK\O[œ™›Ø]
-BˆYˆ
-İÜ™YÜ™XØ[ËœÚ\HOH
-L
-HÜˆ›İœš\Ùš[š]JİÜ™YÜ™XØ[ÊK˜[
+def classification_metrics(y_true, y_pred, num_classes: int = 10) -> dict:
+    """Return counts, accuracy, per-class recall and macro-F1 for one condition.
 
-BˆÜˆœ˜[J
-İÜ™YÜ™XØ[È
-H
-İÜ™YÜ™XØ[ÈˆJJBˆÜˆ›İœ˜[ÛÜÙJİÜ™YÜ™XØ[Ë™XØ[ËÛLYKMË]ÛLYKLLŠJN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	Ü\—ØÛ\Ü×ØXØİ\˜XŞHÙ\È›İYÜ™YHÚ]ÛÛ™\Ú[Û—ÛX]š^	ÊBˆYˆ›İX]š\ØÛÜÙJ›Ø]
-›İË›XXÜ›×ÙŒJK›Ø]
-ŒK›YX[Š
-JK™[İÛLYKMËXœ×İÛLYKLLŠN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ÛXXÜ›×ÙŒHÙ\È›İYÜ™YHÚ]ÛÛ™\Ú[Û—ÛX]š^	ÊB‚ˆ\ÚØÛİ[ÈHœ˜[YK™Ü›İ\JÉØÛÜœ\[Û‰Ë	ÜÙ]™\š]I×KÛÜQ˜[ÙJVÉØÛÛ™][Û—Ú\Ú	×K›[š\]YJ
-BˆYˆ›İ
-\ÚØÛİ[ÈOHJK˜[
+    Accuracy, per_class_accuracy (recall), and macro_f1 are fractions. Recall
+    is zero for classes without true examples. Macro-F1 averages over every
+    configured class, with undefined class F1 contributing zero.
+    """
+    counts = confusion_counts(y_true, y_pred, num_classes)
+    true_positives = counts.diagonal()
+    support = counts.sum(axis=1)
+    f1_denominator = support + counts.sum(axis=0)
+    per_class_accuracy = np.divide(true_positives, support,
+                                   out=np.zeros(len(counts)), where=support > 0)
+    per_class_f1 = np.divide(2 * true_positives, f1_denominator,
+                             out=np.zeros(len(counts)), where=f1_denominator > 0)
+    n_samples = int(support.sum())
+    n_correct = int(true_positives.sum())
+    return {
+        'confusion_matrix': counts,
+        'n_samples': n_samples,
+        'n_correct': n_correct,
+        'accuracy': n_correct / n_samples,
+        'per_class_accuracy': per_class_accuracy,
+        'macro_f1': float(per_class_f1.mean()),
+    }
 
-N‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ	ØÛÛ™][Û—Ú\ÚY™™\œÈXÜ›ÜÜÈ[Ù[ÈÜˆÙYYÈ›ÜˆHÛÛ™][Û‰ÊBˆ›ÜˆÛÛ[[ˆ[ˆÒQS•UWĞÓÓSS”Î‚ˆYˆÛÛ[[ˆ[ˆœ˜[YH[™œ˜[YVØÛÛ[[—K›[š\]YJ›Ü˜OQ˜[ÙJHOHN‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞØÛÛ[[ŸH]\İ™HY[XØ[XÜ›ÜÜÈHÛÜ™HX]š^	ÊB‚ˆ[Ù[ÛÜ™\ˆHİ˜[YNˆH›ÜˆK˜[YH[ˆ[[Y\˜]JÓSÑSÊ_BˆÛÛ™][Û—ÛÜ™\ˆHØÛÛ™][ÛˆH›ÜˆKÛÛ™][Ûˆ[ˆ[[Y\˜]JˆÊ	ØÛX[‰Ë
-WH
-ÈÊ˜[Z[KÙ]™\š]JH›Üˆ˜[Z[H[ˆĞÓÔ”•TQÑSRSQTÂˆ›ÜˆÙ]™\š]H[ˆ˜[™ÙJKŠWJ_Bˆœ˜[YVÉ×Û[Ù[ÛÜ™\‰×HHœ˜[YVÉÛ[Ù[Û˜[YI×K›X\
-[Ù[ÛÜ™\ŠBˆœ˜[YVÉ×ØÛÛ™][Û—ÛÜ™\‰×HHØÛÛ™][Û—ÛÜ™\–ÊË[
-ÊJWBˆ›ÜˆËÈ[ˆš\
-œ˜[YVÉØÛÜœ\[Û‰×Kœ˜[YVÉÜÙ]™\š]I×JWBˆœ˜[YHHœ˜[YKœÛÜİ˜[Y\ÊÉ×Û[Ù[ÛÜ™\‰Ë	ÜÙYY	Ë	×ØÛÛ™][Û—ÛÜ™\‰×JBˆ™]\›ˆœ˜[YK™›Ü
-ÛÛ[[œÏVÉ×Û[Ù[ÛÜ™\‰Ë	×ØÛÛ™][Û—ÛÜ™\‰×JKœ™\Ù]Ú[™^
-›ÜUYJB‚‚™YˆYÙÜ™YØ]WÜÙYYÊ™\İ[Îˆ‘]Qœ˜[YJHOˆXİÜİ‹‘]Qœ˜[YWN‚ˆˆˆ•˜[Y]HÛÜ™H™\İ[È[™›ÙXÙHÙYYX]Ø\™H™\İ[X›\Ë‚‚ˆİ[™\™]šX][ÛœÈ\ÙHØ[\HÑ
-ÙLJHXÜ›ÜÜÈH™YH˜Z[š[™ÂˆÙYYËˆZ\™Y™X]Y[Y™™XİÈ\™HÛÛ\]YÚ][ˆÙYY[™™\ÜY[‚ˆ\˜Ù[YÙHÚ[ÎÈÛÜœ\YÛÛ™][ÛœÈ[™[XYÙ\È\™H™]™\ˆ™X]Y\Âˆ[™\[™[˜Z[š[™È™\XØ]\Ë‚ˆˆˆ‚ˆX]š^H˜[Y]WÛX]š^
-™\İ[ÊBˆ\—Ü[ˆH×BˆØÛÜ™YÜ[œÈH×Bˆ›Üˆ
-[Ù[ÙYY
-KÜ›İ\[ˆX]š^™Ü›İ\JÉÛ[Ù[Û˜[YIË	ÜÙYY	×KÛÜQ˜[ÙJN‚ˆØÛÜ™YH›Ø\İ™\Ü×ÛY]šXÜÊÜ›İ\
-BˆØÛÜ™YÜ[œË˜\[™
-ØÛÜ™Y
-BˆÛX[ˆHØÛÜ™Y›ØÖÜØÛÜ™YÉØÛÜœ\[Û‰×HOH	ØÛX[‰×Kš[ØÖÌBˆÛÜœ\YHØÛÜ™Y›ØÖÜØÛÜ™YÉØÛÜœ\[Û‰×HOH	ØÛX[‰×Bˆ›İÈHÂˆ	Û[Ù[Û˜[YIÎˆ[Ù[	ÜÙYY	Îˆ[
-ÙYY
-Kˆ	ØÛX[—ØXØİ\˜XŞIÎˆ›Ø]
-ÛX[–ÉØXØİ\˜XŞI×JKˆ	ÛXØIÎˆ›Ø]
-ØÛÜ™YÉÛXØI×Kš[ØÖÌJKˆ	Ü›Ø\İ™\Ü×ÙØ\Ü	Îˆ›Ø]
-ØÛÜ™YÉÜ›Ø\İ™\Ü×ÙØ\Ü	×Kš[ØÖÌJKˆBˆYˆ	ÛXXÜ›×ÙŒIÈ[ˆØÛÜ™Y‚ˆ›İÖÉÛYX[—ØÛÜœ\YÛXXÜ›×ÙŒI×HH›Ø]
-ÛÜœ\YÉÛXXÜ›×ÙŒI×K›YX[Š
-JBˆ\—Ü[‹˜\[™
-›İÊBˆ[—Üİ[[X\HH‘]Qœ˜[YJ\—Ü[ŠKœÛÜİ˜[Y\ÊÉÛ[Ù[Û˜[YIË	ÜÙYY	×JKœ™\Ù]Ú[™^
-›ÜUYJBˆ[››İ]YÜ™\İ[ÈH˜ÛÛ˜Ø]
-ØÛÜ™YÜ[œËYÛ›Ü™WÚ[™^UYJB‚ˆÛÛ™][Û—ÙÜ›İ\HX]š^™Ü›İ\JÉÛ[Ù[Û˜[YIË	ØÛÜœ\[Û‰Ë	ÜÙ]™\š]I×KÛÜQ˜[ÙJBˆÛÛ™][Û—Üİ[[X\HHÛÛ™][Û—ÙÜ›İ\ÉØXØİ\˜XŞI×K˜YÙÊˆYX[IÛYX[‰ËØ[\WÜÙ[[X™H˜[Y\Îˆ˜[Y\Ëœİ
-ÙLJKIØÛİ[	ÊKœ™\Ù]Ú[™^
 
-BˆYˆ	ÛXXÜ›×ÙŒIÈ[ˆX]š^‚ˆŒWÜİ[[X\HHÛÛ™][Û—ÙÜ›İ\ÉÛXXÜ›×ÙŒI×K˜YÙÊˆXXÜ›×ÙŒWÛYX[IÛYX[‰ËXXÜ›×ÙŒWÜØ[\WÜÙ[[X™H˜[Y\Îˆ˜[Y\Ëœİ
-ÙLJJKœ™\Ù]Ú[™^
+def _validated_condition_scores(results: pd.DataFrame) -> dict[tuple[str, int], float]:
+    if not isinstance(results, pd.DataFrame):
+        raise ValueError('results must be a pandas DataFrame')
+    if not results.columns.is_unique:
+        raise ValueError('results must not contain duplicate columns')
+    missing_columns = set(_RESULT_COLUMNS).difference(results.columns)
+    if missing_columns:
+        raise ValueError(f'results is missing required columns: {sorted(missing_columns)}')
+    if 'run_id' in results:
+        run_ids = results['run_id']
+        if not all(isinstance(run_id, str) and run_id.strip() for run_id in run_ids):
+            raise ValueError('run_id must contain nonempty strings')
+        if run_ids.nunique() > 1:
+            raise ValueError('results must contain a single run_id')
 
-BˆÛÛ™][Û—Üİ[[X\HHÛÛ™][Û—Üİ[[X\K›Y\™ÙJˆŒWÜİ[[X\KÛVÉÛ[Ù[Û˜[YIË	ØÛÜœ\[Û‰Ë	ÜÙ]™\š]I×K˜[Y]OIÛÛ™Wİ×ÛÛ™IÊB‚ˆ[Ù[ØYÙÜ™YØ][ÛœÈHÂˆ	Û‰Îˆ
-	ÜÙYY	Ë	ØÛİ[	ÊKˆ	ØÛX[—ØXØİ\˜XŞWÛYX[‰Îˆ
-	ØÛX[—ØXØİ\˜XŞIË	ÛYX[‰ÊKˆ	ØÛX[—ØXØİ\˜XŞWÜØ[\WÜÙ	Îˆ
-	ØÛX[—ØXØİ\˜XŞIË[X™Hˆœİ
-ÙLJJKˆ	ÛXØWÛYX[‰Îˆ
-	ÛXØIË	ÛYX[‰ÊKˆ	ÛXØWÜØ[\WÜÙ	Îˆ
-	ÛXØIË[X™Hˆœİ
-ÙLJJKˆ	Ü›Ø\İ™\Ü×ÙØ\ÜÛYX[‰Îˆ
-	Ü›Ø\İ™\Ü×ÙØ\Ü	Ë	ÛYX[‰ÊKˆ	Ü›Ø\İ™\Ü×ÙØ\ÜÜØ[\WÜÙ	Îˆ
-	Ü›Ø\İ™\Ü×ÙØ\Ü	Ë[X™Hˆœİ
-ÙLJJKˆBˆYˆ	ÛYX[—ØÛÜœ\YÛXXÜ›×ÙŒIÈ[ˆ[—Üİ[[X\N‚ˆ[Ù[ØYÙÜ™YØ][ÛœË\]JÂˆ	ÛYX[—ØÛÜœ\YÛXXÜ›×ÙŒWÛYX[‰Îˆ
-	ÛYX[—ØÛÜœ\YÛXXÜ›×ÙŒIË	ÛYX[‰ÊKˆ	ÛYX[—ØÛÜœ\YÛXXÜ›×ÙŒWÜØ[\WÜÙ	Îˆ
-	ÛYX[—ØÛÜœ\YÛXXÜ›×ÙŒIË[X™Hˆœİ
-ÙLJJKˆJBˆ[Ù[Üİ[[X\HH[—Üİ[[X\K™Ü›İ\J	Û[Ù[Û˜[YIËÛÜQ˜[ÙJK˜YÙÊˆ
-Š›[Ù[ØYÙÜ™YØ][ÛœËˆ
-Kœ™\Ù]Ú[™^
+    scores = {}
+    sample_totals = set()
+    rows = results[list(_RESULT_COLUMNS)].itertuples(index=False, name=None)
+    for row_number, (corruption, severity, n_samples, n_correct, accuracy) in enumerate(rows):
+        row = f'results row {row_number}'
+        if not isinstance(corruption, str) or corruption not in ('clean', *_CORRUPTED_FAMILIES):
+            raise ValueError(f'{row}: unknown corruption {corruption!r}')
+        if not _is_integer(severity) or (corruption, int(severity)) not in _CONDITIONS:
+            raise ValueError(f'{row}: invalid severity {severity!r} for {corruption}')
+        condition = (corruption, int(severity))
+        if condition in scores:
+            raise ValueError(f'{row}: duplicate condition {condition!r}')
+        if not _is_integer(n_samples) or int(n_samples) <= 0:
+            raise ValueError(f'{row}: n_samples must be a positive integer')
+        if not _is_integer(n_correct) or not 0 <= int(n_correct) <= int(n_samples):
+            raise ValueError(f'{row}: n_correct must be an integer in [0, n_samples]')
+        if (not (_is_integer(accuracy) or isinstance(accuracy, (float, np.floating)))
+                or not 0 <= accuracy <= 1):
+            raise ValueError(f'{row}: accuracy must be a finite fraction in [0, 1]')
+        accuracy = float(accuracy)
+        # Accept float32 rounding while requiring a zero count to yield exact zero.
+        if not math.isclose(accuracy, int(n_correct) / int(n_samples), rel_tol=1e-7, abs_tol=0.0):
+            raise ValueError(f'{row}: accuracy must agree with n_correct / n_samples')
+        scores[condition] = accuracy
+        sample_totals.add(int(n_samples))
 
-B‚ˆZ\™YH[—Üİ[[X\Kœ]›İ
-[™^IÜÙYY	ËÛÛ[[œÏIÛ[Ù[Û˜[YIËˆ˜[Y\ÏVÉØÛX[—ØXØİ\˜XŞIË	ÛXØIË	Ü›Ø\İ™\Ü×ÙØ\Ü	×JBˆZ\™YÙ[\ÈH‘]Qœ˜[YJÂˆ	ÜÙYY	ÎˆZ\™Yš[™^×Û[\J\O[œš[
-Kˆ	ØÛX[—ØXØİ\˜XŞWØÚ[™ÙWÜ	ÎˆL
-ˆ
-ˆZ\™YÉØÛX[—ØXØİ\˜XŞI×VÉÜ›Ø\İØÛ›‰×HHZ\™YÉØÛX[—ØXØİ\˜XŞI×VÉØÛX[—ØÛ›‰×JKˆ	ÛXØWÚ[\›İ™[Y[Ü	ÎˆL
-ˆ
-ˆZ\™YÉÛXØI×VÉÜ›Ø\İØÛ›‰×HHZ\™YÉÛXØI×VÉØÛX[—ØÛ›‰×JKˆ	Ü›Ø\İ™\Ü×ÙØ\ØÚ[™ÙWÜ	Îˆ
-ˆZ\™YÉÜ›Ø\İ™\Ü×ÙØ\Ü	×VÉÜ›Ø\İØÛ›‰×HHZ\™YÉÜ›Ø\İ™\Ü×ÙØ\Ü	×VÉØÛX[—ØÛ›‰×JKˆJKœ™\Ù]Ú[™^
-›ÜUYJBˆZ\™YÜİ[[X\HH‘]Qœ˜[YJŞÂˆ	Û‰Îˆ[ŠZ\™YÙ[\ÊKˆ
-ŠÙ‰ŞØÛÛ[[ŸWÛYX[‰Îˆ›Ø]
-Z\™YÙ[\ÖØÛÛ[[—K›YX[Š
-JBˆ›ÜˆÛÛ[[ˆ[ˆZ\™YÙ[\Ë˜ÛÛ[[œÈYˆÛÛ[[‹™[™İÚ]
-	×Ü	Ê_Kˆ
-ŠÙ‰ŞØÛÛ[[ŸWÜØ[\WÜÙ	Îˆ›Ø]
-Z\™YÙ[\ÖØÛÛ[[—Kœİ
-ÙLJJBˆ›ÜˆÛÛ[[ˆ[ˆZ\™YÙ[\Ë˜ÛÛ[[œÈYˆÛÛ[[‹™[™İÚ]
-	×Ü	Ê_KˆWJB‚ˆÛ\Ü×Ü›İÜÈH×Bˆ›Üˆ›İÈ[ˆX]š^š]\\\Ê[™^Q˜[ÙJN‚ˆ›ÜˆÛ\Ü×ÚY™XØ[[ˆ[[Y\˜]J›İËœ\—ØÛ\Ü×ØXØİ\˜XŞJN‚ˆÛ\Ü×Ü›İÜË˜\[™
-Âˆ	Û[Ù[Û˜[YIÎˆ›İË›[Ù[Û˜[YK	ØÛÜœ\[Û‰Îˆ›İË˜ÛÜœ\[Û‹ˆ	ÜÙ]™\š]IÎˆ[
-›İËœÙ]™\š]JK	ØÛ\Ü×ÚY	ÎˆÛ\Ü×ÚYˆ	ØXØİ\˜XŞIÎˆ›Ø]
-™XØ[
-KˆJBˆ\—ØÛ\ÜÈH‘]Qœ˜[YJÛ\Ü×Ü›İÜÊK™Ü›İ\JˆÉÛ[Ù[Û˜[YIË	ØÛÜœ\[Û‰Ë	ÜÙ]™\š]IË	ØÛ\Ü×ÚY	×KÛÜQ˜[ÙJVÉØXØİ\˜XŞI×K˜YÙÊˆYX[IÛYX[‰ËØ[\WÜÙ[[X™Hˆœİ
-ÙLJKIØÛİ[	ÊKœ™\Ù]Ú[™^
+    missing = _CONDITIONS.difference(scores)
+    if missing:
+        raise ValueError(f'results is missing conditions: {sorted(missing)}')
+    if len(sample_totals) != 1:
+        raise ValueError('all conditions must have the same n_samples')
+    return scores
 
-B‚ˆ™]\›ˆÂˆ	Ü™\İ[ÉÎˆ[››İ]YÜ™\İ[Ëˆ	Ü[—Üİ[[X\IÎˆ[—Üİ[[X\Kˆ	ØÛÛ™][Û—Üİ[[X\IÎˆÛÛ™][Û—Üİ[[X\Kˆ	Û[Ù[Üİ[[X\IÎˆ[Ù[Üİ[[X\Kˆ	ÜZ\™YÙ[\ÉÎˆZ\™YÙ[\Ëˆ	ÜZ\™YÜİ[[X\IÎˆZ\™YÜİ[[X\Kˆ	Ü\—ØÛ\Ü×Üİ[[X\IÎˆ\—ØÛ\ÜËˆB‚‚™YˆÜ\œÙWØ\œ˜^WØÛÛ[[œÊ™\İ[Îˆ‘]Qœ˜[YJHOˆ‘]Qœ˜[YN‚ˆˆˆ‘XÛÙHH”ÓÓˆ\œ˜^HÙ[È\ÙYHHÜX›H™\İ[ÈÔÕˆ›Ü›X]ˆˆˆ‚ˆXÛÙYH™\İ[Ë˜ÛÜJ
-Bˆ›ÜˆÛÛ[[ˆ[ˆ
-	Ü\—ØÛ\Ü×ØXØİ\˜XŞIË	ØÛÛ™\Ú[Û—ÛX]š^	ÊN‚ˆYˆÛÛ[[ˆ›İ[ˆXÛÙY‚ˆÛÛ[YBˆYˆ\œÙJ˜[YJN‚ˆYˆ\Ú[œİ[˜ÙJ˜[YKİŠN‚ˆN‚ˆ™]\›ˆœÛÛ‹›ØYÊ˜[YJBˆ^Ù\œÛÛ‹’”ÓÓ‘XÛÙQ\œ›Üˆ\È^Î‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰ŞØÛÛ[[ŸHÔÕˆÙ[\È›İ˜[Y”ÓÓ‰ÊHœ›ÛH^Âˆ™]\›ˆ˜[YBˆXÛÙYØÛÛ[[—HHXÛÙYØÛÛ[[—K›X\
-\œÙJBˆ™]\›ˆXÛÙY‚‚™YˆØÜİ—ÜØY™Jœ˜[YNˆ‘]Qœ˜[YJHOˆ‘]Qœ˜[YN‚ˆØY™HHœ˜[YK˜ÛÜJ
-Bˆ›ÜˆÛÛ[[ˆ[ˆ
-	Ü\—ØÛ\Ü×ØXØİ\˜XŞIË	ØÛÛ™\Ú[Û—ÛX]š^	ÊN‚ˆYˆÛÛ[[ˆ[ˆØY™N‚ˆØY™VØÛÛ[[—HHØY™VØÛÛ[[—K›X\
-ˆ[X™H˜[YNˆœÛÛ‹™[\Êœ˜\Ø\œ˜^J˜[YJKÛ\İ
 
-KÙ\\˜]ÜœÏJ	Ë	Ë	Î‰ÊJJBˆ™]\›ˆØY™B‚‚™YˆÜš]WØYÙÜ™YØ]WİX›\ÊX›\ÎˆXİÜİ‹‘]Qœ˜[YWKİ]]Ù\ˆİˆ]
-HOˆ]‚ˆˆˆ”X›\ÚHÛÛ\]HÙ]ÙˆYÙÜ™YØ]HÔÕœÈ\ÈÛ™H™]È\™XİÜK‚‚ˆ^\İ[™Èİ]]\È™]™\ˆ™\XÙYˆš[\È\™H\ÜÙ[X›Y[ˆH[\Ü˜\BˆÚX›[™È\™XİÜH[™H\™XİÜH™[˜[YHX›\Ú\È[HÙÙ]\‹‚ˆˆˆ‚ˆİ]]H]
-İ]]Ù\ŠBˆYˆİ]]™^\İÊ
-HÜˆİ]]š\×ÜŞ[[[šÊ
-N‚ˆ˜Z\ÙHš[Q^\İÑ\œ›ÜŠ‰ØYÙÜ™YØ]Hİ]][™XYH^\İÎˆÛİ]]IÊBˆ^XİYHÂˆ	Ü™\İ[ÉË	Ü[—Üİ[[X\IË	ØÛÛ™][Û—Üİ[[X\IË	Û[Ù[Üİ[[X\IËˆ	ÜZ\™YÙ[\ÉË	ÜZ\™YÜİ[[X\IË	Ü\—ØÛ\Ü×Üİ[[X\IËˆBˆYˆÙ]
-X›\ÊHOH^XİY‚ˆ˜Z\ÙH˜[YQ\œ›ÜŠ‰İX›\È]\İÛÛZ[ˆ^XİHÜÛÜY
-^XİY
-_IÊBˆİ]]œ\™[›ZÙ\Š\™[ÏUYK^\İÛÚÏUYJBˆÚ][\š[K•[\Ü˜\Q\™XİÜJ™Yš^Y‰ËÛİ]]›˜[Y_K‰Ë\[İ]]œ\™[
-H\È[\Ü˜\N‚ˆİYÙYH]
-[\Ü˜\JBˆ›Üˆ˜[YH[ˆÛÜY
-^XİY
-N‚ˆØÜİ—ÜØY™JX›\ÖÛ˜[YWJK×ØÜİŠİYÙYÈ‰ŞÛ˜[Y_K˜Üİ‰Ë[™^Q˜[ÙJBˆÜËœ™\XÙJİYÙYİ]]
-Bˆ™]\›ˆİ]]‚‚™YˆXZ[Š\™İS›Û™JHOˆ[‚ˆˆˆ•˜[Y]HHÛÛ\]HÛÜ™H™\İ[ÈÔÕˆ[™X›\ÚYÙÜ™YØ]HX›\Ëˆˆˆ‚ˆ\œÙ\ˆH\™Ü\œÙK\™İ[Y[\œÙ\Š\ØÜš\[ÛW×ÙØ××ÊBˆ\œÙ\‹˜YØ\™İ[Y[
-	ËKZ[œ]	Ë™\]Z\™YUYK\OT]ˆ[IĞÔÕˆÛÛZ[š[™ÈHMˆÛÛ\]YÛÜ™H]˜[X][Ûˆİ[[X\šY\ÉÊBˆ\œÙ\‹˜YØ\™İ[Y[
-	ËK[İ]]Y\‰Ë™\]Z\™YUYK\OT]ˆ[IÛ™]È\™XİÜH›ÜˆHÙ]™[ˆYÙÜ™YØ]HÔÕˆX›\ÉÊBˆ\™ÜÈH\œÙ\‹œ\œÙWØ\™ÜÊ\™İŠBˆYˆ›İ\™ÜËš[œ]š\×Ùš[J
-HÜˆ\™ÜËš[œ]š\×ÜŞ[[[šÊ
-N‚ˆ\œÙ\‹™\œ›ÜŠ‰Ú[œ]]\İ™H[ˆ^\İ[™È™Yİ[\ˆš[NˆØ\™ÜËš[œ]IÊBˆ™\İ[ÈHÜ\œÙWØ\œ˜^WØÛÛ[[œÊœ™XYØÜİŠ\™ÜËš[œ]
-JBˆX›\ÈHYÙÜ™YØ]WÜÙYYÊ™\İ[ÊBˆİ]]HÜš]WØYÙÜ™YØ]WİX›\ÊX›\Ë\™ÜË›İ]]Ù\ŠBˆš[
-‰Õ˜[Y]YÛ[ŠX›\ÖÈœ™\İ[È—J_HÛÜ™H›İÜÎÈÜ›İHÛ[ŠX›\Ê_HX›\ÈÈÛİ]]IÊBˆ™]\›ˆ‚‚šYˆ×Û˜[YW×ÈOH	××ÛXZ[—×ÉÎ‚ˆ˜Z\ÙHŞ\İ[Q^]
-XZ[Š
-JB
+def robustness_metrics(results: pd.DataFrame) -> pd.DataFrame:
+    """Annotate the 16 condition rows for one run without changing the input.
+
+    Per-condition and family metrics are missing on the clean row. mca and
+    robustness_gap_pp are run-level values repeated on every row. Accuracy and
+    mCA are fractions, relative robustness is a ratio, and *_pp fields are
+    percentage points. Relative robustness is missing with a reason when the
+    clean accuracy is zero.
+    """
+    scores = _validated_condition_scores(results)
+    clean_accuracy = scores['clean', 0]
+
+    scored = results.copy()
+    families = scored['corruption'].to_numpy()
+    accuracies = scored['accuracy'].to_numpy(dtype=np.float64)
+    corrupted = families != 'clean'
+    corrupted_accuracies = accuracies[corrupted]
+
+    drops = pd.array([None] * len(scored), dtype='Float64')
+    drops[corrupted] = 100 * (clean_accuracy - corrupted_accuracies)
+    relative = pd.array([None] * len(scored), dtype='Float64')
+    relative_reason = pd.array([None] * len(scored), dtype='string')
+    if clean_accuracy > 0:
+        relative[corrupted] = corrupted_accuracies / clean_accuracy
+    else:
+        relative_reason[corrupted] = 'zero_clean_accuracy'
+
+    family_mca = pd.array([None] * len(scored), dtype='Float64')
+    for family in _CORRUPTED_FAMILIES:
+        in_family = families == family
+        family_mca[in_family] = accuracies[in_family].mean()
+
+    mca = float(corrupted_accuracies.mean())
+    scored['accuracy_drop_pp'] = drops
+    scored['relative_robustness'] = relative
+    scored['relative_robustness_reason'] = relative_reason
+    scored['family_mca'] = family_mca
+    scored['mca'] = mca
+    scored['robustness_gap_pp'] = 100 * (clean_accuracy - mca)
+    return scored
+
+
+def validate_matrix(results: pd.DataFrame) -> pd.DataFrame:
+    """Validate the complete 2-model Ã— 3-seed Ã— 16-condition core matrix.
+
+    Each input row is a completed model/seed/condition evaluation summary. The
+    returned copy is sorted into protocol order. ``condition_hash`` is required
+    so every model is proven to have received the same indexed test inputs for
+    each condition. Optional dataset/split/normalization/eval identity columns,
+    when present, must also be constant throughout the matrix.
+    """
+    required = {
+        'run_id', 'model_name', 'seed', 'profile', 'status', 'dataset',
+        'checkpoint_sha256', 'config_hash', 'condition_hash', 'eval_seed',
+        'split_hash', 'normalization_hash', 'macro_f1', 'per_class_accuracy',
+        'confusion_matrix', *_RESULT_COLUMNS,
+    }
+    if not isinstance(results, pd.DataFrame):
+        raise ValueError('results must be a pandas DataFrame')
+    if not results.columns.is_unique:
+        raise ValueError('results must not contain duplicate columns')
+    missing = required.difference(results.columns)
+    if missing:
+        raise ValueError(f'results is missing required columns: {sorted(missing)}')
+    if len(results) != len(_MODELS) * len(_SEEDS) * len(_CONDITIONS):
+        raise ValueError('core matrix must contain exactly 96 rows')
+
+    frame = results.copy()
+    if frame['model_name'].isna().any() or not frame['model_name'].isin(_MODELS).all():
+        raise ValueError(f'model_name values must be exactly {_MODELS}')
+    if frame['seed'].isna().any() or not frame['seed'].map(_is_integer).all():
+        raise ValueError('seed values must be integer protocol seeds')
+    frame['seed'] = frame['seed'].astype('int64')
+    if set(frame['seed']) != set(_SEEDS):
+        raise ValueError(f'seed values must be exactly {_SEEDS}')
+    if frame['condition_hash'].map(lambda x: not isinstance(x, str) or not x.strip()).any():
+        raise ValueError('condition_hash must contain nonempty strings')
+    if not (frame['status'] == 'complete').all():
+        raise ValueError('all core evaluation rows must have status=complete')
+    if not (frame['profile'] == 'core').all():
+        raise ValueError('only profile=core rows may enter the core matrix')
+    for column in ('run_id', 'dataset'):
+        if frame[column].map(lambda x: not isinstance(x, str) or not x.strip()).any():
+            raise ValueError(f'{column} must contain nonempty strings')
+    for column in _SHA256_COLUMNS:
+        if frame[column].map(lambda x: not isinstance(x, str)
+                             or len(x) != 64
+                             or any(c not in '0123456789abcdef' for c in x)).any():
+            raise ValueError(f'{column} must contain lowercase SHA-256 hex digests')
+    if not frame['eval_seed'].map(_is_integer).all():
+        raise ValueError('eval_seed must contain integer values')
+    if not (frame['macro_f1'].map(
+            lambda x: (_is_integer(x) or isinstance(x, (float, np.floating)))
+            and math.isfinite(float(x)) and 0 <= float(x) <= 1)).all():
+        raise ValueError('macro_f1 must contain finite fractions in [0, 1]')
+
+    key_columns = ['model_name', 'seed', 'corruption', 'severity']
+    if frame.duplicated(key_columns).any():
+        raise ValueError('core matrix contains duplicate model/seed/condition keys')
+    expected_keys = {
+        (model, seed, corruption, severity)
+        for model in _MODELS for seed in _SEEDS
+        for corruption, severity in _CONDITIONS
+    }
+    actual_keys = set(frame[key_columns].itertuples(index=False, name=None))
+    if actual_keys != expected_keys:
+        raise ValueError('core matrix is missing or has unexpected model/seed/condition keys')
+
+    if not (frame['n_samples'] == 10_000).all():
+        raise ValueError('every core condition must contain exactly 10000 samples')
+    run_ids = []
+    for (_, _), group in frame.groupby(['model_name', 'seed'], sort=False):
+        _validated_condition_scores(group)
+        if group['run_id'].nunique() != 1 or group['checkpoint_sha256'].nunique() != 1 \
+                or group['config_hash'].nunique() != 1:
+            raise ValueError('run_id, checkpoint_sha256 and config_hash must be stable within a run')
+        run_ids.append(group['run_id'].iloc[0])
+    if len(set(run_ids)) != 6:
+        raise ValueError('each model/seed pair must have a unique run_id')
+
+    for row in frame.itertuples(index=False):
+        matrix = np.asarray(row.confusion_matrix)
+        if (matrix.shape != (10, 10) or matrix.dtype.kind not in 'iu'
+                or np.any(matrix < 0) or int(matrix.sum()) != int(row.n_samples)
+                or not np.array_equal(matrix.sum(axis=1), np.full(10, 1000, dtype=matrix.dtype))
+                or int(np.trace(matrix)) != int(row.n_correct)):
+            raise ValueError(
+                'confusion_matrix must be nonnegative int 10x10 with 1000 test labels per class '
+                'and counts matching the row summary')
+        support = matrix.sum(axis=1)
+        recalls = np.divide(np.diag(matrix), support, out=np.zeros(10, dtype=np.float64),
+                            where=support > 0)
+        f1_denominator = support + matrix.sum(axis=0)
+        f1 = np.divide(2 * np.diag(matrix), f1_denominator,
+                       out=np.zeros(10, dtype=np.float64), where=f1_denominator > 0)
+        stored_recalls = np.asarray(row.per_class_accuracy, dtype=np.float64)
+        if (stored_recalls.shape != (10,) or not np.isfinite(stored_recalls).all()
+                or np.any((stored_recalls < 0) | (stored_recalls > 1))
+                or not np.allclose(stored_recalls, recalls, rtol=1e-7, atol=1e-12)):
+            raise ValueError('per_class_accuracy does not agree with confusion_matrix')
+        if not math.isclose(float(row.macro_f1), float(f1.mean()), rel_tol=1e-7, abs_tol=1e-12):
+            raise ValueError('macro_f1 does not agree with confusion_matrix')
+
+    hash_counts = frame.groupby(['corruption', 'severity'], sort=False)['condition_hash'].nunique()
+    if not (hash_counts == 1).all():
+        raise ValueError('condition_hash differs across models or seeds for a condition')
+    for column in _IDENTITY_COLUMNS:
+        if column in frame and frame[column].nunique(dropna=False) != 1:
+            raise ValueError(f'{column} must be identical across the core matrix')
+
+    model_order = {value: i for i, value in enumerate(_MODELS)}
+    condition_order = {condition: i for i, condition in enumerate(
+        [('clean', 0)] + [(family, severity) for family in _CORRUPTED_FAMILIES
+                         for severity in range(1, 6)])}
+    frame['_model_order'] = frame['model_name'].map(model_order)
+    frame['_condition_order'] = [condition_order[(c, int(s))]
+                                 for c, s in zip(frame['corruption'], frame['severity'])]
+    frame = frame.sort_values(['_model_order', 'seed', '_condition_order'])
+    return frame.drop(columns=['_model_order', '_condition_order']).reset_index(drop=True)
+
+
+def aggregate_seeds(results: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    """Validate core results and produce seed-aware result tables.
+
+    Standard deviations use sample SD (ddof=1) across the three training
+    seeds. Paired treatment effects are computed within seed and reported in
+    percentage points; corrupted conditions and images are never treated as
+    independent training replicates.
+    """
+    matrix = validate_matrix(results)
+    per_run = []
+    scored_runs = []
+    for (model, seed), group in matrix.groupby(['model_name', 'seed'], sort=False):
+        scored = robustness_metrics(group)
+        scored_runs.append(scored)
+        clean = scored.loc[scored['corruption'] == 'clean'].iloc[0]
+        corrupted = scored.loc[scored['corruption'] != 'clean']
+        row = {
+            'model_name': model, 'seed': int(seed),
+            'clean_accuracy': float(clean['accuracy']),
+            'mca': float(scored['mca'].iloc[0]),
+            'robustness_gap_pp': float(scored['robustness_gap_pp'].iloc[0]),
+        }
+        if 'macro_f1' in scored:
+            row['mean_corrupted_macro_f1'] = float(corrupted['macro_f1'].mean())
+        per_run.append(row)
+    run_summary = pd.DataFrame(per_run).sort_values(['model_name', 'seed']).reset_index(drop=True)
+    annotated_results = pd.concat(scored_runs, ignore_index=True)
+
+    condition_group = matrix.groupby(['model_name', 'corruption', 'severity'], sort=False)
+    condition_summary = condition_group['accuracy'].agg(
+        mean='mean', sample_sd=lambda values: values.std(ddof=1), n='count').reset_index()
+    if 'macro_f1' in matrix:
+        f1_summary = condition_group['macro_f1'].agg(
+            macro_f1_mean='mean', macro_f1_sample_sd=lambda values: values.std(ddof=1)).reset_index()
+        condition_summary = condition_summary.merge(
+            f1_summary, on=['model_name', 'corruption', 'severity'], validate='one_to_one')
+
+    model_aggregations = {
+        'n': ('seed', 'count'),
+        'clean_accuracy_mean': ('clean_accuracy', 'mean'),
+        'clean_accuracy_sample_sd': ('clean_accuracy', lambda x: x.std(ddof=1)),
+        'mca_mean': ('mca', 'mean'),
+        'mca_sample_sd': ('mca', lambda x: x.std(ddof=1)),
+        'robustness_gap_pp_mean': ('robustness_gap_pp', 'mean'),
+        'robustness_gap_pp_sample_sd': ('robustness_gap_pp', lambda x: x.std(ddof=1)),
+    }
+    if 'mean_corrupted_macro_f1' in run_summary:
+        model_aggregations.update({
+            'mean_corrupted_macro_f1_mean': ('mean_corrupted_macro_f1', 'mean'),
+            'mean_corrupted_macro_f1_sample_sd': ('mean_corrupted_macro_f1', lambda x: x.std(ddof=1)),
+        })
+    model_summary = run_summary.groupby('model_name', sort=False).agg(
+        **model_aggregations,
+    ).reset_index()
+
+    paired = run_summary.pivot(index='seed', columns='model_name',
+                               values=['clean_accuracy', 'mca', 'robustness_gap_pp'])
+    paired_deltas = pd.DataFrame({
+        'seed': paired.index.to_numpy(dtype=np.int64),
+        'clean_accuracy_change_pp': 100 * (
+            paired['clean_accuracy']['robust_cnn'] - paired['clean_accuracy']['clean_cnn']),
+        'mca_improvement_pp': 100 * (
+            paired['mca']['robust_cnn'] - paired['mca']['clean_cnn']),
+        'robustness_gap_change_pp': (
+            paired['robustness_gap_pp']['robust_cnn'] - paired['robustness_gap_pp']['clean_cnn']),
+    }).reset_index(drop=True)
+    paired_summary = pd.DataFrame([{
+        'n': len(paired_deltas),
+        **{f'{column}_mean': float(paired_deltas[column].mean())
+           for column in paired_deltas.columns if column.endswith('_pp')},
+        **{f'{column}_sample_sd': float(paired_deltas[column].std(ddof=1))
+           for column in paired_deltas.columns if column.endswith('_pp')},
+    }])
+
+    class_rows = []
+    for row in matrix.itertuples(index=False):
+        for class_id, recall in enumerate(row.per_class_accuracy):
+            class_rows.append({
+                'model_name': row.model_name, 'corruption': row.corruption,
+                'severity': int(row.severity), 'class_id': class_id,
+                'accuracy': float(recall),
+            })
+    per_class = pd.DataFrame(class_rows).groupby(
+        ['model_name', 'corruption', 'severity', 'class_id'], sort=False)['accuracy'].agg(
+            mean='mean', sample_sd=lambda x: x.std(ddof=1), n='count').reset_index()
+
+    return {
+        'results': annotated_results,
+        'run_summary': run_summary,
+        'condition_summary': condition_summary,
+        'model_summary': model_summary,
+        'paired_deltas': paired_deltas,
+        'paired_summary': paired_summary,
+        'per_class_summary': per_class,
+    }
+
+
+def _parse_array_columns(results: pd.DataFrame) -> pd.DataFrame:
+    """Decode the JSON array cells used by the portable results CSV format."""
+    decoded = results.copy()
+    for column in ('per_class_accuracy', 'confusion_matrix'):
+        if column not in decoded:
+            continue
+        def parse(value):
+            if isinstance(value, str):
+                try:
+                    return json.loads(value)
+                except json.JSONDecodeError as exc:
+                    raise ValueError(f'{column} CSV cell is not valid JSON') from exc
+            return value
+        decoded[column] = decoded[column].map(parse)
+    return decoded
+
+
+def _csv_safe(frame: pd.DataFrame) -> pd.DataFrame:
+    safe = frame.copy()
+    for column in ('per_class_accuracy', 'confusion_matrix'):
+        if column in safe:
+            safe[column] = safe[column].map(
+                lambda value: json.dumps(np.asarray(value).tolist(), separators=(',', ':')))
+    return safe
+
+
+def write_aggregate_tables(tables: dict[str, pd.DataFrame], output_dir: str | Path) -> Path:
+    """Publish the complete set of aggregate CSVs as one new directory.
+
+    Existing output is never replaced. Files are assembled in a temporary
+    sibling directory and the directory rename publishes them together.
+    """
+    output = Path(output_dir)
+    if output.exists() or output.is_symlink():
+        raise FileExistsError(f'aggregate output already exists: {output}')
+    expected = {
+        'results', 'run_summary', 'condition_summary', 'model_summary',
+        'paired_deltas', 'paired_summary', 'per_class_summary',
+    }
+    if set(tables) != expected:
+        raise ValueError(f'tables must contain exactly {sorted(expected)}')
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=f'.{output.name}.', dir=output.parent) as temporary:
+        staged = Path(temporary)
+        for name in sorted(expected):
+            _csv_safe(tables[name]).to_csv(staged / f'{name}.csv', index=False)
+        os.replace(staged, output)
+    return output
+
+
+def main(argv=None) -> int:
+    """Validate a complete core results CSV and publish aggregate tables."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--input', required=True, type=Path,
+                        help='CSV containing the 96 completed core evaluation summaries')
+    parser.add_argument('--output-dir', required=True, type=Path,
+                        help='new directory for the seven aggregate CSV tables')
+    args = parser.parse_args(argv)
+    if not args.input.is_file() or args.input.is_symlink():
+        parser.error(f'input must be an existing regular file: {args.input}')
+    results = _parse_array_columns(pd.read_csv(args.input))
+    tables = aggregate_seeds(results)
+    output = write_aggregate_tables(tables, args.output_dir)
+    print(f'Validated {len(tables["results"])} core rows; wrote {len(tables)} tables to {output}')
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
