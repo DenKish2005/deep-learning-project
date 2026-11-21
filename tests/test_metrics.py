@@ -284,6 +284,10 @@ def test_validate_matrix_rejects_missing_duplicate_hash_mismatch_and_smoke(core_
     changed_hash.at[1, 'condition_hash'] = 'c' * 64
     with pytest.raises(ValueError, match='condition_hash differs'):
         validate_matrix(changed_hash)
+    reused_hash = core_matrix.copy()
+    reused_hash['condition_hash'] = 'c' * 64
+    with pytest.raises(ValueError, match='16 conditions.*unique'):
+        validate_matrix(reused_hash)
     smoke = core_matrix.copy()
     smoke.at[0, 'profile'] = 'smoke'
     with pytest.raises(ValueError, match='profile=core'):

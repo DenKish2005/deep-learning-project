@@ -284,6 +284,10 @@ def validate_matrix(results: pd.DataFrame) -> pd.DataFrame:
     hash_counts = frame.groupby(['corruption', 'severity'], sort=False)['condition_hash'].nunique()
     if not (hash_counts == 1).all():
         raise ValueError('condition_hash differs across models or seeds for a condition')
+    hashes_by_condition = frame.groupby(['corruption', 'severity'], sort=False)[
+        'condition_hash'].first()
+    if hashes_by_condition.nunique() != len(_CONDITIONS):
+        raise ValueError('each of the 16 conditions must have a unique condition_hash')
     for column in _IDENTITY_COLUMNS:
         if column in frame and frame[column].nunique(dropna=False) != 1:
             raise ValueError(f'{column} must be identical across the core matrix')

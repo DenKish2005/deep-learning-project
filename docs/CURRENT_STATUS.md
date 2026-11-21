@@ -4,8 +4,9 @@
 
 Added strict validation and aggregation for the complete 2-model × 3-seed ×
 16-condition matrix. The validator checks core profile/status, unique model/seed/
-condition keys, 10,000 samples per condition, shared condition hashes, frozen
-dataset identities, per-run artifact hashes, and consistency of the stored
+condition keys, 10,000 samples per condition, shared hashes across runs and
+unique hashes across conditions, frozen dataset identities, per-run artifact
+hashes, and consistency of the stored
 confusion matrix, per-class recalls, macro-F1, and counts. Aggregation produces
 per-condition, per-run, per-model, paired-seed, and per-class CSV tables; sample
 SD uses `ddof=1`, and treatment differences are paired by seed in percentage
