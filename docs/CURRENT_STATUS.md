@@ -1,451 +1,91 @@
-# CURRENT PROJECT STATUS
-
-## METRIC-001 â€” 19.11.2026 Â· ready for review
-
-Classification and per-run robustness metrics are implemented in
-[`src/metrics.py`](../src/metrics.py). All 57 synthetic metrics tests passed.
-The full suite passed with **1,007 passed, 20 opt-in skips, and 0 failures**.
-Raw data, split, normalization, and controlled configs passed read-only checks.
-Strict frozen CORR-003 replay failed on this runtime. The recorded Python version
-and recomputed pixel hash differ, and all 36 protected files match their original
-size, SHA-256, and mtime. [Verification record](../report/reproduction.md)
-
-Full METRIC-001 acceptance is pending human review and formal PROTO-001 and
-SETUP-002 sign-off. For review, check confusion-matrix orientation and absent-class
-behavior, the 16-condition input contract, and fraction versus percentage-point
-units. Training, evaluation, and seed aggregation remain open.
-
-## Historical MODEL-001 â€” 18.11.2026
-
-MODEL-001 â€” 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
-full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired
-initial states42/123/2026, BN/dropout/modes/backward/strict state_dict verified.
-Default950PASS/0FAIL/20opt-in SKIP; separate executed CPU/CUDA2PASS/0SKIP.
-All36protected files retain bytes/SHA-256/mtime; historical DATA/CORR/ROBUST actual
-opt-ins not rerun. No training/optimizer steps, CIFAR model inference or EDA.
-Human understanding/review, PROTO-001/SETUP-002/003 formal approvals, course/source/
-team gates and independent reproduction pending. Paired-init constructor QA does
-not establish optimizer budget/full TEST-S01 or training readiness.
-
-Implemented src/models.py with only torch/stdlib dependencies. Caller seeds before
-CPU construction; default layer draws precede one final protocol init. No hidden
-reseed. Reinitialize explicitly resets BN buffers and consumes caller RNG.
-Model state_dict includes `_extra_state` architecture/classes/dropout identity;
-load strict=True into a fresh compatible instance, with explicit map_location and
-weights_only=True. Standard PyTorch load has no transactional rollback guarantee.
-
-[Evidence](../report/model001_evidence.json),17819bytes, SHA-256
-`f658440c8c34425cae6c9e9831dd822c345e7f04a5e1bae39c1e3471677ee362`.
-[Commands/results](../report/reproduction.md). CPU/CUDA repeated eval is same-device
-only; backend flags were unchanged (deterministic algorithms/cuDNN deterministic
-false in these checks). No deterministic-training or cross-device equality claim.
-
-| Task | Full DoD | Remaining |
-|---|---|---|
-| MODEL-001 | PARTIAL; synthetic technical PASS | Independent human review/understanding, formal PROTO-001/SETUP-002 acceptance |
-| ROBUST-001 / DATA-003 | PARTIAL; prior technical PASS preserved | Human/formal dependent acceptance; budget/full scientific controls |
-| TRAIN-* / REPRO-001 / METRIC-001 | TODO | Shared trainer; general identity/resume/backup; metrics API |
-
-Published main blocks489eb04 API/tests,11cffd5 modes/strict identity,6dad624 devices/
-evidence; each full diff/tests/staged checks and immediate ordinary push PASS,
-fresh fetch clean0/0. Final docs/handoff separately published. Next independent
-bounded candidate [METRIC-001](NEXT_STEP_PROMPT.md), not started in this stage.
-
-## Historical status snapshots
-
-## ROBUST-001 â€” 18.11.2026
-
-Independent technical scope **PASS**; full DoD **PARTIAL**. Production
-CorruptionPolicy and existing explicit train-only integration verified; src/data.py
-and src/utils.py unchanged. Frozen probabilities.50/.17/.17/.16, one event/image,
-uniform corrupted severity1..3, identity0; explicit caller-owned keyed generator.
-No training/models/evaluation/EDA/core runs or test-based tuning.
-
-Default **914PASS/0FAIL/19opt-in SKIP**; separately **6actual PASS/0FAIL/0SKIP**:
-3new policy CPU/CUDA cases,1old train-only reference replay,2grid regressions.
-Other13historical opt-ins not repeated (8DATA,3CIFAR corruption,2old CUDA).
-Fresh pip/raw/split/stats/config CLI checks PASS. Heavy checks run sequentially;
-first parallel reference attempt failed MemoryError and first actual spawn attempt
-was stopped after WinError1455. Both unchanged sequential reruns passed; failures
-are retained in [evidence](../report/robust001_evidence.json).
-
-100000keyed selections:49914/16835/17223/16028; max frequency error.00223,
-conditional severity error.00539976. Actual17fixed persisted train IDs,3seeds,
-epochs0/1:102conditions, correct labels/IDs and clean val17samples. NumPy2D/direct
-noise/factor oracles: max pixel1.7881393432617188e-7, normalized7.748603820800781e-7.
-Actual spawn0/2 batch7/5 equality and global RNG isolation PASS; CUDA RTX3060Laptop
-same-device replay PASS, max oracle1.1920928955078125e-7. No CPU/CUDA equality claim.
-
-All28protected files bytes/hashes/mtimes and frozen DATA-002/003 regions preserved.
-Old CORR references independently replayed; frozen CORR-003 current-source mismatch
-remains an expected error. Authenticated read-only source replay at21ede65 PASS;
-PNG/PDF/manifest/evidence unchanged. [Reproduction](../report/reproduction.md).
-
-| Task | Full DoD | Remaining |
-|---|---|---|
-| ROBUST-001 | PARTIAL; independent technical PASS | Independent human code/artifact review and formal prerequisite approvals |
-| DATA-003 | PARTIAL; production robust integration technically verified | Human review/formal dependent acceptance |
-| CORR-001/002/003 | PARTIAL; technical PASS | Human review; Person5/team visual review; protocol/course/team approvals |
-| REPRO-001 / second-machine reproduction | Open | General identity/checkpoints/resume/backup; independent reproduction |
-
-Published main blocks:ef78e05 frozen replay,0c3d3ca policy/tests,d4d56b0 integration
-tests,01bcfb7 actual/evidence; each immediately ordinary push origin main PASS.
-Final docs/handoff published separately. Next bounded candidate:
-[MODEL-001 after prerequisite review](NEXT_STEP_PROMPT.md). PROTO-001/team freeze,
-course/source-policy/LMS/proposal approvals remain pending. Training readiness and
-full scientific TEST-S01/init/budget controls are not established by policy checks.
-
-## Historical CORR-003 â€” 18.11.2026
-
-Independent technical scope **PASS**; full DoD **PARTIAL**. Actual train-only grid:
-10 classes x16 conditions, minimum original IDs29/4/6/9/3/27/0/7/8/1 among persisted
-train45k, class order0..9. CPU float32 raw [0,1], common local audit epsilon per
-image, no geometry/Normalize/auto-contrast or official-test decoding in grid.
-
-Actual [PNG](../outputs/figures/corruption_examples.png)3520x2320,
-[PDF](../outputs/figures/corruption_examples.pdf)1page,
-[source manifest](../outputs/figures/corruption_examples.source.json),
-[evidence](../report/corr003_evidence.json), [commands](../report/reproduction.md).
-Default **815PASS/0FAIL/16opt-in SKIP**; separately **2actual PASS/0FAIL/0SKIP**.
-Independent numeric160cell replay: noise/darkening bitwise, max blur NumPy2D
-error1.7881393432617188e-7. PNG/PDF480RGB samples identical, source error<1/255.
-Agent opened both exports: labels readable, progressive effects, no obvious
-edge/channel artifact. Dark cat/dog s5 difficult; visual audit is bounded, not
-human approval or a claim about model accuracy. Person5/team review **PENDING**.
-Missing/corrupt input negative controls correctly fail; no replacement/output.
-Existing14actual DATA/corruption/CUDA cases not rerun. Fresh pip/raw/split/stats/
-controlled-config CLIs PASS. All23protected files bytes/hashes/mtimes and frozen
-DATA-002/003 source regions unchanged; dependencies/configs/protocol untouched.
-
-| Task | Full DoD | Remaining |
-|---|---|---|
-| CORR-001/002/003 | PARTIAL, independent technical PASS | Independent human code/artifact/visual review, PROTO-001/team/source-policy approvals |
-| DATA-001/002 | PARTIAL, technical PASS | Independent human review |
-| DATA-003 | PARTIAL, independent technical PASS | ROBUST-001/full robust integration/dependent acceptance and formal/human gates |
-| ROBUST-001 / REPRO-001 | TODO | Policy; general identity/checkpoints/resume/backup |
-
-Published main blocks:3c7a46e pixels/tests; b57a3c7 renderer/CLI/tests;
-21ede65 actual artifacts/tests/evidence. Each reviewed/tested and immediately
-pushed origin main PASS. Final docs/handoff published separately; final hash and
-fresh-fetch clean sync in Git/chat. Next bounded technical candidate:
-[ROBUST-001 after current prerequisite review](NEXT_STEP_PROMPT.md).
-No training/models/evaluator/metrics/EDA/scientific results. General REPRO-001,
-course/source-policy/team/protocol and second-machine reproduction stay open;
-Graphify remains historical. Training readiness is not established.
-
-## Historical CORR-002 â€” 18.11.2026
-
-Independent technical scope **PASS**; full DoD **PARTIAL**. Implemented normalized
-separable reflect Gaussian blur, multiplicative darkening and apply_corruption.
-CPU pixel contract/range/no mutation, clean0 vs three families1..5, explicit noise
-RNG and untouched deterministic-family generators verified. CORR-001 noise/keyed
-functions, stable_seed, frozen source regions and scientific settings preserved.
-
-Fresh baseline453PASS/11SKIP; final **777PASS/0FAIL/14opt-in SKIP**. Separately
-**6actual PASS/0FAIL/0SKIP**: 2new CIFAR dispatcher cases +1new CUDA dispatcher
-case +3CORR-001 regressions. All16conditionsÃ—17fixed train IDsÃ—epochs0/1 =544
-image-conditions; spawn0/2 batch7/5 for clean and severity3 of each family.
-CPU/CUDA blur max NumPy2D oracle error1.7881393432617188e-7. Actual CUDA0 on
-RTX3060Laptop; canonical keyed epsilon stays CPU, no cross-device bitwise claim.
-Missing-input negative control: expected exit1/DataIntegrityError,0SKIP.
-Original8actual DATA tests not rerun; fresh raw/split/stats CLIs PASS.
-
-[Evidence](../report/corr002_evidence.json), [reference](../report/corr002_reference.npz)
-187438bytes, SHA-256 `b4396faba198a1497758cd3478983b96a85bd272972cb6266e14d497437d1f03`.
-Reference: train IDs0/1/2, run42 epoch0, clean0 +3families atseverity3, pixels and
-normalized outputs. Existing CORR-001 reference unchanged. All23protected files
-bytes/hashes/mtimes preserved; dependencies/backend/configs/protocol unchanged.
-
-| Task | Full DoD | Remaining |
-|---|---|---|
-| CORR-001/002 | PARTIAL, independent technical PASS | PROTO-001/team freeze/source-policy approvals and independent human review |
-| CORR-003 | TODO; next technical stage | Train-only fixed grid, source manifest and human visual audit |
-| DATA-001/002 | PARTIAL, technical PASS | Independent human review |
-| DATA-003 | PARTIAL, independent technical PASS | ROBUST-001 policy/full integration/dependent acceptance and formal gates/review |
-| ROBUST-001 / REPRO-001 | TODO | Policy; general identity/checkpoints/resume/backup |
-
-Published in main: d339179 blur,72c933a darkening,2586a67 dispatcher,20724ac actual
-tests/artifacts/evidence; each checked and immediately pushed origin main PASS.
-Final docs/handoff is a separate commit; hash/fresh-fetch clean sync in Git/chat.
-[Next CORR-003 prompt](NEXT_STEP_PROMPT.md). No models/training/evaluator/metrics/
-EDA/plots/scientific runs. Graphify remains historical; not rebuilt. Dependency
-edges and human/course/team/protocol/reproduction gates remain open.
-
-## Historical CORR-001 â€” 18.11.2026
-
-Independent technical scope **PASS**; full DoD **PARTIAL**. Exact severity mapping,
-explicit-generator Gaussian noise, `keyed_test_generator` Ð¸ `keyed_test_epsilon`
-Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹ Ð¿Ð¾Ð²ÐµÑ€Ñ… Ð½ÐµÐ¸Ð·Ð¼ÐµÐ½Ñ‘Ð½Ð½Ð¾Ð³Ð¾ stable_seed. CPU reference Ñ„Ð¸ÐºÑÐ¸Ñ€ÑƒÐµÑ‚ original-test
-namespace/IDs, eval100494 Ð¸ Ð¾Ð±Ñ‰Ð¸Ð¹ epsilon Ð´Ð»Ñ Ð²ÑÐµÑ… severity/model identities.
-ÐÐ¸ÐºÐ°ÐºÐ¸Ñ… production wrapper/evaluator/policy Ð¸Ð»Ð¸ training runs Ð½Ðµ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¾.
-
-Fresh baseline357PASS/0FAIL/8SKIP; final **453PASS/0FAIL/11opt-in SKIP**.
-ÐžÑ‚Ð´ÐµÐ»ÑŒÐ½Ð¾ Ð½Ð¾Ð²Ñ‹Ðµ actual checks **3PASS/0FAIL/0SKIP**: noiseâ†’Normalize Ð½Ð°17fixed train
-IDs, epochs0/1, batch7/5 Ð¸ spawn workers0/2; test IDs0/71/9999 Ñ‚Ð¾Ð»ÑŒÐºÐ¾ input contract;
-CUDA primitive Ð½Ð° RTX3060Laptop, same-device equality Ð¸ wrong-device errors.
-Missing actual input Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½ negative control: Ð¾Ð¶Ð¸Ð´Ð°ÐµÐ¼Ñ‹Ð¹ DataIntegrityError/exit1,
-Ð±ÐµÐ· skip. Original8actual data cases Ð² ÑÑ‚Ð¾Ð¼ ÑÑ‚Ð°Ð¿Ðµ Ð½Ðµ Ð¿Ð¾Ð²Ñ‚Ð¾Ñ€ÑÐ»Ð¸ÑÑŒ; Ð¸Ñ… evidence Ð½Ð¸Ð¶Ðµ
-Ð¾ÑÑ‚Ð°Ñ‘Ñ‚ÑÑ Ð¸ÑÑ‚Ð¾Ñ€Ð¸Ñ‡ÐµÑÐºÐ¸Ð¼. Cross-device/platform bitwise equality Ð½Ðµ Ð·Ð°ÑÐ²Ð»ÐµÐ½Ð°.
-
-[Evidence](../report/corr001_evidence.json), [reference NPZ](../report/corr001_reference.npz)
-97580bytes, SHA-256 `40179be75281bdd06dadd266f565e70ad0f7779e81e31fdc6bd1818b45084b33`.
-Ð’ÑÐµ16raw/split/stats/config files ÑÐ¾Ñ…Ñ€Ð°Ð½Ð¸Ð»Ð¸ bytes/hashes/mtimes; source regions
-DATA-002/003, Ð¾Ð±Ð° YAML, lock/backend Ð¸ scientific settings Ð½ÐµÐ¸Ð·Ð¼ÐµÐ½Ð½Ñ‹.
-
-| Task | ÐŸÐ¾Ð»Ð½Ñ‹Ð¹ DoD | ÐžÑÑ‚Ð°Ñ‚Ð¾Ðº |
-|---|---|---|
-| CORR-001 | PARTIAL, independent technical PASS | PROTO-001/team freeze/source-policy approvals Ð¸ independent human review |
-| CORR-002 | TODO | Reflect blur, darkening, apply_corruption; ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ñ‚ÐµÑ…Ð½Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ ÑÑ‚Ð°Ð¿ |
-| DATA-001/002 | PARTIAL, technical PASS | Independent human review |
-| DATA-003 | PARTIAL, independent technical PASS | CORR-001 formal gates, CORR-002/ROBUST-001 full integration/dependent acceptance Ð¸ human review |
-| ROBUST-001 / REPRO-001 | TODO | Policy; general identity/global seed/checkpoints/resume/backup |
-
-Commits7d47569/b73536b/f89d70f/5d12a06 Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½Ñ‹ Ð¸ ÑÑ€Ð°Ð·Ñƒ push origin main PASS.
-Ð¤Ð¸Ð½Ð°Ð»ÑŒÐ½Ð°Ñ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°Ñ†Ð¸Ñ Ð¿ÑƒÐ±Ð»Ð¸ÐºÑƒÐµÑ‚ÑÑ Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ð¾; hash/clean sync â€” Ð² Git history/Ð¾Ñ‚Ð²ÐµÑ‚Ðµ.
-Dependency edges ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ñ‹. Human/course/LMS/proposal/team Ð¸ independent reproduction
-pending. Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ [prompt CORR-002](NEXT_STEP_PROMPT.md); Graphify historical, Ð±ÐµÐ· rebuild.
-
-## Ð˜ÑÑ‚Ð¾Ñ€Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ DATA-003 snapshot â€” 31.10.2026
-
-Independent technical scope **PASS**; full DoD **PARTIAL**. CORR-001 prerequisite
-ÐµÑ‰Ñ‘ TODO; CORR-002/actual robust integration/dependent acceptance Ð¸ independent
-human review pending. Dependency graph/scientific settings Ð½Ðµ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ñ‹.
-
-Ð ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹ compute/prepare/load_normalization, strict schema/provenance Ð¸
-read-only reuse; IndexedCIFAR10, keyed geometry/order, typed train/val/test loaders,
-policy injection boundary Ð¸ stats CLI. Actual stats Ñ‚Ð¾Ð»ÑŒÐºÐ¾ persisted45k, RGB/255,
-float64 two-pass, ddof0; independent uint64 moment oracle PASS, max errors2.78e-16
-mean/8.33e-17 std. Original test Ð½Ðµ ÑƒÑ‡Ð°ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² statistics.
-
-Stats2429bytes FILE SHA-256
-`332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688`;
-semantic stats hash `4450836de3384df4286535985ed0b56b9a411f3033a60ecf57bbfe5edcb01877`.
-ÐžÐ±Ð° YAML ÑÐ¾Ð´ÐµÑ€Ð¶Ð°Ñ‚ verified FILE hash. NPZ/manifest hashes, mtimes, DATA-002 source
-identity Ð¸11raw files (Ð²ÐºÐ»ÑŽÑ‡Ð°Ñ historical diagnostics/manifest) Ð½ÐµÐ¸Ð·Ð¼ÐµÐ½Ð½Ñ‹.
-Full actual batches45k/5k/10k, class counts4500/500/1000 Ð¸ label/ID coverage PASS;
-train352batches, last72. Paired synthetic-policy geometry/order Ð¸ workers0/2 spawn
-bitwise equality Ð½Ð°129actual train IDs, epochs0/1, batches64/37 PASS.
-
-Default **357PASS/0FAIL/8opt-in SKIP**, separately actual **8PASS/0FAIL/0SKIP**.
-pip/config CLI PASS; existing env/lock/backend ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ñ‹. CUDA smoke SKIP:
-backend Ð½ÐµÐ¸Ð·Ð¼ÐµÐ½Ñ‘Ð½. Training/model/corruptions/evaluation/plots/EDA Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹
-Ð¸ Ð½Ðµ Ð·Ð°Ð¿ÑƒÑÐºÐ°Ð»Ð¸ÑÑŒ. Test images Ñ‡Ð¸Ñ‚Ð°Ð»Ð¸ÑÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ fixed loader/integrity contract.
-[Evidence](../report/data003_evidence.json), [commands](../report/reproduction.md).
-
-| Task | ÐŸÐ¾Ð»Ð½Ñ‹Ð¹ DoD | Ð ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚ / Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ðº |
-|---|---|---|
-| DATA-001/002 | PARTIAL | Technical PASS; independent human review pending |
-| DATA-003 | PARTIAL | Independent technical PASS; CORR-001/002 robust integration, dependent acceptance Ð¸ human review pending |
-| CORR-001/002 | TODO | Noise/severity/blur/darkening APIs Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‚; stable_seed ÑƒÐ¶Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ |
-| REPRO-001 | TODO | Ð¢Ð¾Ð»ÑŒÐºÐ¾ data-specific hashes/publication Ð¸ stable_seed/seed_worker; general checkpoint/RNG/backup pending |
-
-Published main commits:cdffe3d stats/tests; df6745b keyed loaders/tests;
-60464bd stats CLI/tests; de303d0 verified actual artifacts/configs/evidence/tests.
-ÐšÐ°Ð¶Ð´Ñ‹Ð¹ Ð±Ð»Ð¾Ðº Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½ Ð¸ ÑÑ€Ð°Ð·Ñƒ push origin main PASS. Docs/handoff Ð¿ÑƒÐ±Ð»Ð¸ÐºÑƒÑŽÑ‚ÑÑ
-Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ð¾, final hash â€” Ð² Git history/Ð¾Ñ‚Ð²ÐµÑ‚Ðµ. Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÑÑ‚Ð°Ð¿ â€”
-[CORR-001 prompt](NEXT_STEP_PROMPT.md). Human/course policy/LMS/submitted proposal,
-team freeze Ð¸ independent reproduction pending. Graphify Ð¾ÑÑ‚Ð°Ñ‘Ñ‚ÑÑ historical snapshot.
-
-## Ð˜ÑÑ‚Ð¾Ñ€Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ DATA-002 snapshot â€” 31.10.2026
-
-Local technical acceptance **PASS**; full DoD **PARTIAL**, independent human
-artifact/code/test review pending. Initial clean main=origin/main7a2b2f3 verified
-by fetch. Existing `.venv`, lock/backend/scientific settings ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ñ‹.
-
-`create_split`/`load_split` Ð¸ CLI `--prepare-split`/read-only `--verify-split`
-Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹. Actual original train50000â†’45000/5000, seed494, exactly4500/500 per
-class; sorted `<i8` indices0..49999, unique/disjoint/exhaustive Ð¸ exact protocol
-replay PASS. Original test10000 Ð½Ðµ ÑƒÑ‡Ð°ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² split. Manifest Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÑ‚ source,
-label order, arrays/NPZ hashes Ð¸ LF creation-code identity; partial/tampered states
-Ð¾Ñ‚Ð²ÐµÑ€Ð³Ð°ÑŽÑ‚ÑÑ, failure diagnostics ÑÐ¾Ñ…Ñ€Ð°Ð½ÑÑŽÑ‚ÑÑ. Reuse hashes/file mtimes PASS;
-11raw files, Ð²ÐºÐ»ÑŽÑ‡Ð°Ñ historical acquisition manifest Ð¸ diagnostics, Ð½Ðµ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ñ‹.
-
-NPZ76550 bytes: `1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284`.
-ÐžÐ±Ð° YAML ÑÐ¾Ð´ÐµÑ€Ð¶Ð°Ñ‚ ÑÑ‚Ð¾Ñ‚ file-byte hash; normalization_sha256 Ð¾ÑÑ‚Ð°Ñ‘Ñ‚ÑÑ null.
-[Manifest](../data/splits/split_manifest.json), [actual evidence](../report/data002_evidence.json),
-[commands/results](../report/reproduction.md). Default282PASS/0FAIL/5opt-in SKIP;
-Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ð¾ actual5PASS/0FAIL/0SKIP; pip/config CLI PASS. CUDA smoke Ð½Ðµ Ð¿Ð¾Ð²Ñ‚Ð¾Ñ€ÑÐ»ÑÑ,
-dependencies/backend Ð½Ðµ Ð¼ÐµÐ½ÑÐ»Ð¸ÑÑŒ. Default suite offline Ð¸ Ð½Ðµ Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ actual data/split.
-
-Published in main:4044d0c algorithm/tests; fd0a272 persistence/provenance/tests;
-f4d7b42 CLI/tests; cf8e684 actual artifacts/configs/evidence/tests. ÐšÐ°Ð¶Ð´Ñ‹Ð¹ commit
-Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½ Ð¸ ÑÑ€Ð°Ð·Ñƒ Ð¾Ð¿ÑƒÐ±Ð»Ð¸ÐºÐ¾Ð²Ð°Ð½ Ð¾Ð±Ñ‹Ñ‡Ð½Ñ‹Ð¼ push. Ð¤Ð¸Ð½Ð°Ð»ÑŒÐ½Ñ‹Ð¹ docs commit â€” Ð² Git history.
-
-| Task | ÐŸÐ¾Ð»Ð½Ñ‹Ð¹ DoD | Ð ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚ / Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ðº |
-|---|---|---|
-| DATA-001/002 | PARTIAL, technical acceptance PASS | Raw data + frozen split verified; independent human review pending |
-| DATA-003 | TODO | Normalization/transforms/loaders Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‚; prerequisite CORR-001 ÐµÑ‰Ñ‘ TODO |
-| REPRO-001 | TODO | Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð¼Ð¸Ð½Ð¸Ð¼Ð°Ð»ÑŒÐ½Ñ‹Ðµ dataset/split hash/write helpers; general identity/RNG/checkpoint/backup infrastructure Ð½Ðµ Ð·Ð°ÐºÑ€Ñ‹Ñ‚Ð° |
-
-Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÐºÐ¾Ð½ÐºÑ€ÐµÑ‚Ð½Ñ‹Ð¹ ÑÑ‚Ð°Ð¿ â€” [DATA-003 prompt](NEXT_STEP_PROMPT.md): stats Ñ‚Ð¾Ð»ÑŒÐºÐ¾
-Ð¿Ð¾ persisted45k train, deterministic keyed transforms/order Ð¸ loaders Ð² Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð°Ñ…
-Ð·Ð°Ð²Ð¸ÑÐ¸Ð¼Ð¾ÑÑ‚ÐµÐ¹. Training readiness Ð½Ðµ Ð´Ð¾ÑÑ‚Ð¸Ð³Ð½ÑƒÑ‚Ð°; scientific runs Ð½Ðµ Ð·Ð°Ð¿ÑƒÑÐºÐ°Ð»Ð¸ÑÑŒ.
-Policy/LMS/submitted proposal/team/independent reproduction Ð¾ÑÑ‚Ð°ÑŽÑ‚ÑÑ pending.
-Graphify â€” historical snapshot Ð´Ð¾ DATA-002, ÑÐ²ÐµÑ€ÑÑ‚ÑŒ Ñ current source; rebuild Ð½Ðµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐ»ÑÑ.
-
-## Ð˜ÑÑ‚Ð¾Ñ€Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ DATA-001 snapshot â€” 30â€“31.10.2026
-
-Ð Ð°Ð±Ð¾Ñ‚Ð° Ð¸Ð´Ñ‘Ñ‚ Ð½ÐµÐ¿Ð¾ÑÑ€ÐµÐ´ÑÑ‚Ð²ÐµÐ½Ð½Ð¾ Ð² `main`; initial fetch Ð¿Ð¾Ð´Ñ‚Ð²ÐµÑ€Ð´Ð¸Ð» main=origin/main
-Ð½Ð°7658894, Ð¸ÑÑ…Ð¾Ð´Ð½Ð¾Ðµ Ñ€Ð°Ð±Ð¾Ñ‡ÐµÐµ Ð´ÐµÑ€ÐµÐ²Ð¾ clean. AGENTS.md Ð² repository Ð¸ Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒÑÐºÐ¾Ð¹
-Ñ†ÐµÐ¿Ð¾Ñ‡ÐºÐµ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½. Foundation dependencies/backend/configs ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ñ‹.
-
-Ð ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹ raw CIFAR-10 loader Ñ offline default, official HTTPS acquisition,
-archive/seven-file checksums Ð´Ð¾ unpickle, Ð¾Ð±Ð° partition contracts, working CLI
-`--root`/`--verify-only` Ð¸ ignored versioned integrity manifest. ÐŸÐ¾Ð²Ñ‚Ð¾Ñ€Ð½Ñ‹Ð¹ acquire
-Ð¿ÐµÑ€ÐµÐ¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐµÑ‚ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½Ð½Ñ‹Ðµ Ð´Ð°Ð½Ð½Ñ‹Ðµ; verify-only Ð½Ðµ Ð¿Ð¸ÑˆÐµÑ‚ artifacts; corrupt/foreign/
-stale artifacts Ð½Ðµ Ð·Ð°Ð¼ÐµÐ½ÑÑŽÑ‚ÑÑ. Default suite:180 PASS,3 actual opt-in SKIP.
-Actual official archive170498071 bytes Ð¸7files Ð¿Ñ€Ð¾ÑˆÐ»Ð¸ MD5/SHA-256 inspection;
-train50000/test10000, RGB32Ã—32,10classes,5000/1000per class PASS. ÐžÑ‚Ð´ÐµÐ»ÑŒÐ½Ñ‹Ðµ actual
-tests:3PASS/0SKIP, Ð²ÐºÐ»ÑŽÑ‡Ð°Ñ read-only/idempotence hashes+mtime. Acquisition manifest
-schema1 ÑÐ¾Ñ…Ñ€Ð°Ð½Ñ‘Ð½ ignored Ñ actual source/provenance. ÐšÐ¾Ð¼Ð°Ð½Ð´Ñ‹/checksums â€” Ð²
-[reproduction record](../report/reproduction.md); default SKIP Ð½Ðµ Ð¾Ð·Ð½Ð°Ñ‡Ð°ÐµÑ‚ CIFAR PASS.
-
-| Task | ÐŸÐ¾Ð»Ð½Ñ‹Ð¹ DoD | Ð ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚ / Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ðº |
-|---|---|---|
-| DATA-001 | PARTIAL, local technical acceptance PASS | Loader/CLI/manifest,180offline PASS +3actual PASS; independent human artifact/code/test reviewer approval pending |
-| DATA-002/003 | TODO | Split/stats/transforms/loaders Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‚; Ð¾Ð±Ð° config hashes Ð¾ÑÑ‚Ð°ÑŽÑ‚ÑÑ null |
-| REPRO-001 | TODO | Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð¼Ð¸Ð½Ð¸Ð¼Ð°Ð»ÑŒÐ½Ñ‹Ð¹ dataset manifest helper; generic identity/RNG/atomic checkpoint/backup infrastructure Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ð° |
-
-Training/model/evaluation/corruptions/plots Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹ Ð¸ Ð½Ðµ Ð·Ð°Ð¿ÑƒÑÐºÐ°Ð»Ð¸ÑÑŒ.
-Test partition Ñ€Ð°Ð·Ñ€ÐµÑˆÑ‘Ð½ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ integrity inspection, Ð±ÐµÐ· scientific tuning.
-Policy/LMS/submitted proposal/roles Ð¸ human approvals Ð¾ÑÑ‚Ð°ÑŽÑ‚ÑÑ pending.
-Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÐºÐ¾Ð½ÐºÑ€ÐµÑ‚Ð½Ñ‹Ð¹ ÑÑ‚Ð°Ð¿ â€” DATA-002: persisted stratified split494 Ð¸ÑÑ…Ð¾Ð´Ð½Ð¾Ð³Ð¾
-train50kâ†’45k/5k,4500/500 per class, disjoint/exhaustive indices, manifests/hashes
-Ð¸ tamper/idempotence tests; test partition Ð½Ðµ ÑƒÑ‡Ð°ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² split decisions.
-
-## ÐžÐ±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Git workflow
-
-ÐŸÐ¾ÑÐ»Ðµ foundation Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒ Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ð» push Ð¸ Ð¿Ð¾Ñ‚Ñ€ÐµÐ±Ð¾Ð²Ð°Ð» Ð²ÑÐµ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ðµ commits
-Ð¸ push Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð² `main`. Foundation commits Ð¿ÐµÑ€ÐµÐ½ÐµÑÐµÐ½Ñ‹ Ð² Ð»Ð¾ÐºÐ°Ð»ÑŒÐ½ÑƒÑŽ `main`
-fast-forward Ð±ÐµÐ· Ð¿ÐµÑ€ÐµÐ¿Ð¸ÑÑ‹Ð²Ð°Ð½Ð¸Ñ Ð¸ÑÑ‚Ð¾Ñ€Ð¸Ð¸. Snapshot ÑÑ‚Ð°Ð¿Ð° Ð½Ð¸Ð¶Ðµ Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÐµÑ‚ Ð¿Ñ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰ÐµÐµ
-ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ðµ Ð´Ð¾ Ð¿ÑƒÐ±Ð»Ð¸ÐºÐ°Ñ†Ð¸Ð¸; Ð°ÐºÑ‚ÑƒÐ°Ð»ÑŒÐ½ÑƒÑŽ ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸ÑŽ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÑ‚ÑŒ Ñ‡ÐµÑ€ÐµÐ· Git.
-[ÐŸÑ€Ð¾Ð¼Ð¿Ñ‚ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰ÐµÐ³Ð¾ ÑÑ‚Ð°Ð¿Ð° DATA-002](NEXT_STEP_PROMPT.md) Ð¾Ð±Ð½Ð¾Ð²Ð»Ñ‘Ð½31.10.2026:
-persisted split494, actual verification Ð¸ Ð¼Ð°Ð»ÐµÐ½ÑŒÐºÐ¸Ðµ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½Ð½Ñ‹Ðµ commit/push Ñ‚Ð¾Ð»ÑŒÐºÐ¾
-Ð² main. DATA-001 scope ÑÐ¾Ñ…Ñ€Ð°Ð½Ñ‘Ð½ Ð² Ð¸ÑÑ‚Ð¾Ñ€Ð¸Ð¸ Git; DATA-002 Ð·Ð´ÐµÑÑŒ ÐµÑ‰Ñ‘ Ð½Ðµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐ»ÑÑ.
-
-## Ð˜ÑÑ‚Ð¾Ñ€Ð¸Ñ‡ÐµÑÐºÐ¾Ðµ ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ðµ Ð¿Ð¾ÑÐ»Ðµ foundation â€” 30.10.2026
-
-Ð‘Ð°Ð·Ð° Ð¿Ñ€Ð¾Ð´Ð¾Ð»Ð¶ÐµÐ½Ð¸Ñ: commit0633f67, Ð¸ÑÑ…Ð¾Ð´Ð½Ð°Ñ Ð²ÐµÑ‚ÐºÐ° main Ð±Ñ‹Ð»Ð° clean; Ð¿Ð¾ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ñ…
-commits Ð¿Ñ€Ð¸ ÑÑ‚Ð°Ñ€Ñ‚Ðµ Ð½Ðµ Ð±Ñ‹Ð»Ð¾. Ð¡Ð¾Ð·Ð´Ð°Ð½Ð° `codex/setup-foundation`, Ð»Ð¾ÐºÐ°Ð»ÑŒÐ½Ñ‹Ðµ commits
-Ð¿Ð¾ Ð»Ð¾Ð³Ð¸Ñ‡ÐµÑÐºÐ¸Ð¼ Ð±Ð»Ð¾ÐºÐ°Ð¼; push/merge/fetch Ð½Ðµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐ»Ð¸ÑÑŒ. Remote freshness Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ð°.
-ÐŸÑ€Ð¸Ð¼ÐµÐ½Ð¸Ð¼Ñ‹Ñ… AGENTS.md Ð² repository/Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒÑÐºÐ¾Ð¹ Ñ†ÐµÐ¿Ð¾Ñ‡ÐºÐµ Ð½ÐµÑ‚.
-
-| Task | Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð¿Ð¾Ð»Ð½Ð¾Ð³Ð¾ DoD | Ð¤Ð°ÐºÑ‚Ð¸Ñ‡ÐµÑÐºÐ¸ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¾ / Ð¾ÑÑ‚Ð°Ð»Ð¾ÑÑŒ |
-|---|---|---|
-| SETUP-001 | PARTIAL | ÐÐ°Ð¹Ð´ÐµÐ½Ñ‹ local guidelines2026, CSR, 2proposal candidates; Ñ€ÐµÐµÑÑ‚Ñ€ hashes/pages. Pending: LMS freshness, detailed rubric, receipt/version, policy precedence, Ñ‚Ð¾Ñ‡Ð½Ñ‹Ðµ cutoff/slot |
-| PROTO-001 | PARTIAL | Technical architecture/protocol review Ð¸ corrections Ð·Ð°Ð¿Ð¸ÑÐ°Ð½Ñ‹; team approval/freeze pending |
-| TEAM-001 | PARTIAL | Role/file plan Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½, Ð¸Ð¼ÐµÐ½Ð° Ð½Ð°Ð¹Ð´ÐµÐ½Ñ‹ Ð² candidate; mapping/availability/backup/reviewer acceptance pending |
-| SETUP-002 | PARTIAL, local technical acceptance PASS | `.venv`,38 exact versions, recipe, pip check/imports/CPU+CUDA smoke PASS; formal human review pending |
-| SETUP-003 | PARTIAL, local technical acceptance PASS | 2YAML, strict schema/config CLI,116 tests PASS; formal human review/protocol acceptance pending |
-
-Ð­Ñ‚Ð¾ Ð·Ð°Ð²ÐµÑ€ÑˆÑ‘Ð½Ð½Ñ‹Ð¹ **Ð»Ð¾ÐºÐ°Ð»ÑŒÐ½Ñ‹Ð¹ Ñ‚ÐµÑ…Ð½Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ Ð¾Ð±ÑŠÑ‘Ð¼ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ ÑÑ‚Ð°Ð¿Ð°**, Ð½Ðµ team sign-off.
-[Evidence](../report/reproduction.md), [environment snapshot](../report/setup_environment.json),
-[source registry](../report/course_materials/README.md), [decisions](SETUP_DECISIONS.md).
-
-Ð ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ config functions Ð² src/utils.py, test_utils Ð¸ environment smoke.
-Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð½Ðµ ÑÐºÐ°Ñ‡Ð¸Ð²Ð°Ð»Ð¸ÑÑŒ, test set Ð½Ðµ Ñ‡Ð¸Ñ‚Ð°Ð»ÑÑ, CNN/training/evaluation/plotting Ð½Ðµ
-Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹ Ð¸ Ð½Ðµ Ð·Ð°Ð¿ÑƒÑÐºÐ°Ð»Ð¸ÑÑŒ. Split/stats paths Ð´ÐµÐºÐ»Ð°Ñ€Ð°Ñ‚Ð¸Ð²Ð½Ñ‹Ðµ, hashes null.
-REPRO-001 TODO (ignore protection Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð°, identity/manifests/backup ÐµÑ‰Ñ‘ Ð½ÐµÑ‚).
-Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ñ‚ÐµÑ…Ð½Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ ÑÑ‚Ð°Ð¿: DATA-001 â†’ DATA-002 â†’ DATA-003 Ñ REPRO-001 primitives;
-course policy/team approvals ÑƒÑ‚Ð¾Ñ‡Ð½ÑÑŽÑ‚ÑÑ Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ð¾ Ð´Ð¾ ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‰Ð¸Ñ… gates.
-
-## Ð˜ÑÑ‚Ð¾Ñ€Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ Ð°ÑƒÐ´Ð¸Ñ‚ Ð´Ð¾ planning commit
-
-Ð’ÐµÑÑŒ Ñ‚ÐµÐºÑÑ‚ Ð½Ð¸Ð¶Ðµ ÑÐ¾Ñ…Ñ€Ð°Ð½ÑÐµÑ‚ snapshot Ð½Ð° 5ce6b1a Ð´Ð¾ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ `docs/`; ÐµÐ³Ð¾ Ñ€Ð°Ð·Ð¼ÐµÑ€Ñ‹,
-Ð²ÐµÑ€ÑÐ¸Ð¸, ÑÑ‚Ð°Ñ‚ÑƒÑÑ‹ Ð¸ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ðµ Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‚ Ñ‚ÐµÐºÑƒÑ‰ÑƒÑŽ Ñ€Ð°Ð±Ð¾Ñ‡ÑƒÑŽ Ð²ÐµÑ‚ÐºÑƒ. ÐžÐ±ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ð½Ñ‹ Ð²ÑÐµ29
-Ð¸ÑÑ…Ð¾Ð´Ð½Ñ‹Ñ… tracked Ñ„Ð°Ð¹Ð»Ð¾Ð². Ð¢ÐµÐºÑƒÑ‰ÐµÐµ ÑÐ¾ÑÑ‚Ð¾ÑÐ½Ð¸Ðµ Ð¸ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ¸ Ð¿ÐµÑ€ÐµÑ‡Ð¸ÑÐ»ÐµÐ½Ñ‹ Ð²Ñ‹ÑˆÐµ.
-
-## ÐÐ°Ð±Ð»ÑŽÐ´Ð°ÐµÐ¼Ñ‹Ðµ Ñ„Ð°ÐºÑ‚Ñ‹
-
-- Ð’ÐµÑ‚ÐºÐ° `main`, HEAD `5ce6b1a` â€” `Architecture created`, 22.09.2026 09:48 +0500. ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ commit `db34ee3` â€” `Initial commit`, 17.09.2026 22:11 +0500.
-- Ð˜Ð· Ð»Ð¾ÐºÐ°Ð»ÑŒÐ½Ñ‹Ñ… Ð²ÐµÑ‚Ð¾Ðº Ñ‚Ð¾Ð»ÑŒÐºÐ¾ main; Ð²Ð¸Ð´Ð½Ñ‹ `origin/main` Ð¸ `origin/HEAD`, ÑÐ¾Ð²Ð¿Ð°Ð´Ð°ÑŽÑ‰Ð¸Ðµ Ñ HEAD. Fetch Ð½Ðµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐ»ÑÑ, Ð°ÐºÑ‚ÑƒÐ°Ð»ÑŒÐ½Ð¾ÑÑ‚ÑŒ remote Ð½Ðµ ÑƒÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð°.
-- Remote: `https://github.com/DenKish2005/deep-learning-project.git`. Ð”Ð¾ Ð°ÑƒÐ´Ð¸Ñ‚Ð° `git status --short` Ð¿ÑƒÑÑ‚Ð¾Ð¹.
-- 20 Ð¸Ð· 29 Ñ„Ð°Ð¹Ð»Ð¾Ð² Ð¸Ð¼ÐµÑŽÑ‚ Ñ€Ð°Ð·Ð¼ÐµÑ€ 0 bytes; Ð¸Ð· Ð½Ð¸Ñ… Ð¿ÑÑ‚ÑŒ â€” Ð¾Ð¶Ð¸Ð´Ð°ÐµÐ¼Ñ‹Ðµ `.gitkeep`, Ð´Ð²Ð° â€” Ð´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ñ‹Ðµ package markers. ÐžÑÑ‚Ð°Ð»ÑŒÐ½Ñ‹Ðµ 13 â€” Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‰Ð°Ñ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ Ð¸ Ð¿ÑƒÑÑ‚Ð¾Ð¹ proposal.
-- 14 Python-Ñ„Ð°Ð¹Ð»Ð¾Ð²: 12 source/script/test Ñ„Ð°Ð¹Ð»Ð¾Ð² Ð¸ Ð´Ð²Ð° `__init__.py`; Ð²ÑÐµ Ð¿ÑƒÑÑ‚Ñ‹Ðµ. ÐÐµÑ‚ Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¹, training loop, Ð¼Ð¾Ð´ÐµÐ»ÐµÐ¹, Ñ€Ð°Ð±Ð¾Ñ‚Ð°ÑŽÑ‰Ð¸Ñ… CLI Ð¸ assertions.
-- ÐÐµÑ‚ datasets, checkpoints, metrics, figures Ð¸ course documents, Ð²ÐºÐ»ÑŽÑ‡Ð°Ñ PDF/DOCX/PPTX. Ð’ ignored ÐºÐ°Ñ‚Ð°Ð»Ð¾Ð³Ð°Ñ… Ñ‚Ð¾Ð¶Ðµ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ `.gitkeep`.
-- Notebook â€” Ð²Ð°Ð»Ð¸Ð´Ð½Ð°Ñ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ð° nbformat 4 Ñ `cells: []`, Ð±ÐµÐ· EDA Ð¸Ð»Ð¸ execution results.
-- ÐžÐ±Ð° YAML ÑÐ¾Ð´ÐµÑ€Ð¶Ð°Ñ‚ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ comment. YAML parser Ð²ÐµÑ€Ð½Ñ‘Ñ‚ `None`, Ð° Ð½Ðµ config mapping; ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð¾Ð±ÑƒÑ‡ÐµÐ½Ð¸Ñ ÑÐµÐ¹Ñ‡Ð°Ñ Ð½ÐµÐ»ÑŒÐ·Ñ ÑÑ‡Ð¸Ñ‚Ð°Ñ‚ÑŒ Ñ€Ð°Ð±Ð¾Ñ‡Ð¸Ð¼Ð¸.
-- `requirements.txt` ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ñ‚ Ð²Ð¾ÑÐµÐ¼ÑŒ Ð¸Ð¼Ñ‘Ð½ Ð±ÐµÐ· versions: torch, torchvision, numpy, pandas, scikit-learn, matplotlib, tqdm, pyyaml. pytest Ð¸ lock Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‚.
-- ÐÐ°Ð¹Ð´ÐµÐ½ Python 3.12.10. Ð§ÐµÑ€ÐµÐ· package metadata Ð½Ð°Ð¹Ð´ÐµÐ½Ñ‹ torch 2.14.0, torchvision 0.29.0, numpy 2.5.3, PyYAML 6.0.3; pytest Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½. Ð­Ñ‚Ð¾ **Ð½Ðµ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° imports, ABI, CUDA Ð¸Ð»Ð¸ Ð¿Ñ€Ð¸Ð³Ð¾Ð´Ð½Ð¾ÑÑ‚Ð¸ Ð¾ÐºÑ€ÑƒÐ¶ÐµÐ½Ð¸Ñ**. GPU/VRAM Ð½Ðµ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐ»Ð¸ÑÑŒ.
-- AGENTS.md Ð² Ñ€ÐµÐ¿Ð¾Ð·Ð¸Ñ‚Ð¾Ñ€Ð¸Ð¸ Ð¸ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½Ð½Ð¾Ð¹ Ñ†ÐµÐ¿Ð¾Ñ‡ÐºÐµ Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒÑÐºÐ¸Ñ… ÐºÐ°Ñ‚Ð°Ð»Ð¾Ð³Ð¾Ð² Ð½Ðµ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½.
-
-## Ð ÐµÐµÑÑ‚Ñ€ ÐºÐ°Ð¶Ð´Ð¾Ð³Ð¾ Ð¸ÑÑ…Ð¾Ð´Ð½Ð¾Ð³Ð¾ Ñ„Ð°Ð¹Ð»Ð°
-
-Ð’ ÑÑ‚Ð¾Ð»Ð±Ñ†Ðµ Â«ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ°/DoDÂ» ÑƒÐºÐ°Ð·Ð°Ð½ Ð±ÑƒÐ´ÑƒÑ‰Ð¸Ð¹ acceptance criterion, Ð° Ð½Ðµ ÑƒÐ¶Ðµ Ð¿Ñ€Ð¾Ð¹Ð´ÐµÐ½Ð½Ð°Ñ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ°. ÐšÐ¾Ð½Ñ‚Ñ€Ð°ÐºÑ‚Ñ‹ Ð¸ Ð·Ð°Ð²Ð¸ÑÐ¸Ð¼Ð¾ÑÑ‚Ð¸ Ñ€Ð°ÑÐºÑ€Ñ‹Ñ‚Ñ‹ Ð² [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md).
-
-| ÐŸÑƒÑ‚ÑŒ | Bytes / Ñ‚ÐµÐºÑƒÑ‰ÐµÐµ Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¸ ÑÑ‚Ð°Ñ‚ÑƒÑ | Ð§Ñ‚Ð¾ Ð´Ð¾Ð»Ð¶Ð½Ð¾ ÑÐ¾Ð´ÐµÑ€Ð¶Ð°Ñ‚ÑŒÑÑ / Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ | Ð—Ð°Ð²Ð¸ÑÐ¸Ð¼Ð¾ÑÑ‚Ð¸ | ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° / DoD |
-|---|---|---|---|---|
-| README.md | 436; Ñ‡Ð°ÑÑ‚Ð¸Ñ‡Ð½Ð¾: Ð¾Ð¿Ð¸ÑÐ°Ð½Ð¸Ðµ scaffold | Setup â†’ data â†’ train â†’ eval â†’ plots, ÑÑÑ‹Ð»ÐºÐ¸ Ð½Ð° docs Ð¸ artifacts | Ð’ÑÐµ CLI | ÐÐ¾Ð²Ñ‹Ð¹ ÑƒÑ‡Ð°ÑÑ‚Ð½Ð¸Ðº Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐµÑ‚ smoke Ð¿Ð¾ README |
-| ARCHITECTURE.txt | 1114; Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ð¾ ÐºÐ°Ðº Ð´ÐµÑ€ÐµÐ²Ð¾ scaffold | Ð¡Ð¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ñ Ñ„Ð¸Ð½Ð°Ð»ÑŒÐ½Ñ‹Ð¼ Ð´ÐµÑ€ÐµÐ²Ð¾Ð¼, Ð±ÐµÐ· Ð·Ð°ÑÐ²Ð»ÐµÐ½Ð¸Ð¹ Ð¾ Ð³Ð¾Ñ‚Ð¾Ð²Ð½Ð¾ÑÑ‚Ð¸ | Architecture doc | Ð’ÑÐµ Ð¿ÑƒÑ‚Ð¸ Ð´ÐµÑ€ÐµÐ²Ð° ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÑŽÑ‚ Ð¿Ð¾ÑÐ»Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ |
-| LICENSE | 1095; Ð¿Ð¾Ð»Ð½Ñ‹Ð¹ MIT license | Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ; dataset/paper licenses ÑƒÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°Ñ‚ÑŒ Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ð¾ | ÐÐµÑ‚ | Ð¢ÐµÐºÑÑ‚ ÑÐ¾Ñ…Ñ€Ð°Ð½Ñ‘Ð½, license Ð½Ðµ Ð²Ñ‹Ð´Ð°ÐµÑ‚ÑÑ Ð·Ð° dataset license |
-| requirements.txt | 67; Ñ‡Ð°ÑÑ‚Ð¸Ñ‡Ð½Ñ‹Ð¹ ÑÐ¿Ð¸ÑÐ¾Ðº | Ð’ÐµÑ€ÑÐ¸Ð¸ Ð¸ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½Ð½Ñ‹Ð¹ lock, pytest/dev dependencies | Env validation | pip check + imports + smoke |
-| .gitignore | 460; Ð±Ð°Ð·Ð¾Ð²Ñ‹Ðµ ignore rules Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹ | Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ outputs/runs, predictions, cache, locks Ð¿Ñ€Ð¸ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸; splits Ð¸ curated tables Ð½Ðµ Ñ‚ÐµÑ€ÑÑ‚ÑŒ | Artifact layout | git check-ignore Ð½Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¸ Ñ€Ð°Ð·Ñ€ÐµÑˆÑ‘Ð½Ð½Ñ‹Ñ… manifests |
-| configs/clean_cnn.yaml | 42; comment placeholder | ÐŸÐ¾Ð»Ð½Ñ‹Ð¹ config Ñ schema_version | utils/train/data | parse + invalid config tests |
-| configs/robust_cnn.yaml | 43; comment placeholder | Ð¢Ð¾Ñ‚ Ð¶Ðµ config, Ð¾Ñ‚Ð»Ð¸Ñ‡Ð°ÐµÑ‚ÑÑ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ regime Ð¸ policy | clean config/corruptions | Controlled fields equality test |
-| data/raw/.gitkeep | 0; Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ð½Ñ‹Ð¹ directory marker | Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ; raw CIFAR Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ð¾ Ð¾Ñ‚ Git | download_data | checksum + class counts |
-| data/processed/.gitkeep | 0; directory marker | Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ; cache optional Ð¸ versioned | split/corruptions | Cache hash ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ manifest |
-| outputs/checkpoints/.gitkeep | 0; directory marker | Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ; best.pt/last.pt per run | train | load round trip, hashes |
-| outputs/metrics/.gitkeep | 0; directory marker | Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ; 96 summaries, aggregate tables | evaluate/metrics | Ð£Ð½Ð¸ÐºÐ°Ð»ÑŒÐ½Ð¾ÑÑ‚ÑŒ matrix keys, cardinality |
-| outputs/figures/.gitkeep | 0; directory marker | Ð¡Ð¾Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑŒ; PNG/PDF figures | plots/metrics | Rendering + source provenance |
-| src/__init__.py | 0; Ð´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ñ‹Ð¹ package marker | ÐœÐ¾Ð¶Ð½Ð¾ Ð¾ÑÑ‚Ð°Ð²Ð¸Ñ‚ÑŒ Ð¿ÑƒÑÑ‚Ñ‹Ð¼, Ð±ÐµÐ· side effects | ÐÐµÑ‚ | import src ÑƒÑÐ¿ÐµÑˆÐµÐ½ |
-| src/data.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | CIFAR loader, persisted split, transforms, datasets, loaders | torchvision/corruptions | test_data_pipeline |
-| src/corruptions.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | Pixel-space corruption + training policy | torch/torchvision | test_corruptions |
-| src/models.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | CompactCNN, init, architecture ID | torch.nn | test_models |
-| src/train.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | Shared training engine + CLI, validation, resume | data/models/utils | test_training + smoke |
-| src/evaluate.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | Fixed conditions inference, predictions, summary | data/models/metrics | test_evaluation |
-| src/metrics.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | Metrics, paired aggregation, table exports + CLI | numpy/pandas | test_metrics |
-| src/utils.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | Config validation, seeds, atomic artifacts, metadata | YAML/stdlib/torch | test_utils |
-| scripts/download_data.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | Download/integrity/split/stats CLI | src.data | Offline error + idempotence |
-| scripts/run_all_evaluations.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | Matrix validation, eval orchestration | src.evaluate | Exactly 96 unique outputs |
-| scripts/make_plots.py | 0; Ð½Ðµ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½ | Reusable plots from saved tables | metrics/data/matplotlib | test_plots |
-| tests/__init__.py | 0; Ð´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ñ‹Ð¹ marker | ÐœÐ¾Ð¶Ð½Ð¾ Ð¾ÑÑ‚Ð°Ð²Ð¸Ñ‚ÑŒ Ð¿ÑƒÑÑ‚Ñ‹Ð¼ | pytest | Collection succeeds |
-| tests/test_data_pipeline.py | 0; Ñ‚ÐµÑÑ‚Ð¾Ð² Ð½ÐµÑ‚ | Split, range, transform, loader tests | data fixtures | Ð ÐµÐ°Ð»ÑŒÐ½Ñ‹Ðµ assertions, no downloads by default |
-| tests/test_corruptions.py | 0; Ñ‚ÐµÑÑ‚Ð¾Ð² Ð½ÐµÑ‚ | Identity/range/determinism/severity tests | corruptions fixtures | Ð’ÑÐµ Ñ‚Ð¸Ð¿Ñ‹/severity Ð¸ invalid inputs |
-| notebooks/01_eda_and_sanity.ipynb | 72; Ð¿ÑƒÑÑ‚Ð¾Ð¹ notebook | EDA Ñ‚Ð¾Ð»ÑŒÐºÐ¾ train, class balance, sample grids; Ð±ÐµÐ· production logic | src.data | Restart & Run All Ð±ÐµÐ· ÑÐºÑ€Ñ‹Ñ‚Ð¾Ð³Ð¾ state |
-| report/proposal.md | 0; Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ð¼Ð¾Ðµ | Ð’Ð¾ÑÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ Ñ€ÐµÐ°Ð»ÑŒÐ½Ñ‹Ð¹ submitted proposal Ñ provenance, Ð½Ðµ ÑÐ¾Ñ‡Ð¸Ð½ÑÑ‚ÑŒ Ð¿Ñ€Ð¾ÑˆÐ»ÑƒÑŽ ÑÐ´Ð°Ñ‡Ñƒ | Teammates/LMS | Source/date/status Ð¿Ð¾Ð´Ñ‚Ð²ÐµÑ€Ð¶Ð´ÐµÐ½Ñ‹ |
-| report/final_report/README.md | 67; placeholder | Report plan, source/build/export links | FINAL_DELIVERABLES | Ð“Ð¾Ñ‚Ð¾Ð²Ñ‹Ð¹ report ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ rubric |
-
-## ÐšÐ»Ð°ÑÑÐ¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ñ Ð³Ð¾Ñ‚Ð¾Ð²Ð½Ð¾ÑÑ‚Ð¸
-
-**Already implemented:** skeleton directory layout, Git repository, MIT text, Ð±Ð°Ð·Ð¾Ð²Ñ‹Ðµ ignore rules, ÐºÑ€Ð°Ñ‚ÐºÐ¾Ðµ Ð¾Ð¿Ð¸ÑÐ°Ð½Ð¸Ðµ Ð¿Ñ€Ð¾ÐµÐºÑ‚Ð° Ð¸ package/directory markers. Ð­Ñ‚Ð¾ Ð½Ðµ Ñ€Ð°Ð±Ð¾Ñ‡Ð°Ñ ML-ÑÐ¸ÑÑ‚ÐµÐ¼Ð°.
-
-**Partially implemented:** README, dependency declaration, architecture tree, Ð¼ÐµÑÑ‚Ð¾ Ð´Ð»Ñ report. YAML Ð¸ notebook Ð¸Ð¼ÐµÑŽÑ‚ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñƒ, Ð¿Ð¾Ð»ÐµÐ·Ð½Ð°Ñ Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ð¾ÑÑ‚ÑŒ Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚.
-
-**Not implemented:** data pipeline, split persistence, corruptions, CNN, training, robust policy, evaluation, metrics, plots, tests, experiment tracking, report, slides Ð¸ reproducibility evidence.
-
-**Requires verification:** submitted proposal, latest rubric, deadlines/timezone, presentation date/duration, AI policy, teammates' names, GPU availability, import/CUDA compatibility, Ð´Ð¾ÑÑ‚ÑƒÐ¿ Ðº dataset, branch freshness.
-
-**Out of scope:** training Ð¸ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ ÑÐµÐ¹Ñ‡Ð°Ñ; frontend/cloud/deployment; Ð¾Ð±ÑÐ·Ð°Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¹ SOTA; adversarial robustness. OPTIONAL extension CIFAR-10-C Ð½Ðµ Ð±Ð»Ð¾ÐºÐ¸Ñ€ÑƒÐµÑ‚ core.
-
-## ÐŸÑ€Ð¾Ð±Ð»ÐµÐ¼Ñ‹ Ð¸ Ð±Ð»Ð¾ÐºÐµÑ€Ñ‹
-
-| ID | ÐÐ°Ð±Ð»ÑŽÐ´ÐµÐ½Ð¸Ðµ | ÐŸÐ¾ÑÐ»ÐµÐ´ÑÑ‚Ð²Ð¸Ðµ | Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð°Ñ Ð·Ð°Ð´Ð°Ñ‡Ð° |
-|---|---|---|---|
-| AUD-01 | ÐÐµÑ‚ Ð¾Ñ„Ð¸Ñ†Ð¸Ð°Ð»ÑŒÐ½Ñ‹Ñ… Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð² Ð¸ Ð¿ÑƒÑÑ‚Ð¾Ð¹ proposal | ÐÐµÐ»ÑŒÐ·Ñ Ð¿Ð¾Ð´Ñ‚Ð²ÐµÑ€Ð´Ð¸Ñ‚ÑŒ Ð¾Ñ†ÐµÐ½ÐºÐ¸/Ð´Ð°Ñ‚Ñ‹/AI permissions | SETUP-001 |
-| AUD-02 | ÐŸÑƒÑÑ‚Ñ‹Ðµ configs Ð¸ source | ÐÐµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚ Ð¸ÑÐ¿Ð¾Ð»Ð½ÑÐµÐ¼Ð¾Ð³Ð¾ experiment | SETUP-003 â†’ DATA/MODEL/TRAIN |
-| AUD-03 | Unpinned dependencies; pytest Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ | ÐÐµÑ‚ Ð¾Ð±Ñ‰ÐµÐ³Ð¾ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐµÐ½Ð½Ð¾Ð³Ð¾ env | SETUP-002 |
-| AUD-04 | Split, normalization, RNG Ð¸ checkpoint schema Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‚ | ÐŸÑ€Ð¸ Ð½Ð°Ð¸Ð²Ð½Ð¾Ð¹ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ñ€Ð¸ÑÐº leakage Ð¸ Ð½ÐµÑÐ¾Ð¿Ð¾ÑÑ‚Ð°Ð²Ð¸Ð¼Ð¾ÑÑ‚Ð¸ | DATA-002, DATA-003, TRAIN-002 |
-| AUD-05 | Raw outputs Ñ†ÐµÐ»Ð¸ÐºÐ¾Ð¼ ignored | ÐŸÐ¾Ñ‚ÐµÑ€Ñ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð¾Ð² Ð±ÐµÐ· Ð²Ð½ÐµÑˆÐ½ÐµÐ¹ ÐºÐ¾Ð¿Ð¸Ð¸ | REPRO-001, RELEASE-001 |
-
-Ð”ÑƒÐ±Ð»Ð¸Ñ€ÑƒÑŽÑ‰ÐµÐ³Ð¾ Ñ€Ð°Ð±Ð¾Ñ‡ÐµÐ³Ð¾ ÐºÐ¾Ð´Ð°, circular imports Ð¸ Ñ„Ð°ÐºÑ‚Ð¸Ñ‡ÐµÑÐºÐ¾Ð¹ ÑƒÑ‚ÐµÑ‡ÐºÐ¸ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð½Ðµ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ð¾, Ð¿Ð¾ÑÐºÐ¾Ð»ÑŒÐºÑƒ ÐºÐ¾Ð´Ð° Ð¸ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð½ÐµÑ‚. Ð­Ñ‚Ð¾ Ð½Ðµ Ð´Ð¾ÐºÐ°Ð·Ð°Ñ‚ÐµÐ»ÑŒÑÑ‚Ð²Ð¾ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾ÑÑ‚Ð¸ Ð±ÑƒÐ´ÑƒÑ‰ÐµÐ¹ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸. Ð ÐµÐ°Ð»ÑŒÐ½Ñ‹Ñ… runtime bugs Ð¸ accuracy Ð¿Ð¾ÐºÐ° Ð¾Ñ†ÐµÐ½Ð¸Ñ‚ÑŒ Ð½ÐµÐ»ÑŒÐ·Ñ.
-
-## Ð’Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð½Ñ‹Ðµ Ð¸ Ð½ÐµÐ²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð½Ñ‹Ðµ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ¸
-
-Ð’Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ñ‹ `rg --files --hidden`, recursive listing with sizes, Ñ‡Ñ‚ÐµÐ½Ð¸Ðµ Ð²ÑÐµÑ… Ð½ÐµÐ¿ÑƒÑÑ‚Ñ‹Ñ… Ñ„Ð°Ð¹Ð»Ð¾Ð², Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° zero-byte Ñ„Ð°Ð¹Ð»Ð¾Ð², `git status`, `git branch -avv`, `git log -8`, `git remote -v`, `git ls-files`, `python --version` Ð¸ package metadata inspection. Ð­Ñ‚Ð¸ Ð¾Ð¿ÐµÑ€Ð°Ñ†Ð¸Ð¸ Ð½Ðµ Ð¸Ð·Ð¼ÐµÐ½ÑÐ»Ð¸ Ð¸ÑÑ…Ð¾Ð´Ð½Ñ‹Ðµ Ñ„Ð°Ð¹Ð»Ñ‹ Ð¸ Git.
-
-ÐÐµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐ»Ð¸ÑÑŒ: installation, imports torch/torchvision, dataset download, notebook execution, pytest, training, evaluation Ð¸ model benchmarks. ÐŸÐ»Ð°Ð½Ð¾Ð²Ñ‹Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð² Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°Ñ†Ð¸Ð¸ Ð½Ðµ ÑÐ²Ð»ÑÑŽÑ‚ÑÑ Ð¾Ñ‚Ñ‡Ñ‘Ñ‚Ð¾Ð¼ Ð¾Ð± ÑƒÑÐ¿ÐµÑˆÐ½Ð¾Ð¼ Ð·Ð°Ð¿ÑƒÑÐºÐµ.
-
-ÐŸÐ¾ÑÐ»Ðµ Ð¿Ð»Ð°Ð½Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ñ‹ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ñ‹ `docs/*.md`. Ð˜ÑÑ…Ð¾Ð´Ð½Ñ‹Ðµ 29 Ñ„Ð°Ð¹Ð»Ð¾Ð² Ð´Ð¾Ð»Ð¶Ð½Ñ‹ Ð¾ÑÑ‚Ð°Ñ‚ÑŒÑÑ byte-identical; Ð¸Ñ‚Ð¾Ð³Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð¿ÐµÑ€ÐµÑ‡Ð¸ÑÐ»ÐµÐ½Ð° Ð² MASTER_PROJECT_PLAN.
-
-## ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ planning package
-
-Ð¤Ð°ÐºÑ‚Ð¸Ñ‡ÐµÑÐºÐ¸ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¾ 30.10.2026:
-
-- Ð’ÑÐµ 14 Ñ‚Ñ€ÐµÐ±ÑƒÐµÐ¼Ñ‹Ñ… Markdown-Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð² ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÑŽÑ‚, Ð½ÐµÐ¿ÑƒÑÑ‚Ñ‹Ðµ Ð¸ Ñ‡Ð¸Ñ‚Ð°ÑŽÑ‚ÑÑ ÐºÐ°Ðº UTF-8.
-- Ð›Ð¾ÐºÐ°Ð»ÑŒÐ½Ñ‹Ðµ Markdown-ÑÑÑ‹Ð»ÐºÐ¸ Ð²ÐµÐ´ÑƒÑ‚ Ð½Ð° ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÑŽÑ‰Ð¸Ðµ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ñ‹; code fences ÑÐ±Ð°Ð»Ð°Ð½ÑÐ¸Ñ€Ð¾Ð²Ð°Ð½Ñ‹.
-- Ð’ roadmap Ñ€Ð¾Ð²Ð½Ð¾ 49 ÑƒÐ½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ñ… task cards, ÐºÐ°Ð¶Ð´Ð°Ñ ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ñ‚ Ð²ÑÐµ 20 Ð¾Ð±ÑÐ·Ð°Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ñ… Ð¿Ð¾Ð»ÐµÐ¹; dependency graph Ð½Ðµ ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ñ‚ Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ñ‹Ñ… prerequisite IDs Ð¸Ð»Ð¸ cycles.
-- Ð’ protocol Ñ€Ð¾Ð²Ð½Ð¾ 96 ÑƒÐ½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ñ… matrix rows: 2 regimes Ã— 3 seeds Ã— 16 conditions. Ð”Ð»Ñ ÐºÐ°Ð¶Ð´Ð¾Ð³Ð¾ run Ð¿Ñ€Ð¸ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‚ clean0 Ð¸ Ð²ÑÐµ 15 corruption conditions.
-- Ð’ÑÐµ 29 Ð¸ÑÑ…Ð¾Ð´Ð½Ñ‹Ñ… tracked Ñ„Ð°Ð¹Ð»Ð¾Ð² ÑÐ¾Ð²Ð¿Ð°Ð´Ð°ÑŽÑ‚ Ñ HEAD Ð¿Ð¾ÑÐ»Ðµ ÑˆÑ‚Ð°Ñ‚Ð½Ñ‹Ñ… Git clean filters; `git diff --exit-code` Ð¸ `git diff --check` Ð¿Ñ€Ð¾Ñ…Ð¾Ð´ÑÑ‚. Ð£ LICENSE checkout Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐµÑ‚ CRLF Ð¿Ñ€Ð¸ LF Ð² Git blob Ð¸Ð·-Ð·Ð° `core.autocrlf=true`; ÑÑ‚Ð¾ Ð½Ðµ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð° ÑÑ‚Ð¾Ð¹ Ð·Ð°Ð´Ð°Ñ‡ÐµÐ¹.
-- `git status --short` Ð¿Ð¾ÐºÐ°Ð·Ñ‹Ð²Ð°ÐµÑ‚ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ `?? docs/`. Commits, push, branch changes Ð¸ remote mutations Ð½Ðµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐ»Ð¸ÑÑŒ.
-
-Ð­Ñ‚Ð¾ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°Ñ†Ð¸Ð¸ Ð¸ Ð½ÐµÐ¸Ð·Ð¼ÐµÐ½Ð½Ð¾ÑÑ‚Ð¸ Ð¸ÑÑ…Ð¾Ð´Ð½Ð¸ÐºÐ¾Ð². ML unit/integration tests, imports/ABI/CUDA checks, data download, training Ð¸ evaluation Ð¿Ð¾-Ð¿Ñ€ÐµÐ¶Ð½ÐµÐ¼Ñƒ **Ð½Ðµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐ»Ð¸ÑÑŒ**.
+þŠmþ&yºÞÃòân¶«Ëñè™æë{Ü™ßì…éez{ì†X§{_?n)ÿ¦Ã©z¶­Š‰ç¢Ú^®h­µçHÈÕT”‘S•“Ò‘PÕÕUTÂ‚ˆÈÈQU’PËLˆ8 %ŒKŒLKŒŒˆ0­ÈXÚšXØ[[\[Y[][Ûˆ™XYH›Üˆ™]šY]Â‚YYÝšXÝ˜[Y][Ûˆ[™YÙÜ™YØ][Ûˆ›ÜˆHÛÛ\]H‹[[Ù[0åÈË\ÙYY0åÂŒM‹XÛÛ™][ÛˆX]š^ˆH˜[Y]ÜˆÚXÚÜÈÛÜ™H›Ùš[KÜÝ]\Ë[š\]YH[Ù[ÜÙYYÂ˜ÛÛ™][ÛˆÙ^\ËLØ[\\È\ˆÛÛ™][Û‹Ú\™YÛÛ™][Ûˆ\Ú\Ëœ›Þ™[‚™]\Ù]Y[]Y\Ë\‹\[ˆ\Y˜XÝ\Ú\Ë[™ÛÛœÚ\Ý[˜ÞHÙˆHÝÜ™Y˜ÛÛ™\Ú[ÛˆX]š^\‹XÛ\ÜÈ™XØ[ËXXÜ›ËQŒK[™ÛÝ[ËˆYÙÜ™YØ][Ûˆ›ÙXÙ\Âœ\‹XÛÛ™][Û‹\‹\[‹\‹[[Ù[Z\™Y\ÙYY[™\‹XÛ\ÜÈÔÕˆX›\ÎÈØ[\B”Ñ\Ù\ÈÙLX[™™X]Y[Y™™\™[˜Ù\È\™HZ\™YžHÙYY[ˆ\˜Ù[YÙBœÚ[ËˆHÓHX›\Ú\È[Ù]™[ˆX›\È\ÈÛ™H™]ÈÝ]]\™XÝÜžH[™œ™Y\Ù\ÈÈÝ™\Üš]H[ˆ^\Ý[™È\™XÝÜžK‚‚[
+ŠŒˆ\ÝÈ[ˆ\ÝËÝ\ÝÛY]šXÜËœX\ÜÙY
+Šˆ[ˆHÞ[]XÈÔK[Û›H[‚Ú]]ÛˆËŒLË[TH‹KK[™[™\ÈËŒKŒKˆWØÛÛ\[X[™Ú]Y™ˆKXÚXÚØœ\ÜÙYˆ\È\ÈXÚšXØ[]šY[˜ÙH›ÜˆQU’PËL‹›Ý[XØÙ\[˜ÙN‚‘USL™X[™\Ý[ËØÚXÚÜÚ[È\™H›Ý]˜Z[X›KÛÈHM‹\›ÝÈš[˜[X]š^˜[™ØÚY[YšXÈÝ]]X›\È]™H›Ý™Y[ˆÙ[™\˜]YˆH™\ÜÚ]ÜžIÜÈ[›™Y˜ÛÝ\œÙH[š\›Û›Y[\È]ÛˆËŒLˆ[™™YYÈ]ÈÝÛˆ™\šYšXØ][Û‹ˆ›Ü›X[”“ÕËLKÔÑUTLˆ™]šY]È™[XZ[œÈ[™[™Ë‚‚ˆÈÈQU’PËLH8 %NKŒLKŒŒˆ0­È™XYH›Üˆ™]šY]Â‚Û\ÜÚYšXØ][Ûˆ[™\‹\[ˆ›Ø\Ý™\ÜÈY]šXÜÈ\™H[\[Y[Y[‚–ØÜ˜ËÛY]šXÜËœXJ‹‹ÜÜ˜ËÛY]šXÜËœJKˆ[MÈÞ[]XÈY]šXÜÈ\ÝÈ\ÜÙY‚•H[ÝZ]H\ÜÙYÚ]
+ŠŒKÈ\ÜÙYŒÜZ[ˆÚÚ\Ë[™˜Z[\™\ÊŠ‹‚”˜]È]KÜ]›Ü›X[^˜][Û‹[™ÛÛ›ÛYÛÛ™šYÜÈ\ÜÙY™XY[Û›HÚXÚÜË‚”ÝšXÝœ›Þ™[ˆÓÔ”‹LÈ™\^H˜Z[YÛˆ\È[[YKˆH™XÛÜ™Y]Ûˆ™\œÚ[Û‚˜[™™XÛÛ\]Y^[\ÚY™™\‹[™[Íˆ›ÝXÝYš[\ÈX]ÚZ\ˆÜšYÚ[˜[œÚ^™KÒKLM‹[™][YKˆÕ™\šYšXØ][Ûˆ™XÛÜ™J‹‹Ü™\ÜÜ™\›ÙXÝ[Û‹›Y
+B‚‘[QU’PËLHXØÙ\[˜ÙH\È[™[™È[X[ˆ™]šY]È[™›Ü›X[“ÕËLH[™”ÑUTLˆÚYÛ‹[Ù™‹ˆ›Üˆ™]šY]ËÚXÚÈÛÛ™\Ú[Û‹[X]š^ÜšY[][Ûˆ[™XœÙ[XÛ\ÜÂ˜™Z]š[Ü‹HM‹XÛÛ™][Ûˆ[œ]ÛÛ˜XÝ[™œ˜XÝ[Ûˆ™\œÝ\È\˜Ù[YÙK\Ú[[š]Ëˆ˜Z[š[™Ë]˜[X][Û‹[™ÙYYYÙÜ™YØ][Ûˆ™[XZ[ˆÜ[‹‚‚ˆÈÈ\ÝÜšXØ[SÑSLH8 %NŒLKŒŒ‚‚“SÑSLH8 %NŒLKŒŒŽˆÛÛ\XÝÓ“ˆŒH[™\[™[Þ[]XÈXÚšXØ[PH
+Š”TÔÊŠŽÂ™[Ñ
+Š”T•PS
+Š‹ˆ^XÝŽÍˆ\˜[Y]\œË˜]ÈÙÚ]Ë›ÝØÛÛ[š]Z\™Yš[š]X[Ý]\Í‹ÌLŒËÌŒ‹“‹Ù›ÜÝ]Û[Ù\ËØ˜XÚÝØ\™ÜÝšXÝÝ]WÙXÝ™\šYšYY‚‘Y˜][MLTÔËÌRSÌŒÜZ[ˆÒÒTÈÙ\\˜]H^XÝ]YÔKÐÕQL”TÔËÌÒÒT‚[Íœ›ÝXÝYš[\È™]Z[ˆž]\ËÔÒKLM‹Û][YNÈ\ÝÜšXØ[UKÐÓÔ”‹Ô“Ð•TÕXÝX[›ÜZ[œÈ›Ý™\[‹ˆ›È˜Z[š[™ËÛÜ[Z^™\ˆÝ\ËÒQTˆ[Ù[[™™\™[˜ÙHÜˆQK‚’[X[ˆ[™\œÝ[™[™ËÜ™]šY]Ë“ÕËLKÔÑUTL‹ÌÈ›Ü›X[\›Ý˜[ËÛÝ\œÙKÜÛÝ\˜ÙKÂX[HØ]\È[™[™\[™[™\›ÙXÝ[Ûˆ[™[™ËˆZ\™YZ[š]ÛÛœÝXÝÜˆPHÙ\Â››Ý\ÝX›\ÚÜ[Z^™\ˆYÙ]Ù[TÕTÌHÜˆ˜Z[š[™È™XY[™\ÜË‚‚’[\[Y[YÜ˜ËÛ[Ù[ËœHÚ]Û›HÜ˜ÚÜÝXˆ\[™[˜ÚY\ËˆØ[\ˆÙYYÈ™Y›Ü™BÔHÛÛœÝXÝ[ÛŽÈY˜][^Y\ˆ˜]ÜÈ™XÙYHÛ™Hš[˜[›ÝØÛÛ[š]ˆ›ÈY[‚œ™\ÙYYˆ™Z[š]X[^™H^XÚ]H™\Ù]È“ˆY™™\œÈ[™ÛÛœÝ[Y\ÈØ[\ˆ“‘Ë‚“[Ù[Ý]WÙXÝ[˜ÛY\ÈÙ^˜WÜÝ]X\˜Ú]XÝ\™KØÛ\ÜÙ\ËÙ›ÜÝ]Y[]NÂ›ØYÝšXÝUYH[ÈHœ™\ÚÛÛ\]X›H[œÝ[˜ÙKÚ]^XÚ]X\ÛØØ][Ûˆ[™ÙZYÚ×ÛÛ›OUYKˆÝ[™\™UÜ˜ÚØY\È›È˜[œØXÝ[Û˜[›Û˜XÚÈÝX\˜[YK‚‚–Ñ]šY[˜ÙWJ‹‹Ü™\ÜÛ[Ù[WÙ]šY[˜ÙKšœÛÛŠKMÎNXž]\ËÒKLM‚˜NÎÌÍXØYM˜ÎYNNÌYŒ˜ÌÍYMÙŒMYLX˜YLÎXÌYLÍÌMÍÙYLÍŒ˜‚–ÐÛÛ[X[™ËÜ™\Ý[×J‹‹Ü™\ÜÜ™\›ÙXÝ[Û‹›Y
+KˆÔKÐÕQH™\X]Y]˜[\ÈØ[YKY]šXÙB›Û›NÈ˜XÚÙ[™›YÜÈÙ\™H[˜Ú[™ÙY
+]\›Z[š\ÝXÈ[ÛÜš]\ËØÝQ“ˆ]\›Z[š\ÝXÂ™˜[ÙH[ˆ\ÙHÚXÚÜÊKˆ›È]\›Z[š\ÝXË]˜Z[š[™ÈÜˆÜ›ÜÜËY]šXÙH\]X[]HÛZ[K‚‚Ÿ\ÚÈ[Ñ™[XZ[š[™ÈŸKK_KK_KK_ŸSÑSLHT•PSÈÞ[]XÈXÚšXØ[TÔÈ[™\[™[[X[ˆ™]šY]ËÝ[™\œÝ[™[™Ë›Ü›X[“ÕËLKÔÑUTLˆXØÙ\[˜ÙHŸ“Ð•TÕLHÈUKLÈT•PSÈš[ÜˆXÚšXØ[TÔÈ™\Ù\™Y[X[‹Ù›Ü›X[\[™[XØÙ\[˜ÙNÈYÙ]Ù[ØÚY[YšXÈÛÛ›ÛÈŸRS‹JˆÈ‘T“ËLHÈQU’PËLHÑÈÚ\™Y˜Z[™\ŽÈÙ[™\˜[Y[]KÜ™\Ý[YKØ˜XÚÝ\ÈY]šXÜÈTH‚”X›\ÚYXZ[ˆ›ØÚÜÍYXŒTKÝ\ÝËLXÙ™™H[Ù\ËÜÝšXÝY[]K™YŒ]šXÙ\ËÂ™]šY[˜ÙNÈXXÚ[Y™‹Ý\ÝËÜÝYÙYÚXÚÜÈ[™[[YYX]HÜ™[˜\žH\ÚTÔË™œ™\Ú™]ÚÛX[ŒÌˆš[˜[ØÜËÚ[™Ù™ˆÙ\\˜][HX›\ÚYˆ™^[™\[™[˜›Ý[™YØ[™Y]HÓQU’PËLWJ‘VÔÕTÔ“ÓT›Y
+K›ÝÝ\Y[ˆ\ÈÝYÙK‚‚ˆÈÈ\ÝÜšXØ[Ý]\ÈÛ˜\ÚÝÂ‚ˆÈÈ“Ð•TÕLH8 %NŒLKŒŒ‚‚’[™\[™[XÚšXØ[ØÛÜH
+Š”TÔÊŠŽÈ[Ñ
+Š”T•PS
+Š‹ˆ›ÙXÝ[Û‚ÛÜœ\[Û”ÛXÞH[™^\Ý[™È^XÚ]˜Z[‹[Û›H[YÜ˜][Ûˆ™\šYšYYÈÜ˜ËÙ]KœB˜[™Ü˜ËÝ][ËœH[˜Ú[™ÙYˆœ›Þ™[ˆ›Ø˜Xš[]Y\ËLËŒMËËŒMËËŒM‹Û™H]™[Ú[XYÙK[šY›Ü›HÛÜœ\YÙ]™\š]LK‹ŒËY[]LÈ^XÚ]Ø[\‹[ÝÛ™YÙ^YYÙ[™\˜]Ü‹‚“›È˜Z[š[™ËÛ[Ù[ËÙ]˜[X][Û‹ÑQKØÛÜ™H[œÈÜˆ\ÝX˜\ÙY[š[™Ë‚‚‘Y˜][
+ŠŽLMTÔËÌRSÌN[ÜZ[ˆÒÒT
+ŠŽÈÙ\\˜][H
+Š˜XÝX[TÔËÌRSÌÒÒT
+ŠŽ‚ŒÛ™]ÈÛXÞHÔKÐÕQHØ\Ù\Ë[Û˜Z[‹[Û›H™Y™\™[˜ÙH™\^K™ÜšY™YÜ™\ÜÚ[ÛœË‚“Ý\ŒLÚ\ÝÜšXØ[ÜZ[œÈ›Ý™\X]Y
+UKÐÒQTˆÛÜœ\[Û‹›ÛÕQJK‚‘œ™\Ú\Ü˜]ËÜÜ]ÜÝ]ËØÛÛ™šYÈÓHÚXÚÜÈTÔËˆX]žHÚXÚÜÈ[ˆÙ\]Y[X[NÂ™š\œÝ\˜[[™Y™\™[˜ÙH][\˜Z[YY[[ÜžQ\œ›Üˆ[™š\œÝXÝX[Ü]Ûˆ][\Ø\ÈÝÜYY\ˆÚ[‘\œ›ÜŒMMKˆ›Ý[˜Ú[™ÙYÙ\]Y[X[™\[œÈ\ÜÙYÈ˜Z[\™\Â˜\™H™]Z[™Y[ˆÙ]šY[˜ÙWJ‹‹Ü™\ÜÜ›Ø\ÝWÙ]šY[˜ÙKšœÛÛŠK‚‚ŒLÙ^YYÙ[XÝ[ÛœÎNLMÌMŽÍKÌMÌŒŒËÌMŒŽÈX^œ™\]Y[˜ÞH\œ›Ü‹ŒŒŒË˜ÛÛ™][Û˜[Ù]™\š]H\œ›Ü‹ŒLÎNMÍ‹ˆXÝX[MÙš^Y\œÚ\ÝY˜Z[ˆQËÜÙYYË™\ØÚÌÌNŒL˜ÛÛ™][ÛœËÛÜœ™XÝX™[ËÒQÈ[™ÛX[ˆ˜[MÜØ[\\Ëˆ[TL‘Ù\™XÝ››Ú\ÙKÙ˜XÝÜˆÜ˜XÛ\ÎˆX^^[KÎLÎLÍÌŒMÌNKMË›Ü›X[^™YËÍŒÎŒÎYKMË‚XÝX[Ü]ÛŒÌˆ˜]ÚËÍH\]X[]H[™ÛØ˜[“‘È\ÛÛ][ÛˆTÔÎÈÕQH•ÌŒ\ÜœØ[YKY]šXÙH™\^HTÔËX^Ü˜XÛLKŒNLŒLŽMMLÎLYKMËˆ›ÈÔKÐÕQH\]X[]HÛZ[K‚‚[Ž›ÝXÝYš[\Èž]\ËÚ\Ú\ËÛ][Y\È[™œ›Þ™[ˆUKL‹ÌÈ™YÚ[ÛœÈ™\Ù\™Y‚“ÛÓÔ”ˆ™Y™\™[˜Ù\È[™\[™[H™\^YYÈœ›Þ™[ˆÓÔ”‹LÈÝ\œ™[\ÛÝ\˜ÙHZ\ÛX]Úœ™[XZ[œÈ[ˆ^XÝY\œ›Ü‹ˆ]][XØ]Y™XY[Û›HÛÝ\˜ÙH™\^H]ŒYYMHTÔÎÂ”‘ËÔ‹ÛX[šY™\ÝÙ]šY[˜ÙH[˜Ú[™ÙYˆÔ™\›ÙXÝ[Û—J‹‹Ü™\ÜÜ™\›ÙXÝ[Û‹›Y
+K‚‚Ÿ\ÚÈ[Ñ™[XZ[š[™ÈŸKK_KK_KK_Ÿ“Ð•TÕLHT•PSÈ[™\[™[XÚšXØ[TÔÈ[™\[™[[X[ˆÛÙKØ\Y˜XÝ™]šY]È[™›Ü›X[™\™\]Z\Ú]H\›Ý˜[ÈŸUKLÈT•PSÈ›ÙXÝ[Ûˆ›Ø\Ý[YÜ˜][ÛˆXÚšXØ[H™\šYšYY[X[ˆ™]šY]ËÙ›Ü›X[\[™[XØÙ\[˜ÙHŸÓÔ”‹LKÌ‹ÌÈT•PSÈXÚšXØ[TÔÈ[X[ˆ™]šY]ÎÈ\œÛÛKÝX[Hš\ÝX[™]šY]ÎÈ›ÝØÛÛØÛÝ\œÙKÝX[H\›Ý˜[ÈŸ‘T“ËLHÈÙXÛÛ™[XXÚ[™H™\›ÙXÝ[ÛˆÜ[ˆÙ[™\˜[Y[]KØÚXÚÜÚ[ËÜ™\Ý[YKØ˜XÚÝ\È[™\[™[™\›ÙXÝ[Ûˆ‚”X›\ÚYXZ[ˆ›ØÚÜÎ™YÎLHœ›Þ™[ˆ™\^KÌÙØØHÛXÞKÝ\ÝËM˜Œ[YÜ˜][Û‚\ÝËX˜Ù˜ÈXÝX[Ù]šY[˜ÙNÈXXÚ[[YYX][HÜ™[˜\žH\ÚÜšYÚ[ˆXZ[ˆTÔË‚‘š[˜[ØÜËÚ[™Ù™ˆX›\ÚYÙ\\˜][Kˆ™^›Ý[™YØ[™Y]N‚–ÓSÑSLHY\ˆ™\™\]Z\Ú]H™]šY]×J‘VÔÕTÔ“ÓT›Y
+Kˆ“ÕËLKÝX[Hœ™Y^™K˜ÛÝ\œÙKÜÛÝ\˜ÙK\ÛXÞKÓTËÜ›ÜÜØ[\›Ý˜[È™[XZ[ˆ[™[™Ëˆ˜Z[š[™È™XY[™\ÜÈ[™™[ØÚY[YšXÈTÕTÌKÚ[š]ØYÙ]ÛÛ›ÛÈ\™H›Ý\ÝX›\ÚYžHÛXÞHÚXÚÜË‚‚ˆÈÈ\ÝÜšXØ[ÓÔ”‹LÈ8 %NŒLKŒŒ‚‚’[™\[™[XÚšXØ[ØÛÜH
+Š”TÔÊŠŽÈ[Ñ
+Š”T•PS
+Š‹ˆXÝX[˜Z[‹[Û›HÜšY‚ŒLÛ\ÜÙ\ÈMˆÛÛ™][ÛœËZ[š[][HÜšYÚ[˜[QÌŽKÍÍ‹ÎKÌËÌËÌÍËÎÌH[[Û™È\œÚ\ÝY˜Z[ZËÛ\ÜÈÜ™\Œ‹ŽKˆÔH›Ø]Ìˆ˜]ÈÌWKÛÛ[[ÛˆØØ[]Y]\Ú[Ûˆ\‚š[XYÙK›ÈÙ[ÛY]žKÓ›Ü›X[^™KØ]]ËXÛÛ˜\ÝÜˆÙ™šXÚX[]\ÝXÛÙ[™È[ˆÜšY‚‚XÝX[Ô‘×J‹‹ÛÝ]]ËÙšYÝ\™\ËØÛÜœ\[Û—Ù^[\\Ëœ™ÊLÍLŒŒÌŒ–Ô—J‹‹ÛÝ]]ËÙšYÝ\™\ËØÛÜœ\[Û—Ù^[\\ËœŠL\YÙK–ÜÛÝ\˜ÙHX[šY™\ÝJ‹‹ÛÝ]]ËÙšYÝ\™\ËØÛÜœ\[Û—Ù^[\\ËœÛÝ\˜ÙKšœÛÛŠK–Ù]šY[˜ÙWJ‹‹Ü™\ÜØÛÜœŒ×Ù]šY[˜ÙKšœÛÛŠKØÛÛ[X[™×J‹‹Ü™\ÜÜ™\›ÙXÝ[Û‹›Y
+K‚‘Y˜][
+ŠŽMTTÔËÌRSÌM›ÜZ[ˆÒÒT
+ŠŽÈÙ\\˜][H
+ŠŒ˜XÝX[TÔËÌRSÌÒÒT
+Š‹‚’[™\[™[[Y\šXÌMŒÙ[™\^Nˆ›Ú\ÙKÙ\šÙ[š[™Èš]Ú\ÙKX^›\ˆ[TL‘™\œ›ÜŒKÎLÎLÍÌŒMÌNKMËˆ‘ËÔ‘ÐˆØ[\\ÈY[XØ[ÛÝ\˜ÙH\œ›ÜKÌMK‚YÙ[Ü[™Y›Ý^ÜÎˆX™[È™XYX›K›ÙÜ™\ÜÚ]™HY™™XÝË›ÈØš[Ý\Â™YÙKØÚ[›™[\Y˜XÝˆ\šÈØ]ÙÙÈÍHY™šXÝ[Èš\ÝX[]Y]\È›Ý[™Y›Ýš[X[ˆ\›Ý˜[ÜˆHÛZ[HX›Ý][Ù[XØÝ\˜XÞKˆ\œÛÛKÝX[H™]šY]È
+Š”S‘S‘ÊŠ‹‚“Z\ÜÚ[™ËØÛÜœ\[œ]™YØ]]™HÛÛ›ÛÈÛÜœ™XÝH˜Z[È›È™\XÙ[Y[ÛÝ]]‚‘^\Ý[™ÌMXÝX[UKØÛÜœ\[Û‹ÐÕQHØ\Ù\È›Ý™\[‹ˆœ™\Ú\Ü˜]ËÜÜ]ÜÝ]ËÂ˜ÛÛ›ÛYXÛÛ™šYÈÓ\ÈTÔËˆ[ŒÜ›ÝXÝYš[\Èž]\ËÚ\Ú\ËÛ][Y\È[™œ›Þ™[‚‘UKL‹ÌÈÛÝ\˜ÙH™YÚ[ÛœÈ[˜Ú[™ÙYÈ\[™[˜ÚY\ËØÛÛ™šYÜËÜ›ÝØÛÛ[ÝXÚY‚‚Ÿ\ÚÈ[Ñ™[XZ[š[™ÈŸKK_KK_KK_ŸÓÔ”‹LKÌ‹ÌÈT•PS[™\[™[XÚšXØ[TÔÈ[™\[™[[X[ˆÛÙKØ\Y˜XÝÝš\ÝX[™]šY]Ë“ÕËLKÝX[KÜÛÝ\˜ÙK\ÛXÞH\›Ý˜[ÈŸUKLKÌˆT•PSXÚšXØ[TÔÈ[™\[™[[X[ˆ™]šY]ÈŸUKLÈT•PS[™\[™[XÚšXØ[TÔÈ“Ð•TÕLKÙ[›Ø\Ý[YÜ˜][Û‹Ù\[™[XØÙ\[˜ÙH[™›Ü›X[Ú[X[ˆØ]\ÈŸ“Ð•TÕLHÈ‘T“ËLHÑÈÛXÞNÈÙ[™\˜[Y[]KØÚXÚÜÚ[ËÜ™\Ý[YKØ˜XÚÝ\‚”X›\ÚYXZ[ˆ›ØÚÜÎŒØÍØM™H^[ËÝ\ÝÎÈMØLØÍÈ™[™\™\‹ÐÓKÝ\ÝÎÂŒŒYYMHXÝX[\Y˜XÝËÝ\ÝËÙ]šY[˜ÙKˆXXÚ™]šY]ÙYÝ\ÝY[™[[YYX][Bœ\ÚYÜšYÚ[ˆXZ[ˆTÔËˆš[˜[ØÜËÚ[™Ù™ˆX›\ÚYÙ\\˜][NÈš[˜[\Ú[™™œ™\ÚY™]ÚÛX[ˆÞ[˜È[ˆÚ]ØÚ]ˆ™^›Ý[™YXÚšXØ[Ø[™Y]N‚–Ô“Ð•TÕLHY\ˆÝ\œ™[™\™\]Z\Ú]H™]šY]×J‘VÔÕTÔ“ÓT›Y
+K‚“›È˜Z[š[™ËÛ[Ù[ËÙ]˜[X]Ü‹ÛY]šXÜËÑQKÜØÚY[YšXÈ™\Ý[ËˆÙ[™\˜[‘T“ËLK˜ÛÝ\œÙKÜÛÝ\˜ÙK\ÛXÞKÝX[KÜ›ÝØÛÛ[™ÙXÛÛ™[XXÚ[™H™\›ÙXÝ[ÛˆÝ^HÜ[ŽÂ‘Ü˜\YžH™[XZ[œÈ\ÝÜšXØ[ˆ˜Z[š[™È™XY[™\ÜÈ\È›Ý\ÝX›\ÚY‚‚ˆÈÈ\ÝÜšXØ[ÓÔ”‹Lˆ8 %NŒLKŒŒ‚‚’[™\[™[XÚšXØ[ØÛÜH
+Š”TÔÊŠŽÈ[Ñ
+Š”T•PS
+Š‹ˆ[\[Y[Y›Ü›X[^™YœÙ\\˜X›H™Y›XÝØ]\ÜÚX[ˆ›\‹][\XØ]]™H\šÙ[š[™È[™\WØÛÜœ\[Û‹‚ÔH^[ÛÛ˜XÝÜ˜[™ÙKÛ›È]]][Û‹ÛX[ŒœÈ™YH˜[Z[Y\ÌK‹K^XÚ]›Ú\ÙB”“‘È[™[ÝXÚY]\›Z[š\ÝXËY˜[Z[HÙ[™\˜]ÜœÈ™\šYšYYˆÓÔ”‹LH›Ú\ÙKÚÙ^YY™[˜Ý[ÛœËÝX›WÜÙYYœ›Þ™[ˆÛÝ\˜ÙH™YÚ[ÛœÈ[™ØÚY[YšXÈÙ][™ÜÈ™\Ù\™Y‚‚‘œ™\Ú˜\Ù[[™MLÔTÔËÌLTÒÒTÈš[˜[
+ŠÍÍÔTÔËÌRSÌMÜZ[ˆÒÒT
+Š‹ˆÙ\\˜][BŠŠ˜XÝX[TÔËÌRSÌÒÒT
+ŠŽˆ›™]ÈÒQTˆ\Ü]Ú\ˆØ\Ù\È
+Ì[™]ÈÕQH\Ü]Ú\‚˜Ø\ÙH
+ÌÐÓÔ”‹LH™YÜ™\ÜÚ[ÛœËˆ[M˜ÛÛ™][ÛœðåÌMÙš^Y˜Z[ˆQðåÙ\ØÚÌÌHMMš[XYÙKXÛÛ™][ÛœÎÈÜ]ÛŒÌˆ˜]ÚËÍH›ÜˆÛX[ˆ[™Ù]™\š]LÈÙˆXXÚ˜[Z[K‚ÔKÐÕQH›\ˆX^[TL‘Ü˜XÛH\œ›ÜŒKÎLÎLÍÌŒMÌNKMËˆXÝX[ÕQLÛ‚”•ÌŒ\ÜÈØ[›ÛšXØ[Ù^YY\Ú[ÛˆÝ^\ÈÔK›ÈÜ›ÜÜËY]šXÙHš]Ú\ÙHÛZ[K‚“Z\ÜÚ[™ËZ[œ]™YØ]]™HÛÛ›Ûˆ^XÝY^]KÑ]R[YÜš]Q\œ›Ü‹ÒÒT‚“ÜšYÚ[˜[XÝX[UH\ÝÈ›Ý™\[ŽÈœ™\Ú˜]ËÜÜ]ÜÝ]ÈÓ\ÈTÔË‚‚–Ñ]šY[˜ÙWJ‹‹Ü™\ÜØÛÜœŒ—Ù]šY[˜ÙKšœÛÛŠKÜ™Y™\™[˜ÙWJ‹‹Ü™\ÜØÛÜœŒ—Ü™Y™\™[˜ÙK›œŠBŒNÍÎž]\ËÒKLMˆÎM™˜X˜LNNLMMÍÍNÙÍÎNØŽM˜NX™ÌŽMÌ˜ØŒ™LMMÍÍÙYŒØ‚”™Y™\™[˜ÙNˆ˜Z[ˆQÌÌKÌ‹[ˆ\ØÚÛX[Œ
+ÌÙ˜[Z[Y\È]Ù]™\š]LË^[È[™››Ü›X[^™YÝ]]Ëˆ^\Ý[™ÈÓÔ”‹LH™Y™\™[˜ÙH[˜Ú[™ÙYˆ[ŒÜ›ÝXÝYš[\Â˜ž]\ËÚ\Ú\ËÛ][Y\È™\Ù\™YÈ\[™[˜ÚY\ËØ˜XÚÙ[™ØÛÛ™šYÜËÜ›ÝØÛÛ[˜Ú[™ÙY‚‚Ÿ\ÚÈ[Ñ™[XZ[š[™ÈŸKK_KK_KK_ŸÓÔ”‹LKÌˆT•PS[™\[™[XÚšXØ[TÔÈ“ÕËLKÝX[Hœ™Y^™KÜÛÝ\˜ÙK\ÛXÞH\›Ý˜[È[™[™\[™[[X[ˆ™]šY]ÈŸÓÔ”‹LÈÑÎÈ™^XÚšXØ[ÝYÙH˜Z[‹[Û›Hš^YÜšYÛÝ\˜ÙHX[šY™\Ý[™[X[ˆš\ÝX[]Y]ŸUKLKÌˆT•PSXÚšXØ[TÔÈ[™\[™[[X[ˆ™]šY]ÈŸUKLÈT•PS[™\[™[XÚšXØ[TÔÈ“Ð•TÕLHÛXÞKÙ[[YÜ˜][Û‹Ù\[™[XØÙ\[˜ÙH[™›Ü›X[Ø]\ËÜ™]šY]ÈŸ“Ð•TÕLHÈ‘T“ËLHÑÈÛXÞNÈÙ[™\˜[Y[]KØÚXÚÜÚ[ËÜ™\Ý[YKØ˜XÚÝ\‚”X›\ÚY[ˆXZ[ŽˆÌÎLMÎH›\‹Ì˜ÎLÌØH\šÙ[š[™ËN˜MÈ\Ü]Ú\‹ŒÌXÈXÝX[\ÝËØ\Y˜XÝËÙ]šY[˜ÙNÈXXÚÚXÚÙY[™[[YYX][H\ÚYÜšYÚ[ˆXZ[ˆTÔË‚‘š[˜[ØÜËÚ[™Ù™ˆ\ÈHÙ\\˜]HÛÛ[Z]È\ÚÙœ™\ÚY™]ÚÛX[ˆÞ[˜È[ˆÚ]ØÚ]‚–Ó™^ÓÔ”‹LÈ›Û\J‘VÔÕTÔ“ÓT›Y
+Kˆ›È[Ù[ËÝ˜Z[š[™ËÙ]˜[X]Ü‹ÛY]šXÜËÂ‘QKÜÝËÜØÚY[YšXÈ[œËˆÜ˜\YžH™[XZ[œÈ\ÝÜšXØ[È›Ý™XZ[ˆ\[™[˜ÞB™YÙ\È[™[X[‹ØÛÝ\œÙKÝX[KÜ›ÝØÛÛÜ™\›ÙXÝ[ÛˆØ]\È™[XZ[ˆÜ[‹‚‚ˆÈÈ\ÝÜšXØ[ÓÔ”‹LH8 %NŒLKŒŒ‚‚’[™\[™[XÚšXØ[ØÛÜH
+Š”TÔÊŠŽÈ[Ñ
+Š”T•PS
+Š‹ˆ^XÝÙ]™\š]HX\[™Ë™^XÚ]YÙ[™\˜]ÜˆØ]\ÜÚX[ˆ›Ú\ÙKÙ^YYÝ\ÝÙÙ[™\˜]Ü˜4.Ù^YYÝ\ÝÙ\Ú[Û˜´`4-t,4.ô.4-ô/´,´,4/tbÈ4/ô/´,´-t`4aH4/t-t.4-ô/4-t/tdt/t/t/´,ô/ˆÝX›WÜÙYYˆÔH™Y™\™[˜ÙH4a4.4.´`t.4`4`ô-t`ˆÜšYÚ[˜[]\Ý›˜[Y\ÜXÙKÒQË]˜[LM4.4/´,tbt.4.H\Ú[Ûˆ4-4.ôcÈ4,´`t-taHÙ]™\š]KÛ[Ù[Y[]Y\Ë‚´'t.4.´,4.´.4aH›ÙXÝ[ÛˆÜ˜\\‹Ù]˜[X]Ü‹ÜÛXÞH4.4.ô.˜Z[š[™È[œÈ4/t-H4-4/´,t,4,´.ô-t/t/‹‚‚‘œ™\Ú˜\Ù[[™LÍMÔTÔËÌRSÎÒÒTÈš[˜[
+ŠLÔTÔËÌRSÌL[ÜZ[ˆÒÒT
+Š‹‚´'´`´-4-t.ôc4/t/ˆ4/t/´,´bô-HXÝX[ÚXÚÜÈ
+ŠŒÔTÔËÌRSÌÒÒT
+ŠŽˆ›Ú\Ùx¡¤“›Ü›X[^™H4/t,MÙš^Y˜Z[‚’QË\ØÚÌÌK˜]ÚËÍH4.Ü]ÛˆÛÜšÙ\œÌÌŽÈ\ÝQÌÍÌKÎNNNH4`´/´.ôc4.´/ˆ[œ]ÛÛ˜XÝÂÕQHš[Z]]™H4/t,•ÌŒ\ÜØ[YKY]šXÙH\]X[]H4.Ü›Û™ËY]šXÙH\œ›ÜœË‚“Z\ÜÚ[™ÈXÝX[[œ]4/ô`4/´,´-t`4-t/H™YØ]]™HÛÛ›Ûˆ4/´-´.4-4,4-t/4bô.H]R[YÜš]Q\œ›Ü‹Ù^]K´,t-t-ÈÚÚ\ˆÜšYÚ[˜[XÝX[]HØ\Ù\È4,ˆ4ct`´/´/4ct`´,4/ô-H4/t-H4/ô/´,´`´/´`4cô.ô.4`tcÈ4.4aH]šY[˜ÙH4/t.4-´-B´/´`t`´,4dt`´`tcÈ4.4`t`´/´`4.4aô-t`t.´.4/ˆÜ›ÜÜËY]šXÙKÜ]›Ü›Hš]Ú\ÙH\]X[]H4/t-H4-ô,4cô,´.ô-t/t,‚‚–Ñ]šY[˜ÙWJ‹‹Ü™\ÜØÛÜœŒWÙ]šY[˜ÙKšœÛÛŠKÜ™Y™\™[˜ÙH”—J‹‹Ü™\ÜØÛÜœŒWÜ™Y™\™[˜ÙK›œŠBŽMÍNž]\ËÒKLMˆMÎX™MÍLŽX™™Y™MYMÌYÍÍÎYNYLÌY™Í˜™NNLŒÌØ‚´$´`t-LMœ˜]ËÜÜ]ÜÝ]ËØÛÛ™šYÈš[\È4`t/´at`4,4/t.4.ô.ž]\ËÚ\Ú\ËÛ][Y\ÎÈÛÝ\˜ÙH™YÚ[ÛœÂ‘UKL‹ÌË4/´,t,PSSØÚËØ˜XÚÙ[™4.ØÚY[YšXÈÙ][™ÜÈ4/t-t.4-ô/4-t/t/tbË‚‚Ÿ\ÚÈ4'ô/´.ô/tbô.HÑ4'´`t`´,4`´/´.ˆŸKK_KK_KK_ŸÓÔ”‹LHT•PS[™\[™[XÚšXØ[TÔÈ“ÕËLKÝX[Hœ™Y^™KÜÛÝ\˜ÙK\ÛXÞH\›Ý˜[È4.[™\[™[[X[ˆ™]šY]ÈŸÓÔ”‹LˆÑÈ™Y›XÝ›\‹\šÙ[š[™Ë\WØÛÜœ\[ÛŽÈ4`t.ô-t-4`ôc´bt.4.H4`´-tat/t.4aô-t`t.´.4.H4ct`´,4/ÈŸUKLKÌˆT•PSXÚšXØ[TÔÈ[™\[™[[X[ˆ™]šY]ÈŸUKLÈT•PS[™\[™[XÚšXØ[TÔÈÓÔ”‹LH›Ü›X[Ø]\ËÓÔ”‹L‹Ô“Ð•TÕLH[[YÜ˜][Û‹Ù\[™[XØÙ\[˜ÙH4.[X[ˆ™]šY]ÈŸ“Ð•TÕLHÈ‘T“ËLHÑÈÛXÞNÈÙ[™\˜[Y[]KÙÛØ˜[ÙYYØÚXÚÜÚ[ËÜ™\Ý[YKØ˜XÚÝ\‚ÛÛ[Z]ÍÙÍMŽKØÌÍLÍ˜‹ÙŽYÌ‹ÍYL˜Lˆ4/ô`4/´,´-t`4-t/tbÈ4.4`t`4,4-ô`È\ÚÜšYÚ[ˆXZ[ˆTÔË‚´)4.4/t,4.ôc4/t,4cÈ4-4/´.´`ô/4-t/t`´,4a´.4cÈ4/ô`ô,t.ô.4.´`ô-t`´`tcÈ4/´`´-4-t.ôc4/t/ŽÈ\ÚØÛX[ˆÞ[˜È8 %4,ˆÚ]\ÝÜžKô/´`´,´-t`´-K‚‘\[™[˜ÞHYÙ\È4`t/´at`4,4/t-t/tbËˆ[X[‹ØÛÝ\œÙKÓTËÜ›ÜÜØ[ÝX[H4.[™\[™[™\›ÙXÝ[Û‚œ[™[™Ëˆ4(t.ô-t-4`ôc´bt.4.HÜ›Û\ÓÔ”‹L—J‘VÔÕTÔ“ÓT›Y
+NÈÜ˜\YžH\ÝÜšXØ[4,t-t-È™XZ[‚‚ˆÈÈ4&4`t`´/´`4.4aô-t`t.´.4.HUKLÈÛ˜\ÚÝ8 %ÌKŒLŒŒ‚‚’[™\[™[XÚšXØ[ØÛÜH
+Š”TÔÊŠŽÈ[Ñ
+Š”T•PS
+Š‹ˆÓÔ”‹LH™\™\]Z\Ú]B´-tbtdHÑÎÈÓÔ”‹L‹ØXÝX[›Ø\Ý[YÜ˜][Û‹Ù\[™[XØÙ\[˜ÙH4.[™\[™[š[X[ˆ™]šY]È[™[™Ëˆ\[™[˜ÞHÜ˜\ÜØÚY[YšXÈÙ][™ÜÈ4/t-H4.4-ô/4-t/t-t/tbË‚‚´(4-t,4.ô.4-ô/´,´,4/tbÈÛÛ\]KÜ™\\™KÛØYÛ›Ü›X[^˜][Û‹ÝšXÝØÚ[XKÜ›Ý™[˜[˜ÙH4.œ™XY[Û›H™]\ÙNÈ[™^YÒQTŒLÙ^YYÙ[ÛY]žKÛÜ™\‹\Y˜Z[‹Ý˜[Ý\ÝØY\œËœÛXÞH[š™XÝ[Ûˆ›Ý[™\žH4.Ý]ÈÓKˆXÝX[Ý]È4`´/´.ôc4.´/ˆ\œÚ\ÝYZË‘Ð‹ÌMK™›Ø]ÛË\\ÜËÙŒÈ[™\[™[Z[[ÛY[Ü˜XÛHTÔËX^\œ›ÜœÌ‹ÎKLM‚›YX[‹ÎŒÌÙKLMÈÝˆÜšYÚ[˜[\Ý4/t-H4`ôaô,4`t`´,´`ô-t`ˆ4,ˆÝ]\ÝXÜË‚‚”Ý]ÌŽXž]\È’SHÒKLM‚˜ÌÌ˜ÌŽMNMNLÍ˜Ž™Œ˜ÌLŒÙ˜XLXŒŒYŒ˜NLXLÌ˜ØŒÍLX™ŒMMŽÂœÙ[X[XÈÝ]È\ÚLÍ™LÌÎŽLÍNNYYM˜ŽXMLYŒÌÌØMŒXÙMØ˜™™MYYØŒNÍØ‚´'´,t,PSS4`t/´-4-t`4-´,4`ˆ™\šYšYY’SH\Úˆ”‹ÛX[šY™\Ý\Ú\Ë][Y\ËUKLˆÛÝ\˜ÙBšY[]H4.L\˜]Èš[\È
+4,´.´.ôc´aô,4cÈ\ÝÜšXØ[XYÛ›ÜÝXÜËÛX[šY™\Ý
+H4/t-t.4-ô/4-t/t/tbË‚‘[XÝX[˜]Ú\ÍZËÍZËÌLËÛ\ÜÈÛÝ[ÍLÍLÌL4.X™[ÒQÛÝ™\˜YÙHTÔÎÂ˜Z[ŒÍL˜˜]Ú\Ë\ÝÌ‹ˆZ\™YÞ[]XË\ÛXÞHÙ[ÛY]žKÛÜ™\ˆ4.ÛÜšÙ\œÌÌˆÜ]Û‚˜š]Ú\ÙH\]X[]H4/t,LŽXXÝX[˜Z[ˆQË\ØÚÌÌK˜]Ú\ÍÌÍÈTÔË‚‚‘Y˜][
+ŠŒÍMÔTÔËÌRSÎÜZ[ˆÒÒT
+Š‹Ù\\˜][HXÝX[
+ŠŽTÔËÌRSÌÒÒT
+Š‹‚œ\ØÛÛ™šYÈÓHTÔÎÈ^\Ý[™È[‹ÛØÚËØ˜XÚÙ[™4`t/´at`4,4/t-t/tbËˆÕQHÛ[ÚÙHÒÒT‚˜˜XÚÙ[™4/t-t.4-ô/4-t/tdt/Kˆ˜Z[š[™ËÛ[Ù[ØÛÜœ\[ÛœËÙ]˜[X][Û‹ÜÝËÑQH4/t-H4`4-t,4.ô.4-ô/´,´,4/tbÂ´.4/t-H4-ô,4/ô`ô`t.´,4.ô.4`tcˆ\Ý[XYÙ\È4aô.4`´,4.ô.4`tc4`´/´.ôc4.´/ˆ4-4.ôcÈš^YØY\‹Ú[YÜš]HÛÛ˜XÝ‚–Ñ]šY[˜ÙWJ‹‹Ü™\ÜÙ]L×Ù]šY[˜ÙKšœÛÛŠKØÛÛ[X[™×J‹‹Ü™\ÜÜ™\›ÙXÝ[Û‹›Y
+K‚‚Ÿ\ÚÈ4'ô/´.ô/tbô.HÑ4(4-t-ô`ô.ôc4`´,4`ˆÈ4/´`t`´,4`´/´.ˆŸKK_KK_KK_ŸUKLKÌˆT•PSXÚšXØ[TÔÎÈ[™\[™[[X[ˆ™]šY]È[™[™ÈŸUKLÈT•PS[™\[™[XÚšXØ[TÔÎÈÓÔ”‹LKÌˆ›Ø\Ý[YÜ˜][Û‹\[™[XØÙ\[˜ÙH4.[X[ˆ™]šY]È[™[™ÈŸÓÔ”‹LKÌˆÑÈ›Ú\ÙKÜÙ]™\š]KØ›\‹Ù\šÙ[š[™ÈT\È4/´`´`t`ô`´`t`´,´`ôc´`ŽÈÝX›WÜÙYY4`ô-´-H4`4-t,4.ô.4-ô/´,´,4/HŸ‘T“ËLHÑÈ4(´/´.ôc4.´/ˆ]K\ÜXÚYšXÈ\Ú\ËÜX›XØ][Ûˆ4.ÝX›WÜÙYYÜÙYYÝÛÜšÙ\ŽÈÙ[™\˜[ÚXÚÜÚ[Ô“‘ËØ˜XÚÝ\[™[™È‚”X›\ÚYXZ[ˆÛÛ[Z]Î˜Ù™™LÙÝ]ËÝ\ÝÎÈÍXˆÙ^YYØY\œËÝ\ÝÎÂŒ™Ý]ÈÓKÝ\ÝÎÈLÌÙ™\šYšYYXÝX[\Y˜XÝËØÛÛ™šYÜËÙ]šY[˜ÙKÝ\ÝË‚´&´,4-´-4bô.H4,t.ô/´.ˆ4/ô`4/´,´-t`4-t/H4.4`t`4,4-ô`È\ÚÜšYÚ[ˆXZ[ˆTÔËˆØÜËÚ[™Ù™ˆ4/ô`ô,t.ô.4.´`ôc´`´`tcÂ´/´`´-4-t.ôc4/t/‹š[˜[\Ú8 %4,ˆÚ]\ÝÜžKô/´`´,´-t`´-Kˆ4(t.ô-t-4`ôc´bt.4.H4ct`´,4/È8 %–ÐÓÔ”‹LH›Û\J‘VÔÕTÔ“ÓT›Y
+Kˆ[X[‹ØÛÝ\œÙHÛXÞKÓTËÜÝX›Z]Y›ÜÜØ[X[Hœ™Y^™H4.[™\[™[™\›ÙXÝ[Ûˆ[™[™ËˆÜ˜\YžH4/´`t`´,4dt`´`tcÈ\ÝÜšXØ[Û˜\ÚÝ‚‚ˆÈÈ4&4`t`´/´`4.4aô-t`t.´.4.HUKLˆÛ˜\ÚÝ8 %ÌKŒLŒŒ‚‚“ØØ[XÚšXØ[XØÙ\[˜ÙH
+Š”TÔÊŠŽÈ[Ñ
+Š”T•PS
+Š‹[™\[™[[X[‚˜\Y˜XÝØÛÙKÝ\Ý™]šY]È[™[™Ëˆ[š]X[ÛX[ˆXZ[[ÜšYÚ[‹ÛXZ[ØL˜Œ™ŒÈ™\šYšYY˜žH™]Úˆ^\Ý[™È™[˜ØÚËØ˜XÚÙ[™ÜØÚY[YšXÈÙ][™ÜÈ4`t/´at`4,4/t-t/tbË‚‚˜Ü™X]WÜÜ]ØØYÜÜ]4.ÓHK\™\\™K\Ü]Ü™XY[Û›HK]™\šYžK\Ü]´`4-t,4.ô.4-ô/´,´,4/tbËˆXÝX[ÜšYÚ[˜[˜Z[L8¡¤LÍLÙYYM^XÝMLÍL\‚˜Û\ÜÎÈÛÜYN[™XÙ\Ì‹NNNK[š\]YKÙ\Ú›Ú[Ù^]\Ý]™H4.^XÝ›ÝØÛÛœ™\^HTÔËˆÜšYÚ[˜[\ÝL4/t-H4`ôaô,4`t`´,´`ô-t`ˆ4,ˆÜ]ˆX[šY™\Ý4/ô`4/´,´-t`4cô-t`ˆÛÝ\˜ÙK›X™[Ü™\‹\œ˜^\ËÓ”ˆ\Ú\È4.ˆÜ™X][Û‹XÛÙHY[]NÈ\X[Ý[\\™YÝ]\Â´/´`´,´-t`4,ô,4c´`´`tcË˜Z[\™HXYÛ›ÜÝXÜÈ4`t/´at`4,4/tcôc´`´`tcËˆ™]\ÙH\Ú\ËÙš[H][Y\ÈTÔÎÂŒL\˜]Èš[\Ë4,´.´.ôc´aô,4cÈ\ÝÜšXØ[XÜ]Z\Ú][ÛˆX[šY™\Ý4.XYÛ›ÜÝXÜË4/t-H4.4-ô/4-t/t-t/tbË‚‚“”ÍMLž]\ÎˆYÎMŒXLŒÍÙÙN™ØXÌØÌ™XMÎÙM˜N™ŽŒŒÍYÍNLÌÎ˜YŽLÍ™LYŽ‚´'´,t,PSS4`t/´-4-t`4-´,4`ˆ4ct`´/´`ˆš[KXž]H\ÚÈ›Ü›X[^˜][Û—ÜÚLMˆ4/´`t`´,4dt`´`tcÈ[‚–ÓX[šY™\ÝJ‹‹Ù]KÜÜ]ËÜÜ]ÛX[šY™\ÝšœÛÛŠKØXÝX[]šY[˜ÙWJ‹‹Ü™\ÜÙ]L—Ù]šY[˜ÙKšœÛÛŠK–ØÛÛ[X[™ËÜ™\Ý[×J‹‹Ü™\ÜÜ™\›ÙXÝ[Û‹›Y
+KˆY˜][Ž”TÔËÌRSÍ[ÜZ[ˆÒÒTÂ´/´`´-4-t.ôc4/t/ˆXÝX[TTÔËÌRSÌÒÒTÈ\ØÛÛ™šYÈÓHTÔËˆÕQHÛ[ÚÙH4/t-H4/ô/´,´`´/´`4cô.ô`tcË™\[™[˜ÚY\ËØ˜XÚÙ[™4/t-H4/4-t/tcô.ô.4`tcˆY˜][ÝZ]HÙ™›[™H4.4/t-H4`´`4-t,t`ô-t`ˆXÝX[]KÜÜ]‚‚”X›\ÚY[ˆXZ[ŽÈ[ÛÜš]KÝ\ÝÎÈ™LÌˆ\œÚ\Ý[˜ÙKÜ›Ý™[˜[˜ÙKÝ\ÝÎÂ™ØˆÓKÝ\ÝÎÈÙŽMŽXÝX[\Y˜XÝËØÛÛ™šYÜËÙ]šY[˜ÙKÝ\ÝËˆ4&´,4-´-4bô.HÛÛ[Z]´/ô`4/´,´-t`4-t/H4.4`t`4,4-ô`È4/´/ô`ô,t.ô.4.´/´,´,4/H4/´,tbôaô/tbô/\Úˆ4)4.4/t,4.ôc4/tbô.HØÜÈÛÛ[Z]8 %4,ˆÚ]\ÝÜžK‚‚Ÿ\ÚÈ4'ô/´.ô/tbô.HÑ4(4-t-ô`ô.ôc4`´,4`ˆÈ4/´`t`´,4`´/´.ˆŸKK_KK_KK_ŸUKLKÌˆT•PSXÚšXØ[XØÙ\[˜ÙHTÔÈ˜]È]H
+Èœ›Þ™[ˆÜ]™\šYšYYÈ[™\[™[[X[ˆ™]šY]È[™[™ÈŸUKLÈÑÈ›Ü›X[^˜][Û‹Ý˜[œÙ›Ü›\ËÛØY\œÈ4/´`´`t`ô`´`t`´,´`ôc´`ŽÈ™\™\]Z\Ú]HÓÔ”‹LH4-tbtdHÑÈŸ‘T“ËLHÑÈ4(´/´.ôc4.´/ˆ4/4.4/t.4/4,4.ôc4/tbô-H]\Ù]ÜÜ]\ÚÝÜš]H[\œÎÈÙ[™\˜[Y[]KÔ“‘ËØÚXÚÜÚ[Ø˜XÚÝ\[™œ˜\ÝXÝ\™H4/t-H4-ô,4.´`4bô`´,‚´(t.ô-t-4`ôc´bt.4.H4.´/´/t.´`4-t`´/tbô.H4ct`´,4/È8 %ÑUKLÈ›Û\J‘VÔÕTÔ“ÓT›Y
+NˆÝ]È4`´/´.ôc4.´/‚´/ô/ˆ\œÚ\ÝYZÈ˜Z[‹]\›Z[š\ÝXÈÙ^YY˜[œÙ›Ü›\ËÛÜ™\ˆ4.ØY\œÈ4,ˆ4,ô`4,4/t.4a´,4aB´-ô,4,´.4`t.4/4/´`t`´-t.Kˆ˜Z[š[™È™XY[™\ÜÈ4/t-H4-4/´`t`´.4,ô/t`ô`´,ÈØÚY[YšXÈ[œÈ4/t-H4-ô,4/ô`ô`t.´,4.ô.4`tc‚”ÛXÞKÓTËÜÝX›Z]Y›ÜÜØ[ÝX[KÚ[™\[™[™\›ÙXÝ[Ûˆ4/´`t`´,4c´`´`tcÈ[™[™Ë‚‘Ü˜\YžH8 %\ÝÜšXØ[Û˜\ÚÝ4-4/ˆUKL‹4`t,´-t`4cô`´c4`HÝ\œ™[ÛÝ\˜ÙNÈ™XZ[4/t-H4,´bô/ô/´.ô/tcô.ô`tcË‚‚ˆÈÈ4&4`t`´/´`4.4aô-t`t.´.4.HUKLHÛ˜\ÚÝ8 %Ì8 $ÌÌKŒLŒŒ‚‚´(4,4,t/´`´,4.4-4dt`ˆ4/t-t/ô/´`t`4-t-4`t`´,´-t/t/t/ˆ4,ˆXZ[˜È[š]X[™]Ú4/ô/´-4`´,´-t`4-4.4.ÈXZ[[ÜšYÚ[‹ÛXZ[‚´/t,ÍNM4.4`tat/´-4/t/´-H4`4,4,t/´aô-t-H4-4-t`4-t,´/ˆÛX[‹ˆQÑS•Ë›Y4,ˆ™\ÜÚ]ÜžH4.4`4/´-4.4`´-t.ôc4`t.´/´.B´a´-t/ô/´aô.´-H4/t-H4/t,4.t-4-t/Kˆ›Ý[™][Ûˆ\[™[˜ÚY\ËØ˜XÚÙ[™ØÛÛ™šYÜÈ4`t/´at`4,4/t-t/tbË‚‚´(4-t,4.ô.4-ô/´,´,4/tbÈ˜]ÈÒQT‹LLØY\ˆ4`HÙ™›[™HY˜][Ù™šXÚX[ÈXÜ]Z\Ú][Û‹˜\˜Ú]™KÜÙ]™[‹Yš[HÚXÚÜÝ[\È4-4/ˆ[œXÚÛK4/´,t,\][ÛˆÛÛ˜XÝËÛÜšÚ[™ÈÓB˜K\›ÛÝØK]™\šYžK[Û›X4.YÛ›Ü™Y™\œÚ[Û™Y[YÜš]HX[šY™\Ýˆ4'ô/´,´`´/´`4/tbô.HXÜ]Z\™B´/ô-t`4-t.4`t/ô/´.ôc4-ô`ô-t`ˆ4/ô`4/´,´-t`4-t/t/tbô-H4-4,4/t/tbô-NÈ™\šYžK[Û›H4/t-H4/ô.4b4-t`ˆ\Y˜XÝÎÈÛÜœ\Ù›Ü™ZYÛ‹ÂœÝ[H\Y˜XÝÈ4/t-H4-ô,4/4-t/tcôc´`´`tcËˆY˜][ÝZ]NŒNTÔËÈXÝX[ÜZ[ˆÒÒT‚XÝX[Ù™šXÚX[\˜Ú]™LMÌNÌHž]\È4.Ùš[\È4/ô`4/´b4.ô.QKÔÒKLMˆ[œÜXÝ[ÛŽÂ˜Z[LÝ\ÝL‘ÐŒÌ°åÌÌ‹LÛ\ÜÙ\ËLÌL\ˆÛ\ÜÈTÔËˆ4'´`´-4-t.ôc4/tbô-HXÝX[\ÝÎŒÔTÔËÌÒÒT4,´.´.ôc´aô,4cÈ™XY[Û›KÚY[\Ý[˜ÙH\Ú\ÊÛ][YKˆXÜ]Z\Ú][ÛˆX[šY™\ÝœØÚ[XLH4`t/´at`4,4/tdt/HYÛ›Ü™Y4`HXÝX[ÛÝ\˜ÙKÜ›Ý™[˜[˜ÙKˆ4&´/´/4,4/t-4bËØÚXÚÜÝ[\È8 %4,‚–Ü™\›ÙXÝ[Ûˆ™XÛÜ™J‹‹Ü™\ÜÜ™\›ÙXÝ[Û‹›Y
+NÈY˜][ÒÒT4/t-H4/´-ô/t,4aô,4-t`ˆÒQTˆTÔË‚‚Ÿ\ÚÈ4'ô/´.ô/tbô.HÑ4(4-t-ô`ô.ôc4`´,4`ˆÈ4/´`t`´,4`´/´.ˆŸKK_KK_KK_ŸUKLHT•PSØØ[XÚšXØ[XØÙ\[˜ÙHTÔÈØY\‹ÐÓKÛX[šY™\ÝNÙ™›[™HTÔÈ
+ÌØXÝX[TÔÎÈ[™\[™[[X[ˆ\Y˜XÝØÛÙKÝ\Ý™]šY]Ù\ˆ\›Ý˜[[™[™ÈŸUKL‹ÌÈÑÈÜ]ÜÝ]ËÝ˜[œÙ›Ü›\ËÛØY\œÈ4/´`´`t`ô`´`t`´,´`ôc´`ŽÈ4/´,t,ÛÛ™šYÈ\Ú\È4/´`t`´,4c´`´`tcÈ[Ÿ‘T“ËLHÑÈ4(´/´.ôc4.´/ˆ4/4.4/t.4/4,4.ôc4/tbô.H]\Ù]X[šY™\Ý[\ŽÈÙ[™\šXÈY[]KÔ“‘ËØ]ÛZXÈÚXÚÜÚ[Ø˜XÚÝ\[™œ˜\ÝXÝ\™H4/t-H4`4-t,4.ô.4-ô/´,´,4/t,‚•˜Z[š[™ËÛ[Ù[Ù]˜[X][Û‹ØÛÜœ\[ÛœËÜÝÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/tbÈ4.4/t-H4-ô,4/ô`ô`t.´,4.ô.4`tc‚•\Ý\][Ûˆ4`4,4-ô`4-tb4dt/H4`´/´.ôc4.´/ˆ4-4.ôcÈ[YÜš]H[œÜXÝ[Û‹4,t-t-ÈØÚY[YšXÈ[š[™Ë‚”ÛXÞKÓTËÜÝX›Z]Y›ÜÜØ[Ü›Û\È4.[X[ˆ\›Ý˜[È4/´`t`´,4c´`´`tcÈ[™[™Ë‚´(t.ô-t-4`ôc´bt.4.H4.´/´/t.´`4-t`´/tbô.H4ct`´,4/È8 %UKLŽˆ\œÚ\ÝYÝ˜]YšYYÜ]M4.4`tat/´-4/t/´,ô/‚˜Z[Lø¡¤ZËÍZËLÍL\ˆÛ\ÜË\Ú›Ú[Ù^]\Ý]™H[™XÙ\ËX[šY™\ÝËÚ\Ú\Â´.[\\‹ÚY[\Ý[˜ÙH\ÝÎÈ\Ý\][Ûˆ4/t-H4`ôaô,4`t`´,´`ô-t`ˆ4,ˆÜ]XÚ\Ú[ÛœË‚‚ˆÈÈ4'´,t/t/´,´.ô-t/t.4-HÚ]ÛÜšÙ›ÝÂ‚´'ô/´`t.ô-H›Ý[™][Ûˆ4/ô/´.ôc4-ô/´,´,4`´-t.ôc4`4,4-ô`4-tb4.4.È\Ú4.4/ô/´`´`4-t,t/´,´,4.È4,´`t-H4`t.ô-t-4`ôc´bt.4-HÛÛ[Z]Â´.\Ú4`´/´.ôc4.´/ˆ4,ˆXZ[˜ˆ›Ý[™][ÛˆÛÛ[Z]È4/ô-t`4-t/t-t`t-t/tbÈ4,ˆ4.ô/´.´,4.ôc4/t`ôcˆXZ[˜™˜\ÝY›ÜØ\™4,t-t-È4/ô-t`4-t/ô.4`tbô,´,4/t.4cÈ4.4`t`´/´`4.4.ˆÛ˜\ÚÝ4ct`´,4/ô,4/t.4-´-H4/´/ô.4`tbô,´,4-t`ˆ4/ô`4-t-4bô-4`ôbt-t-B´`t/´`t`´/´cô/t.4-H4-4/ˆ4/ô`ô,t.ô.4.´,4a´.4.È4,4.´`´`ô,4.ôc4/t`ôcˆ4`t.4/tat`4/´/t.4-ô,4a´.4cˆ4/ô`4/´,´-t`4cô`´c4aô-t`4-t-ÈÚ]‚–ô'ô`4/´/4/ô`ˆ4`t.ô-t-4`ôc´bt-t,ô/ˆ4ct`´,4/ô,UKL—J‘VÔÕTÔ“ÓT›Y
+H4/´,t/t/´,´.ôdt/LÌKŒLŒŒŽ‚œ\œÚ\ÝYÜ]MXÝX[™\šYšXØ][Ûˆ4.4/4,4.ô-t/tc4.´.4-H4/ô`4/´,´-t`4-t/t/tbô-HÛÛ[Z]Ü\Ú4`´/´.ôc4.´/‚´,ˆXZ[‹ˆUKLHØÛÜH4`t/´at`4,4/tdt/H4,ˆ4.4`t`´/´`4.4.Ú]ÈUKLˆ4-ô-4-t`tc4-tbtdH4/t-H4,´bô/ô/´.ô/tcô.ô`tcË‚‚ˆÈÈ4&4`t`´/´`4.4aô-t`t.´/´-H4`t/´`t`´/´cô/t.4-H4/ô/´`t.ô-H›Ý[™][Ûˆ8 %ÌŒLŒŒ‚‚´$t,4-ô,4/ô`4/´-4/´.ô-´-t/t.4cÎˆÛÛ[Z]ŒÌÙË4.4`tat/´-4/t,4cÈ4,´-t`´.´,XZ[ˆ4,tbô.ô,ÛX[ŽÈ4/ô/´`t.ô-t-4`ôc´bt.4aB˜ÛÛ[Z]È4/ô`4.4`t`´,4`4`´-H4/t-H4,tbô.ô/‹ˆ4(t/´-ô-4,4/t,ÛÙ^ÜÙ]\Y›Ý[™][Û˜4.ô/´.´,4.ôc4/tbô-HÛÛ[Z]Â´/ô/ˆ4.ô/´,ô.4aô-t`t.´.4/4,t.ô/´.´,4/È\ÚÛY\™ÙKÙ™]Ú4/t-H4,´bô/ô/´.ô/tcô.ô.4`tcˆ™[[ÝHœ™\Ú™\ÜÈ4/t-t.4-ô,´-t`t`´/t,‚´'ô`4.4/4-t/t.4/4bôaHQÑS•Ë›Y4,ˆ™\ÜÚ]ÜžKô`4/´-4.4`´-t.ôc4`t.´/´.H4a´-t/ô/´aô.´-H4/t-t`‹‚‚Ÿ\ÚÈ4(t`´,4`´`ô`H4/ô/´.ô/t/´,ô/ˆÑ4)4,4.´`´.4aô-t`t.´.4,´bô/ô/´.ô/t-t/t/ˆÈ4/´`t`´,4.ô/´`tcŸKK_KK_KK_ŸÑUTLHT•PS4't,4.t-4-t/tbÈØØ[ÝZY[[™\ÌŒ‹ÔÔ‹œ›ÜÜØ[Ø[™Y]\ÎÈ4`4-t-t`t`´`\Ú\ËÜYÙ\Ëˆ[™[™ÎˆTÈœ™\Ú™\ÜË]Z[YXœšXË™XÙZ\Ý™\œÚ[Û‹ÛXÞH™XÙY[˜ÙK4`´/´aô/tbô-HÝ]Ù™‹ÜÛÝŸ“ÕËLHT•PSXÚšXØ[\˜Ú]XÝ\™KÜ›ÝØÛÛ™]šY]È4.ÛÜœ™XÝ[ÛœÈ4-ô,4/ô.4`t,4/tbÎÈX[H\›Ý˜[Ùœ™Y^™H[™[™ÈŸPSKLHT•PS›ÛKÙš[H[ˆ4/ô`4/´,´-t`4-t/K4.4/4-t/t,4/t,4.t-4-t/tbÈ4,ˆØ[™Y]NÈX\[™ËØ]˜Z[Xš[]KØ˜XÚÝ\Ü™]šY]Ù\ˆXØÙ\[˜ÙH[™[™ÈŸÑUTLˆT•PSØØ[XÚšXØ[XØÙ\[˜ÙHTÔÈ™[˜Î^XÝ™\œÚ[ÛœË™XÚ\K\ÚXÚËÚ[\ÜËÐÔJÐÕQHÛ[ÚÙHTÔÎÈ›Ü›X[[X[ˆ™]šY]È[™[™ÈŸÑUTLÈT•PSØØ[XÚšXØ[XØÙ\[˜ÙHTÔÈ–PSSÝšXÝØÚ[XKØÛÛ™šYÈÓKLMˆ\ÝÈTÔÎÈ›Ü›X[[X[ˆ™]šY]ËÜ›ÝØÛÛXØÙ\[˜ÙH[™[™È‚´+t`´/ˆ4-ô,4,´-t`4b4dt/t/tbô.H
+Š´.ô/´.´,4.ôc4/tbô.H4`´-tat/t.4aô-t`t.´.4.H4/´,tb´dt/4`´-t.´`ôbt-t,ô/ˆ4ct`´,4/ô,
+Š‹4/t-HX[HÚYÛ‹[Ù™‹‚–Ñ]šY[˜ÙWJ‹‹Ü™\ÜÜ™\›ÙXÝ[Û‹›Y
+KÙ[š\›Û›Y[Û˜\ÚÝJ‹‹Ü™\ÜÜÙ]\Ù[š\›Û›Y[šœÛÛŠK–ÜÛÝ\˜ÙH™YÚ\ÝžWJ‹‹Ü™\ÜØÛÝ\œÙWÛX]\šX[ËÔ‘PQQK›Y
+KÙXÚ\Ú[Ûœ×JÑUTÑPÒTÒSÓ”Ë›Y
+K‚‚´(4-t,4.ô.4-ô/´,´,4/tbÈ4`´/´.ôc4.´/ˆÛÛ™šYÈ[˜Ý[ÛœÈ4,ˆÜ˜ËÝ][ËœK\ÝÝ][È4.[š\›Û›Y[Û[ÚÙK‚´%4,4/t/tbô-H4/t-H4`t.´,4aô.4,´,4.ô.4`tc\ÝÙ]4/t-H4aô.4`´,4.ô`tcËÓ“‹Ý˜Z[š[™ËÙ]˜[X][Û‹ÜÝ[™È4/t-B´`4-t,4.ô.4-ô/´,´,4/tbÈ4.4/t-H4-ô,4/ô`ô`t.´,4.ô.4`tcˆÜ]ÜÝ]È]È4-4-t.´.ô,4`4,4`´.4,´/tbô-K\Ú\È[‚”‘T“ËLHÑÈ
+YÛ›Ü™H›ÝXÝ[Ûˆ4-4/´,t,4,´.ô-t/t,Y[]KÛX[šY™\ÝËØ˜XÚÝ\4-tbtdH4/t-t`ŠK‚´(t.ô-t-4`ôc´bt.4.H4`´-tat/t.4aô-t`t.´.4.H4ct`´,4/ÎˆUKLH8¡¤ˆUKLˆ8¡¤ˆUKLÈ4`H‘T“ËLHš[Z]]™\ÎÂ˜ÛÝ\œÙHÛXÞKÝX[H\›Ý˜[È4`ô`´/´aô/tcôc´`´`tcÈ4/´`´-4-t.ôc4/t/ˆ4-4/ˆ4`t/´/´`´,´-t`´`t`´,´`ôc´bt.4aHØ]\Ë‚‚ˆÈÈ4&4`t`´/´`4.4aô-t`t.´.4.H4,4`ô-4.4`ˆ4-4/ˆ[›š[™ÈÛÛ[Z]‚´$´-t`tc4`´-t.´`t`ˆ4/t.4-´-H4`t/´at`4,4/tcô-t`ˆÛ˜\ÚÝ4/t,XÙM˜ŒXH4-4/ˆ4`t/´-ô-4,4/t.4cÈØÜËØÈ4-t,ô/ˆ4`4,4-ô/4-t`4bË´,´-t`4`t.4.4`t`´,4`´`ô`tbÈ4.4.´/´/4,4/t-4bÈ4/t-H4/´/ô.4`tbô,´,4c´`ˆ4`´-t.´`ôbt`ôcˆ4`4,4,t/´aô`ôcˆ4,´-t`´.´`Ëˆ4'´,t`t.ô-t-4/´,´,4/tbÈ4,´`t-LŽB´.4`tat/´-4/tbôaH˜XÚÙY4a4,4.t.ô/´,‹ˆ4(´-t.´`ôbt-t-H4`t/´`t`´/´cô/t.4-H4.4/ô`4/´,´-t`4.´.4/ô-t`4-taô.4`t.ô-t/tbÈ4,´bôb4-K‚‚ˆÈÈ4't,4,t.ôc´-4,4-t/4bô-H4a4,4.´`´bÂ‚‹H4$´-t`´.´,XZ[˜PQXÙM˜ŒXX8 %\˜Ú]XÝ\™HÜ™X]YŒ‹ŒKŒŒˆN
+ÌLˆ4'ô`4-t-4bô-4`ôbt.4.HÛÛ[Z]ŒÍYLØ8 %[š]X[ÛÛ[Z]MËŒKŒŒˆŒŽŒLH
+ÌL‚‹H4&4-È4.ô/´.´,4.ôc4/tbôaH4,´-t`´/´.ˆ4`´/´.ôc4.´/ˆXZ[ŽÈ4,´.4-4/tbÈÜšYÚ[‹ÛXZ[˜4.ÜšYÚ[‹ÒPQ4`t/´,´/ô,4-4,4c´bt.4-H4`HPQˆ™]Ú4/t-H4,´bô/ô/´.ô/tcô.ô`tcË4,4.´`´`ô,4.ôc4/t/´`t`´c™[[ÝH4/t-H4`ô`t`´,4/t/´,´.ô-t/t,‚‹H™[[ÝNˆÎ‹ËÙÚ]X‹˜ÛÛKÑ[’Ú\ÚŒKÙY\[X\›š[™Ë\›Ú™XÝ™Ú]ˆ4%4/ˆ4,4`ô-4.4`´,Ú]Ý]\ÈK\ÚÜ4/ô`ô`t`´/´.K‚‹HŒ4.4-ÈŽH4a4,4.t.ô/´,ˆ4.4/4-tc´`ˆ4`4,4-ô/4-t`ž]\ÎÈ4.4-È4/t.4aH4/ôcô`´c8 %4/´-´.4-4,4-t/4bô-H™Ú]ÙY\4-4,´,8 %4-4/´/ô`ô`t`´.4/4bô-HXÚØYÙHX\šÙ\œËˆ4'´`t`´,4.ôc4/tbô-HLÈ8 %4/´`´`t`ô`´`t`´,´`ôc´bt,4cÈ4`4-t,4.ô.4-ô,4a´.4cÈ4.4/ô`ô`t`´/´.H›ÜÜØ[‚‹HM]Û‹ta4,4.t.ô/´,ŽˆLˆÛÝ\˜ÙKÜØÜš\Ý\Ý4a4,4.t.ô/´,ˆ4.4-4,´,×Ú[š]×ËœXÈ4,´`t-H4/ô`ô`t`´bô-Kˆ4't-t`ˆ4a4`ô/t.´a´.4.K˜Z[š[™ÈÛÜ4/4/´-4-t.ô-t.K4`4,4,t/´`´,4c´bt.4aHÓH4.\ÜÙ\[ÛœË‚‹H4't-t`ˆ]\Ù]ËÚXÚÜÚ[ËY]šXÜËšYÝ\™\È4.ÛÝ\œÙHØÝ[Y[Ë4,´.´.ôc´aô,4cÈ‹ÑÐÖÔˆ4$ˆYÛ›Ü™Y4.´,4`´,4.ô/´,ô,4aH4`´/´-´-H4`´/´.ôc4.´/ˆ™Ú]ÙY\‚‹H›ÝX›ÛÚÈ8 %4,´,4.ô.4-4/t,4cÈ4`t`´`4`ô.´`´`ô`4,˜™›Ü›X]4`HÙ[Îˆ×X4,t-t-ÈQH4.4.ô.^XÝ][Ûˆ™\Ý[Ë‚‹H4'´,t,PSS4`t/´-4-t`4-´,4`ˆ4`´/´.ôc4.´/ˆÛÛ[Y[ˆPSS\œÙ\ˆ4,´-t`4/tdt`ˆ›Û™X4,4/t-HÛÛ™šYÈX\[™ÎÈ4.´/´/4,4/t-4bÈ4/´,t`ôaô-t/t.4cÈ4`t-t.taô,4`H4/t-t.ôc4-ôcÈ4`taô.4`´,4`´c4`4,4,t/´aô.4/4.‚‹H™\]Z\™[Y[Ë4`t/´-4-t`4-´.4`ˆ4,´/´`t-t/4c4.4/4dt/H4,t-t-È™\œÚ[ÛœÎˆÜ˜ÚÜ˜Úš\Ú[Û‹[\K[™\ËØÚZÚ][X\›‹X]ÝX‹YK^X[[ˆ]\Ý4.ØÚÈ4/´`´`t`ô`´`t`´,´`ôc´`‹‚‹H4't,4.t-4-t/H]ÛˆËŒL‹ŒLˆ4)ô-t`4-t-ÈXÚØYÙHY]Y]H4/t,4.t-4-t/tbÈÜ˜Ú‹ŒMŒÜ˜Úš\Ú[ÛˆŒŽKŒ[\H‹KŒËVPSS‹ŒŒÎÈ]\Ý4/t-H4/t,4.t-4-t/Kˆ4+t`´/ˆ
+Š´/t-H4/ô`4/´,´-t`4.´,[\ÜËP’KÕQH4.4.ô.4/ô`4.4,ô/´-4/t/´`t`´.4/´.´`4`ô-´-t/t.4cÊŠ‹ˆÔKÕ”SH4/t-H4/ô`4/´,´-t`4cô.ô.4`tc‚‹HQÑS•Ë›Y4,ˆ4`4-t/ô/´-ô.4`´/´`4.4.4.4/ô`4/´,´-t`4-t/t/t/´.H4a´-t/ô/´aô.´-H4`4/´-4.4`´-t.ôc4`t.´.4aH4.´,4`´,4.ô/´,ô/´,ˆ4/t-H4/´,t/t,4`4`ô-´-t/K‚‚ˆÈÈ4(4-t-t`t`´`4.´,4-´-4/´,ô/ˆ4.4`tat/´-4/t/´,ô/ˆ4a4,4.t.ô,‚´$ˆ4`t`´/´.ô,ta´-H0ªô'ô`4/´,´-t`4.´,ÑÑ0®È4`ô.´,4-ô,4/H4,t`ô-4`ôbt.4.HXØÙ\[˜ÙHÜš]\š[Û‹4,4/t-H4`ô-´-H4/ô`4/´.t-4-t/t/t,4cÈ4/ô`4/´,´-t`4.´,ˆ4&´/´/t`´`4,4.´`´bÈ4.4-ô,4,´.4`t.4/4/´`t`´.4`4,4`t.´`4bô`´bÈ4,ˆÕPÒ’PÐSÐTÒUPÕT‘K›YJPÒ’PÐSÐTÒUPÕT‘K›Y
+K‚‚Ÿ4'ô`ô`´cž]\ÈÈ4`´-t.´`ôbt-t-H4/t,4-ô/t,4aô-t/t.4-H4.4`t`´,4`´`ô`H4)ô`´/ˆ4-4/´.ô-´/t/ˆ4`t/´-4-t`4-´,4`´c4`tcÈÈ4.4-ô/4-t/t-t/t.4-H4%ô,4,´.4`t.4/4/´`t`´.4'ô`4/´,´-t`4.´,ÈÑŸKK_KK_KK_KK_KK_Ÿ‘PQQK›YÍŽÈ4aô,4`t`´.4aô/t/Žˆ4/´/ô.4`t,4/t.4-HØØY™›ÛÙ]\8¡¤ˆ]H8¡¤ˆ˜Z[ˆ8¡¤ˆ]˜[8¡¤ˆÝË4`t`tbô.ô.´.4/t,ØÜÈ4.\Y˜XÝÈ4$´`t-HÓH4't/´,´bô.H4`ôaô,4`t`´/t.4.ˆ4,´bô/ô/´.ô/tcô-t`ˆÛ[ÚÙH4/ô/ˆ‘PQQHŸTÒUPÕT‘KLLMÈ4`4-t,4.ô.4-ô/´,´,4/t/ˆ4.´,4.ˆ4-4-t`4-t,´/ˆØØY™›Û4(t.4/tat`4/´/t.4-ô.4`4/´,´,4`´c4`H4a4.4/t,4.ôc4/tbô/4-4-t`4-t,´/´/4,t-t-È4-ô,4cô,´.ô-t/t.4.H4/ˆ4,ô/´`´/´,´/t/´`t`´.\˜Ú]XÝ\™HØÈ4$´`t-H4/ô`ô`´.4-4-t`4-t,´,4`t`ôbt-t`t`´,´`ôc´`ˆ4/ô/´`t.ô-H4`4-t,4.ô.4-ô,4a´.4.ŸPÑS”ÑHLMNÈ4/ô/´.ô/tbô.HRUXÙ[œÙH4(t/´at`4,4/t.4`´cÈ]\Ù]Ü\\ˆXÙ[œÙ\È4`ôaô.4`´bô,´,4`´c4/´`´-4-t.ôc4/t/ˆ4't-t`ˆ4(´-t.´`t`ˆ4`t/´at`4,4/tdt/KXÙ[œÙH4/t-H4,´bô-4,4-t`´`tcÈ4-ô,]\Ù]XÙ[œÙHŸ™\]Z\™[Y[ËÎÈ4aô,4`t`´.4aô/tbô.H4`t/ô.4`t/´.ˆ4$´-t`4`t.4.4.4/ô`4/´,´-t`4-t/t/tbô.HØÚË]\ÝÙ]ˆ\[™[˜ÚY\È[ˆ˜[Y][Ûˆ\ÚXÚÈ
+È[\ÜÈ
+ÈÛ[ÚÙHŸ™Ú]YÛ›Ü™HŒÈ4,t,4-ô/´,´bô-HYÛ›Ü™H[\È4`4-t,4.ô.4-ô/´,´,4/tbÈ4%4/´,t,4,´.4`´cÝ]]ËÜ[œË™YXÝ[ÛœËØXÚKØÚÜÈ4/ô`4.4/t-t/´,tat/´-4.4/4/´`t`´.ÈÜ]È4.Ý\˜]YX›\È4/t-H4`´-t`4cô`´c\Y˜XÝ^[Ý]Ú]ÚXÚËZYÛ›Ü™H4/t,4-4,4/t/tbôaH4.4`4,4-ô`4-tb4dt/t/tbôaHX[šY™\ÝÈŸÛÛ™šYÜËØÛX[—ØÛ›‹žX[[ŽÈÛÛ[Y[XÙZÛ\ˆ4'ô/´.ô/tbô.HÛÛ™šYÈ4`HØÚ[XWÝ™\œÚ[Ûˆ][ËÝ˜Z[‹Ù]H\œÙH
+È[˜[YÛÛ™šYÈ\ÝÈŸÛÛ™šYÜËÜ›Ø\ÝØÛ›‹žX[[ÎÈÛÛ[Y[XÙZÛ\ˆ4(´/´`ˆ4-´-HÛÛ™šYË4/´`´.ô.4aô,4-t`´`tcÈ4`´/´.ôc4.´/ˆ™YÚ[YH4.ÛXÞHÛX[ˆÛÛ™šYËØÛÜœ\[ÛœÈÛÛ›ÛYšY[È\]X[]H\ÝŸ]KÜ˜]ËË™Ú]ÙY\È4`4-t,4.ô.4-ô/´,´,4/t/tbô.H\™XÝÜžHX\šÙ\ˆ4(t/´at`4,4/t.4`´cÈ˜]ÈÒQTˆ4/´`´-4-t.ôc4/t/ˆ4/´`ˆÚ]ÝÛ›ØYÙ]HÚXÚÜÝ[H
+ÈÛ\ÜÈÛÝ[ÈŸ]KÜ›ØÙ\ÜÙYË™Ú]ÙY\È\™XÝÜžHX\šÙ\ˆ4(t/´at`4,4/t.4`´cÈØXÚHÜ[Û˜[4.™\œÚ[Û™YÜ]ØÛÜœ\[ÛœÈØXÚH\Ú4`t/´/´`´,´-t`´`t`´,´`ô-t`ˆX[šY™\ÝŸÝ]]ËØÚXÚÜÚ[ËË™Ú]ÙY\È\™XÝÜžHX\šÙ\ˆ4(t/´at`4,4/t.4`´cÈ™\ÝœÛ\Ýœ\ˆ[ˆ˜Z[ˆØY›Ý[™š\\Ú\ÈŸÝ]]ËÛY]šXÜËË™Ú]ÙY\È\™XÝÜžHX\šÙ\ˆ4(t/´at`4,4/t.4`´cÈMˆÝ[[X\šY\ËYÙÜ™YØ]HX›\È]˜[X]KÛY]šXÜÈ4(ô/t.4.´,4.ôc4/t/´`t`´cX]š^Ù^\ËØ\™[˜[]HŸÝ]]ËÙšYÝ\™\ËË™Ú]ÙY\È\™XÝÜžHX\šÙ\ˆ4(t/´at`4,4/t.4`´cÈ‘ËÔˆšYÝ\™\ÈÝËÛY]šXÜÈ™[™\š[™È
+ÈÛÝ\˜ÙH›Ý™[˜[˜ÙHŸÜ˜Ë××Ú[š]×ËœHÈ4-4/´/ô`ô`t`´.4/4bô.HXÚØYÙHX\šÙ\ˆ4'4/´-´/t/ˆ4/´`t`´,4,´.4`´c4/ô`ô`t`´bô/4,t-t-ÈÚYHY™™XÝÈ4't-t`ˆ[\ÜÜ˜È4`ô`t/ô-tb4-t/HŸÜ˜ËÙ]KœHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/HÒQTˆØY\‹\œÚ\ÝYÜ]˜[œÙ›Ü›\Ë]\Ù]ËØY\œÈÜ˜Úš\Ú[Û‹ØÛÜœ\[ÛœÈ\ÝÙ]WÜ\[[™HŸÜ˜ËØÛÜœ\[ÛœËœHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/H^[\ÜXÙHÛÜœ\[Ûˆ
+È˜Z[š[™ÈÛXÞHÜ˜ÚÝÜ˜Úš\Ú[Ûˆ\ÝØÛÜœ\[ÛœÈŸÜ˜ËÛ[Ù[ËœHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/HÛÛ\XÝÓ“‹[š]\˜Ú]XÝ\™HQÜ˜Ú››ˆ\ÝÛ[Ù[ÈŸÜ˜ËÝ˜Z[‹œHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/HÚ\™Y˜Z[š[™È[™Ú[™H
+ÈÓK˜[Y][Û‹™\Ý[YH]KÛ[Ù[ËÝ][È\ÝÝ˜Z[š[™È
+ÈÛ[ÚÙHŸÜ˜ËÙ]˜[X]KœHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/Hš^YÛÛ™][ÛœÈ[™™\™[˜ÙK™YXÝ[ÛœËÝ[[X\žH]KÛ[Ù[ËÛY]šXÜÈ\ÝÙ]˜[X][ÛˆŸÜ˜ËÛY]šXÜËœHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/HY]šXÜËZ\™YYÙÜ™YØ][Û‹X›H^ÜÈ
+ÈÓH[\KÜ[™\È\ÝÛY]šXÜÈŸÜ˜ËÝ][ËœHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/HÛÛ™šYÈ˜[Y][Û‹ÙYYË]ÛZXÈ\Y˜XÝËY]Y]HPSSÜÝX‹ÝÜ˜Ú\ÝÝ][ÈŸØÜš\ËÙÝÛ›ØYÙ]KœHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/HÝÛ›ØYÚ[YÜš]KÜÜ]ÜÝ]ÈÓHÜ˜Ë™]HÙ™›[™H\œ›Üˆ
+ÈY[\Ý[˜ÙHŸØÜš\ËÜ[—Ø[Ù]˜[X][ÛœËœHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/HX]š^˜[Y][Û‹]˜[Ü˜Ú\Ý˜][ÛˆÜ˜Ë™]˜[X]H^XÝHMˆ[š\]YHÝ]]ÈŸØÜš\ËÛXZÙWÜÝËœHÈ4/t-H4`4-t,4.ô.4-ô/´,´,4/H™]\ØX›HÝÈœ›ÛHØ]™YX›\ÈY]šXÜËÙ]KÛX]ÝXˆ\ÝÜÝÈŸ\ÝË××Ú[š]×ËœHÈ4-4/´/ô`ô`t`´.4/4bô.HX\šÙ\ˆ4'4/´-´/t/ˆ4/´`t`´,4,´.4`´c4/ô`ô`t`´bô/]\ÝÛÛXÝ[ÛˆÝXØÙYYÈŸ\ÝËÝ\ÝÙ]WÜ\[[™KœHÈ4`´-t`t`´/´,ˆ4/t-t`ˆÜ]˜[™ÙK˜[œÙ›Ü›KØY\ˆ\ÝÈ]Hš^\™\È4(4-t,4.ôc4/tbô-H\ÜÙ\[ÛœË›ÈÝÛ›ØYÈžHY˜][Ÿ\ÝËÝ\ÝØÛÜœ\[ÛœËœHÈ4`´-t`t`´/´,ˆ4/t-t`ˆY[]KÜ˜[™ÙKÙ]\›Z[š\ÛKÜÙ]™\š]H\ÝÈÛÜœ\[ÛœÈš^\™\È4$´`t-H4`´.4/ôbËÜÙ]™\š]H4.[˜[Y[œ]ÈŸ›ÝX›ÛÚÜËÌWÙYWØ[™ÜØ[š]Kš\[˜ˆÌŽÈ4/ô`ô`t`´/´.H›ÝX›ÛÚÈQH4`´/´.ôc4.´/ˆ˜Z[‹Û\ÜÈ˜[[˜ÙKØ[\HÜšYÎÈ4,t-t-È›ÙXÝ[ÛˆÙÚXÈÜ˜Ë™]H™\Ý\	ˆ[ˆ[4,t-t-È4`t.´`4bô`´/´,ô/ˆÝ]HŸ™\ÜÜ›ÜÜØ[›YÈ4/´`´`t`ô`´`t`´,´`ô-t`ˆ4`t/´-4-t`4-´.4/4/´-H4$´/´`t`t`´,4/t/´,´.4`´c4`4-t,4.ôc4/tbô.HÝX›Z]Y›ÜÜØ[4`H›Ý™[˜[˜ÙK4/t-H4`t/´aô.4/tcô`´c4/ô`4/´b4.ô`ôcˆ4`t-4,4aô`ÈX[[X]\ËÓTÈÛÝ\˜ÙKÙ]KÜÝ]\È4/ô/´-4`´,´-t`4-´-4-t/tbÈŸ™\ÜÙš[˜[Ü™\ÜÔ‘PQQK›YÎÈXÙZÛ\ˆ™\Ü[‹ÛÝ\˜ÙKØZ[Ù^Ü[šÜÈ’SSÑSU‘TP“TÈ4$ô/´`´/´,´bô.H™\Ü4`t/´/´`´,´-t`´`t`´,´`ô-t`ˆXœšXÈ‚ˆÈÈ4&´.ô,4`t`t.4a4.4.´,4a´.4cÈ4,ô/´`´/´,´/t/´`t`´.‚ŠŠ[™XYH[\[Y[YŠŠˆÚÙ[]Ûˆ\™XÝÜžH^[Ý]Ú]™\ÜÚ]ÜžKRU^4,t,4-ô/´,´bô-HYÛ›Ü™H[\Ë4.´`4,4`´.´/´-H4/´/ô.4`t,4/t.4-H4/ô`4/´-t.´`´,4.XÚØYÙKÙ\™XÝÜžHX\šÙ\œËˆ4+t`´/ˆ4/t-H4`4,4,t/´aô,4cÈSt`t.4`t`´-t/4,‚‚ŠŠ”\X[H[\[Y[YŠŠˆ‘PQQK\[™[˜ÞHXÛ\˜][Û‹\˜Ú]XÝ\™H™YK4/4-t`t`´/ˆ4-4.ôcÈ™\ÜˆPSS4.›ÝX›ÛÚÈ4.4/4-tc´`ˆ4`´/´.ôc4.´/ˆ4`t`´`4`ô.´`´`ô`4`Ë4/ô/´.ô-t-ô/t,4cÈ4a4`ô/t.´a´.4/´/t,4.ôc4/t/´`t`´c4/´`´`t`ô`´`t`´,´`ô-t`‹‚‚ŠŠ“›Ý[\[Y[YŠŠˆ]H\[[™KÜ]\œÚ\Ý[˜ÙKÛÜœ\[ÛœËÓ“‹˜Z[š[™Ë›Ø\ÝÛXÞK]˜[X][Û‹Y]šXÜËÝË\ÝË^\š[Y[˜XÚÚ[™Ë™\ÜÛY\È4.™\›ÙXÚXš[]H]šY[˜ÙK‚‚ŠŠ”™\]Z\™\È™\šYšXØ][ÛŽŠŠˆÝX›Z]Y›ÜÜØ[]\ÝXœšXËXY[™\ËÝ[Y^›Û™K™\Ù[][Ûˆ]KÙ\˜][Û‹RHÛXÞKX[[X]\ÉÈ˜[Y\ËÔH]˜Z[Xš[]K[\ÜÐÕQHÛÛ\]Xš[]K4-4/´`t`´`ô/È4.ˆ]\Ù]œ˜[˜Úœ™\Ú™\ÜË‚‚ŠŠ“Ý]ÙˆØÛÜNŠŠˆ˜Z[š[™È4.4`4-t,4.ô.4-ô,4a´.4cÈ4`t-t.taô,4`NÈœ›Û[™ØÛÝYÙ\Þ[Y[È4/´,tcô-ô,4`´-t.ôc4/tbô.HÓÕNÈY™\œØ\šX[›Ø\Ý™\ÜËˆÔSÓS^[œÚ[ÛˆÒQT‹LLPÈ4/t-H4,t.ô/´.´.4`4`ô-t`ˆÛÜ™K‚‚ˆÈÈ4'ô`4/´,t.ô-t/4bÈ4.4,t.ô/´.´-t`4bÂ‚ŸQ4't,4,t.ôc´-4-t/t.4-H4'ô/´`t.ô-t-4`t`´,´.4-H4(t.ô-t-4`ôc´bt,4cÈ4-ô,4-4,4aô,ŸKK_KK_KK_KK_ŸUQLH4't-t`ˆ4/´a4.4a´.4,4.ôc4/tbôaH4-4/´.´`ô/4-t/t`´/´,ˆ4.4/ô`ô`t`´/´.H›ÜÜØ[4't-t.ôc4-ôcÈ4/ô/´-4`´,´-t`4-4.4`´c4/´a´-t/t.´.ô-4,4`´bËÐRH\›Z\ÜÚ[ÛœÈÑUTLHŸUQLˆ4'ô`ô`t`´bô-HÛÛ™šYÜÈ4.ÛÝ\˜ÙH4't-H4`t`ôbt-t`t`´,´`ô-t`ˆ4.4`t/ô/´.ô/tcô-t/4/´,ô/ˆ^\š[Y[ÑUTLÈ8¡¤ˆUKÓSÑSÕRSˆŸUQLÈ[œ[›™Y\[™[˜ÚY\ÎÈ]\Ý4/´`´`t`ô`´`t`´,´`ô-t`ˆ4't-t`ˆ4/´,tbt-t,ô/ˆ4/ô`4/´,´-t`4-t/t/t/´,ô/ˆ[ˆÑUTLˆŸUQLÜ]›Ü›X[^˜][Û‹“‘È4.ÚXÚÜÚ[ØÚ[XH4/´`´`t`ô`´`t`´,´`ôc´`ˆ4'ô`4.4/t,4.4,´/t/´.H4`4-t,4.ô.4-ô,4a´.4.4`4.4`t.ˆXZØYÙH4.4/t-t`t/´/ô/´`t`´,4,´.4/4/´`t`´.UKL‹UKLËRS‹LˆŸUQLH˜]ÈÝ]]È4a´-t.ô.4.´/´/YÛ›Ü™Y4'ô/´`´-t`4cÈ4,4`4`´-ta4,4.´`´/´,ˆ4,t-t-È4,´/t-tb4/t-t.H4.´/´/ô.4.‘T“ËLK‘SPTÑKLH‚´%4`ô,t.ô.4`4`ôc´bt-t,ô/ˆ4`4,4,t/´aô-t,ô/ˆ4.´/´-4,Ú\˜Ý[\ˆ[\ÜÈ4.4a4,4.´`´.4aô-t`t.´/´.H4`ô`´-taô.´.4-4,4/t/tbôaH4/t-H4/´,t/t,4`4`ô-´-t/t/‹4/ô/´`t.´/´.ôc4.´`È4.´/´-4,4.4-4,4/t/tbôaH4/t-t`‹ˆ4+t`´/ˆ4/t-H4-4/´.´,4-ô,4`´-t.ôc4`t`´,´/ˆ4.´/´`4`4-t.´`´/t/´`t`´.4,t`ô-4`ôbt-t.H4`4-t,4.ô.4-ô,4a´.4.ˆ4(4-t,4.ôc4/tbôaH[[YHYÜÈ4.XØÝ\˜XÞH4/ô/´.´,4/´a´-t/t.4`´c4/t-t.ôc4-ôcË‚‚ˆÈÈ4$´bô/ô/´.ô/t-t/t/tbô-H4.4/t-t,´bô/ô/´.ô/t-t/t/tbô-H4/ô`4/´,´-t`4.´.‚´$´bô/ô/´.ô/t-t/tbÈ™ÈKYš[\ÈKZY[˜™XÝ\œÚ]™H\Ý[™ÈÚ]Ú^™\Ë4aô`´-t/t.4-H4,´`t-taH4/t-t/ô`ô`t`´bôaH4a4,4.t.ô/´,‹4/ô`4/´,´-t`4.´,™\›ËXž]H4a4,4.t.ô/´,‹Ú]Ý]\ØÚ]œ˜[˜ÚX]˜Ú]ÙÈNÚ]™[[ÝH]˜Ú]ËYš[\Ø]ÛˆK]™\œÚ[Û˜4.XÚØYÙHY]Y]H[œÜXÝ[Û‹ˆ4+t`´.4/´/ô-t`4,4a´.4.4/t-H4.4-ô/4-t/tcô.ô.4.4`tat/´-4/tbô-H4a4,4.t.ôbÈ4.Ú]‚‚´'t-H4,´bô/ô/´.ô/tcô.ô.4`tcˆ[œÝ[][Û‹[\ÜÈÜ˜ÚÝÜ˜Úš\Ú[Û‹]\Ù]ÝÛ›ØY›ÝX›ÛÚÈ^XÝ][Û‹]\Ý˜Z[š[™Ë]˜[X][Ûˆ4.[Ù[™[˜ÚX\šÜËˆ4'ô.ô,4/t/´,´bô-H4.´/´/4,4/t-4bÈ4,ˆ4-4/´.´`ô/4-t/t`´,4a´.4.4/t-H4cô,´.ôcôc´`´`tcÈ4/´`´aôdt`´/´/4/´,H4`ô`t/ô-tb4/t/´/4-ô,4/ô`ô`t.´-K‚‚´'ô/´`t.ô-H4/ô.ô,4/t.4`4/´,´,4/t.4cÈ4-4/´,t,4,´.ô-t/tbÈ4`´/´.ôc4.´/ˆ4-4/´.´`ô/4-t/t`´bÈØÜËÊ‹›Yˆ4&4`tat/´-4/tbô-HŽH4a4,4.t.ô/´,ˆ4-4/´.ô-´/tbÈ4/´`t`´,4`´c4`tcÈž]KZY[XØ[È4.4`´/´,ô/´,´,4cÈ4/ô`4/´,´-t`4.´,4/ô-t`4-taô.4`t.ô-t/t,4,ˆPTÕT—Ô“Ò‘PÕÔS‹‚‚ˆÈÈ4'ô`4/´,´-t`4.´,4`t/´-ô-4,4/t/t/´,ô/ˆ[›š[™ÈXÚØYÙB‚´)4,4.´`´.4aô-t`t.´.4,´bô/ô/´.ô/t-t/t/ˆÌŒLŒŒŽ‚‚‹H4$´`t-HM4`´`4-t,t`ô-t/4bôaHX\šÙÝÛ‹t-4/´.´`ô/4-t/t`´/´,ˆ4`t`ôbt-t`t`´,´`ôc´`‹4/t-t/ô`ô`t`´bô-H4.4aô.4`´,4c´`´`tcÈ4.´,4.ˆU‹N‚‹H4&ô/´.´,4.ôc4/tbô-HX\šÙÝÛ‹t`t`tbô.ô.´.4,´-t-4`ô`ˆ4/t,4`t`ôbt-t`t`´,´`ôc´bt.4-H4-4/´.´`ô/4-t/t`´bÎÈÛÙH™[˜Ù\È4`t,t,4.ô,4/t`t.4`4/´,´,4/tbË‚‹H4$ˆ›ØYX\4`4/´,´/t/ˆH4`ô/t.4.´,4.ôc4/tbôaH\ÚÈØ\™Ë4.´,4-´-4,4cÈ4`t/´-4-t`4-´.4`ˆ4,´`t-HŒ4/´,tcô-ô,4`´-t.ôc4/tbôaH4/ô/´.ô-t.NÈ\[™[˜ÞHÜ˜\4/t-H4`t/´-4-t`4-´.4`ˆ4/t-t.4-ô,´-t`t`´/tbôaH™\™\]Z\Ú]HQÈ4.4.ô.ÞXÛ\Ë‚‹H4$ˆ›ÝØÛÛ4`4/´,´/t/ˆMˆ4`ô/t.4.´,4.ôc4/tbôaHX]š^›ÝÜÎˆˆ™YÚ[Y\È0åÈÈÙYYÈ0åÈMˆÛÛ™][ÛœËˆ4%4.ôcÈ4.´,4-´-4/´,ô/ˆ[ˆ4/ô`4.4`t`ô`´`t`´,´`ôc´`ˆÛX[Œ4.4,´`t-HMHÛÜœ\[ÛˆÛÛ™][ÛœË‚‹H4$´`t-HŽH4.4`tat/´-4/tbôaH˜XÚÙY4a4,4.t.ô/´,ˆ4`t/´,´/ô,4-4,4c´`ˆ4`HPQ4/ô/´`t.ô-H4b4`´,4`´/tbôaHÚ]ÛX[ˆš[\œÎÈÚ]Y™ˆKY^]XÛÙX4.Ú]Y™ˆKXÚXÚØ4/ô`4/´at/´-4cô`‹ˆ4(ÈPÑS”ÑHÚXÚÛÝ]4.4`t/ô/´.ôc4-ô`ô-t`ˆÔ“ˆ4/ô`4.ˆ4,ˆÚ]›Øˆ4.4-Ët-ô,ÛÜ™K˜]]ØÜ›]YXÈ4ct`´/ˆ4/t-H4.4-ô/4-t/t-t/t.4-H4a4,4.t.ô,4ct`´/´.H4-ô,4-4,4aô-t.K‚‹HÚ]Ý]\ÈK\ÚÜ4/ô/´.´,4-ôbô,´,4-t`ˆ4`´/´.ôc4.´/ˆÏÈØÜËØˆÛÛ[Z]Ë\Úœ˜[˜ÚÚ[™Ù\È4.™[[ÝH]]][ÛœÈ4/t-H4,´bô/ô/´.ô/tcô.ô.4`tc‚‚´+t`´/ˆ4/ô`4/´,´-t`4.´,4-4/´.´`ô/4-t/t`´,4a´.4.4.4/t-t.4-ô/4-t/t/t/´`t`´.4.4`tat/´-4/t.4.´/´,‹ˆS[š]Ú[YÜ˜][Ûˆ\ÝË[\ÜËÐP’KÐÕQHÚXÚÜË]HÝÛ›ØY˜Z[š[™È4.]˜[X][Ûˆ4/ô/‹t/ô`4-t-´/t-t/4`È
+Š´/t-H4,´bô/ô/´.ô/tcô.ô.4`tc
+Š‹‚
