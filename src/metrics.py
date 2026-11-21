@@ -445,7 +445,13 @@ def write_aggregate_tables(tables: dict[str, pd.DataFrame], output_dir: str | Pa
     with tempfile.TemporaryDirectory(prefix=f'.{output.name}.', dir=output.parent) as temporary:
         staged = Path(temporary)
         for name in sorted(expected):
-            _csv_safe(tables[name]).to_csv(staged / f'{name}.csv', index=False)
+            table = tables[name]
+            if name == 'results':
+                # The protocol keeps large per-condition arrays in JSON/NPZ and
+                # exports only scalar metrics and artifact paths to results.csv.
+                table = table.drop(columns=['confusion_matrix', 'per_class_accuracy'],
+                                   errors='ignore')
+            _csv_safe(table).to_csv(staged / f'{name}.csv', index=False)
         os.replace(staged, output)
     return output
 

@@ -418,6 +418,8 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
   `aggregate_seeds` returns seven tables: annotated results, per-run summaries,
   per-condition summaries, model summaries, paired seed deltas and their
   summary, and per-class summaries. Standard deviations use sample `ddof=1`.
+  The exported `results.csv` contains scalar fields and artifact paths; confusion
+  matrices and per-class arrays remain in per-condition JSON/NPZ artifacts.
   The CLI is:
 
   ```text

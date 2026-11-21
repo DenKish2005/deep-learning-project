@@ -329,8 +329,6 @@ def test_aggregate_seeds_uses_paired_seeds_and_sample_sd(core_matrix):
 
 
 def test_metrics_cli_publishes_complete_tables_and_refuses_overwrite(core_matrix, tmp_path):
-    import json
-
     from src.metrics import _csv_safe
 
     source = tmp_path / 'results.csv'
@@ -344,9 +342,11 @@ def test_metrics_cli_publishes_complete_tables_and_refuses_overwrite(core_matrix
     }
     saved = pd.read_csv(output / 'results.csv')
     assert len(saved) == 96
+    assert 'confusion_matrix' not in saved
+    assert 'per_class_accuracy' not in saved
+    assert 'mca' in saved and 'accuracy_drop_pp' in saved
     assert len(pd.read_csv(output / 'condition_summary.csv')) == 32
     assert len(pd.read_csv(output / 'paired_deltas.csv')) == 3
-    assert len(json.loads(saved.iloc[0]['confusion_matrix'])) == 10
     with pytest.raises(FileExistsError, match='already exists'):
         metrics_main([
             '--input', str(source), '--output-dir', str(output),
