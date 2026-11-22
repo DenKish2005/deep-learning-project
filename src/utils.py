@@ -1,16 +1,16 @@
-"""Configuration schema v1. No dataset access, device probing or artifact creation.
-
-Paths are repository-relative declarations. Null provenance hashes are allowed
-for preparation only; future training must verify actual split/stats artifacts.
-DATA-003 adds only stable_seed/seed_worker; general REPRO-001/checkpoints remain pending.
-"""
+"""Configuration, reproducible seeds, and local experiment identity helpers."""
 
 import argparse
 import hashlib
+from importlib.metadata import PackageNotFoundError, version
 import json
 import math
+import os
 from pathlib import Path, PurePosixPath, PureWindowsPath
+import platform
 import re
+import subprocess
+from tempfile import TemporaryDirectory
 
 import yaml
 
@@ -245,8 +245,8 @@ def validate_config(cfg: dict) -> None:
     _check_protocol(cfg, _PROTOCOL)
 
 
-def load_config(path: str | Path) -> dict:
-    """Read UTF-8 YAML with no implicit defaults, downloads or filesystem writes."""
+def load_config(path: str | Path, *, require_core_protocol: bool = True) -> dict:
+    """Read UTF-8 YAML; synthetic run records can request schema-only validation."""
     path = Path(path)
     try:
         with path.open(encoding='utf-8') as stream:
@@ -254,7 +254,10 @@ def load_config(path: str | Path) -> dict:
     except (OSError, UnicodeError, yaml.YAMLError, ConfigError) as exc:
         raise ConfigError(f'{path}: cannot read config: {exc}') from exc
     try:
-        validate_config(cfg)
+        if require_core_protocol:
+            validate_config(cfg)
+        else:
+            _validate_tree(cfg, _SCHEMA)
     except ConfigError as exc:
         raise ConfigError(f'{path}: {exc}') from exc
     return cfg
@@ -278,6 +281,126 @@ def validate_controlled_configs(clean: dict, robust: dict) -> None:
             elif value != right[key]:
                 _fail(child_path, f'controlled setting differs: {value!r} != {right[key]!r}')
     compare(clean, robust)
+
+
+def sha256_file(path: Path) -> str:
+    with Path(path).open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def json_sha256(value) -> str:
+    """Hash canonical JSON with sorted keys, compact separators, and finite numbers."""
+    payload = json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False)
+    return hashlib.sha256(payload.encode('utf-8')).hexdigest()
+
+
+def config_hash(cfg: dict) -> str:
+    """Fingerprint resolved settings, including synthetic overrides and data identities."""
+    _validate_tree(cfg, _SCHEMA)
+    dataset = cfg['dataset']
+    if dataset['split_sha256'] is None or dataset['normalization_sha256'] is None:
+        raise ConfigError('config identity requires resolved split and normalization hashes')
+    settings = {key: value for key, value in cfg.items() if key not in ('dataset', 'output')}
+    settings['dataset'] = {key: value for key, value in dataset.items()
+                           if key not in ('root', 'split_path', 'normalization_path')}
+    return json_sha256({'kind': 'csci494-config-v1', 'settings': settings})
+
+
+def capture_code_identity(repository: Path) -> dict:
+    """Record HEAD and raw contents of tracked and non-ignored checkout files."""
+    git_environment = {**os.environ, 'GIT_OPTIONAL_LOCKS': '0'}
+
+    def git(root, *args):
+        return subprocess.check_output(['git', '-C', os.fspath(root), *args], env=git_environment)
+
+    root = Path(os.fsdecode(git(repository, 'rev-parse', '--show-toplevel').rstrip(b'\r\n')))
+    git_sha = git(root, 'rev-parse', 'HEAD').decode().strip()
+    status_args = ('status', '--porcelain=v1', '-z', '--untracked-files=all')
+    status = git(root, *status_args)
+    names = git(root, 'ls-files', '-z', '--cached', '--others', '--exclude-standard')
+    files = {}
+    for name in sorted(set(os.fsdecode(names).split('\0')) - {''}):
+        path = root / name
+        if path.is_symlink():
+            files[name] = {'symlink': os.readlink(path)}
+        elif path.is_file():
+            files[name] = sha256_file(path)
+        elif not path.exists():
+            files[name] = None
+        else:
+            raise ValueError(f'cannot fingerprint checkout path: {name}')
+    if git(root, 'rev-parse', 'HEAD').decode().strip() != git_sha or git(root, *status_args) != status:
+        raise RuntimeError('Git HEAD or working tree status changed during identity capture')
+    return {'git_sha': git_sha, 'git_dirty': bool(status),
+            'code_snapshot_sha256': json_sha256({'kind': 'csci494-checkout-v1', 'files': files})}
+
+
+def capture_environment(device: str = 'cpu', *, num_workers: int = 0) -> dict:
+    """Read source-independent runtime metadata without changing backend flags."""
+    import torch
+
+    if type(num_workers) is not int or num_workers < 0:
+        raise ValueError('num_workers must be a nonnegative integer')
+    device = torch.device(device)
+    if device.type not in ('cpu', 'cuda'):
+        raise ValueError('device must be cpu or cuda')
+    gpu = None
+    driver_versions = None
+    if device.type == 'cuda':
+        index = torch.cuda.current_device() if device.index is None else device.index
+        device = torch.device('cuda', index)
+        properties = torch.cuda.get_device_properties(device)
+        gpu = {'name': properties.name, 'vram_bytes': properties.total_memory,
+               'capability': list(torch.cuda.get_device_capability(device))}
+        try:
+            driver_versions = sorted(set(subprocess.check_output(
+                ['nvidia-smi', '--query-gpu=driver_version', '--format=csv,noheader'],
+                stderr=subprocess.DEVNULL, text=True, timeout=10).splitlines()))
+        except (OSError, subprocess.SubprocessError):
+            pass
+    packages = {}
+    for package in ('torch', 'torchvision', 'numpy', 'pandas', 'scikit-learn', 'matplotlib',
+                    'tqdm', 'PyYAML', 'pytest', 'Pillow'):
+        try:
+            packages[package] = version(package)
+        except PackageNotFoundError:
+            packages[package] = None
+    snapshot = {
+        'schema_version': 1,
+        'python': platform.python_version(),
+        'platform': platform.system(),
+        'os_release': platform.release(),
+        'machine': platform.machine(),
+        'packages': packages,
+        'device': str(device),
+        'num_workers': num_workers,
+        'torch_num_threads': torch.get_num_threads(),
+        'torch_cuda_build': torch.version.cuda,
+        'cudnn': torch.backends.cudnn.version(),
+        'gpu': gpu,
+        'nvidia_driver': driver_versions,
+        'deterministic_algorithms': torch.are_deterministic_algorithms_enabled(),
+        'deterministic_warn_only': torch.is_deterministic_algorithms_warn_only_enabled(),
+        'cudnn_benchmark': torch.backends.cudnn.benchmark,
+        'cudnn_deterministic': torch.backends.cudnn.deterministic,
+        'cuda_matmul_fp32_precision': torch.backends.cuda.matmul.fp32_precision,
+        'cudnn_conv_fp32_precision': torch.backends.cudnn.conv.fp32_precision,
+        'cublas_workspace_config': os.environ.get('CUBLAS_WORKSPACE_CONFIG') if gpu else None,
+    }
+    return {**snapshot, 'environment_id': json_sha256(snapshot)}
+
+
+def write_json_atomic(path: Path, value) -> None:
+    """Publish a new JSON file atomically without replacing existing content."""
+    path = Path(path)
+    with TemporaryDirectory(prefix='.json-', dir=path.parent) as directory:
+        staged = Path(directory) / 'record.json'
+        with staged.open('w', encoding='utf-8', newline='\n') as stream:
+            json.dump(value, stream, indent=2, sort_keys=True, allow_nan=False)
+            stream.write('\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(staged, path)
 
 
 def main(argv=None):
