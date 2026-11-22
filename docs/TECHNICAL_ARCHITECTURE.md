@@ -378,8 +378,8 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 
 - `train_one_epoch(model, loader, optimizer, criterion, device) -> dict`: weighted loss sum/N, correct/N, elapsed seconds; finite checks loss/gradients.
 - `validate(model, loader, criterion, device) -> dict`: eval + inference_mode, no state update, deterministic clean val.
-- `train_run(config: dict, seed: int, resume: Path | None=None, profile='core') -> Path`: output run manifest/checkpoint path.
-- `main(argv=None)`: flags в REPRODUCIBILITY. No test loader in train_run. Shared engine для обеих models, отличие только policy в train dataset.
+- Current `train_run(config: dict, seed: int) -> dict`: returns in-memory epoch metrics, best validation scores, and optimizer counts. Both models use the same engine. The Robust policy is injected into the training partition. The loader request includes train and validation only.
+- `main(argv=None)`, manifests, and checkpoint-backed run output follow with `REPRO-001` and `TRAIN-002`. The future CLI flags are in REPRODUCIBILITY.
 - Inputs cfg + saved split/stats; outputs history.csv, manifests, best/last checkpoint. Epoch loop 1..40, scheduler.step один раз после epoch, logs содержат LR, использованный в текущем epoch. Best: maximum val_acc, ties lower val_loss, remaining ties earlier epoch.
 - NaN/Inf → run failed, сохранить diagnostic manifest, не публиковать partial как complete. KeyboardInterrupt сохраняет status interrupted; resume только с последнего complete epoch. Tests TEST-T01..03; integration 2 epochs on fixture, checkpoint → eval. DoD: valid logs, unchanged val BN stats, 352 updates/epoch, resume equality reference CPU.
 

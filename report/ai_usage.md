@@ -1,5 +1,13 @@
 # AI assistance record
 
+## TRAIN-001 — 22.11.2026
+
+At the user's request, Codex planned and implemented the shared training and
+validation loop, wrote and ran synthetic tests for both CompactCNN regimes,
+and ran a separate CUDA synthetic check. Codex documented the test evidence.
+Checkpoint-backed training and independent human review are pending.
+[Verification record](../docs/CURRENT_STATUS.md)
+
 ## EVAL-001 — 22.11.2026
 
 At the user's request, Codex planned and implemented the synthetic milestone for

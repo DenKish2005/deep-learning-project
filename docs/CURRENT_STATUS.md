@@ -1,5 +1,29 @@
 # CURRENT PROJECT STATUS
 
+## TRAIN-001 — 22.11.2026 · shared trainer synthetic milestone
+
+`src/train.py` implements the training loop for both CompactCNN configs. It
+requests the training and clean validation partitions, sets the training epoch
+before iteration, and uses cross-entropy, AdamW, and the configured cosine
+schedule. Epoch loss is weighted by sample count. Clean validation runs once
+per epoch in inference mode. Best-epoch selection uses highest validation
+accuracy, then lowest validation loss, then earliest epoch.
+
+`tests/test_training.py` exercises two epochs of the actual CompactCNN for each
+regime on tiny synthetic datasets, including the Robust corruption policy. It
+checks that training updates weights, validation leaves model state unchanged,
+and the configured run requests only train/validation and expects 352 optimizer
+steps per epoch for 40 epochs. Full acceptance is pending. The trainer returns
+metrics and the best epoch in memory. On-disk run history and provenance are
+part of artifact integration with `REPRO-001`, and checkpoint/resume is
+`TRAIN-002`. Core CIFAR-10 training is pending.
+
+The five trainer tests passed. The full local suite on Python 3.14.4 finished
+with 1,028 passed and 20 skipped. A separate synthetic CUDA run on an RTX 4060 Ti
+completed two epochs with four optimizer updates and verified restoration of
+the caller's Torch RNG and backend settings. The pinned course environment still
+needs replay.
+
 ## EVAL-001 — 22.11.2026 · synthetic evaluator milestone
 
 `src/evaluate.py` builds the 16 protocol conditions and evaluates one condition

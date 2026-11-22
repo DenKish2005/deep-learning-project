@@ -447,7 +447,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** TRAIN-001.
 - **2. Title:** Shared training/validation engine.
 - **3. Purpose:** Одинаковый budget и selection.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — shared training and validation loop implemented and exercised on synthetic data. Core training and independent review are pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** SETUP-003; DATA-003; MODEL-001.
