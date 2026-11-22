@@ -1,16 +1,22 @@
 """Shared training and clean validation for both CompactCNN regimes."""
 
 from contextlib import contextmanager
+from copy import deepcopy
+import hashlib
 import os
+from pathlib import Path
+import random
 from time import perf_counter
 
+import numpy as np
 import torch
 from torch import nn
 
+from src.checkpoints import CheckpointRun, capture_rng, checkpoint_directory, restore_rng
 from src.corruptions import CorruptionPolicy
-from src.data import make_loaders
+from src.data import CLASSES, make_loaders, verify_cifar10_files
 from src.models import CompactCNN
-from src.utils import validate_config
+from src.utils import capture_code_identity, capture_environment, config_hash, json_sha256, validate_config
 
 
 def _run_epoch(model, loader, criterion, device, optimizer=None) -> dict:
@@ -71,7 +77,8 @@ def validate(model, loader, criterion, device) -> dict:
 
 
 def _run_epochs(model, train_loader, val_loader, training: dict, device: torch.device, *,
-                expected_counts: tuple[int, int, int] | None = None) -> dict:
+                expected_counts: tuple[int, int, int] | None = None,
+                checkpoints: CheckpointRun | None = None, resume: bool = False) -> dict:
     optimizer = torch.optim.AdamW(model.parameters(), lr=training['lr'],
                                   betas=tuple(training['betas']), eps=training['eps'],
                                   weight_decay=training['weight_decay'])
@@ -81,9 +88,28 @@ def _run_epochs(model, train_loader, val_loader, training: dict, device: torch.d
     history = []
     best_score = None
     best_epoch = None
+    best_model = None
+    next_epoch = 1
+    elapsed = 0.0
+    loaders = (train_loader, val_loader)
+    if resume:
+        if checkpoints is None:
+            raise ValueError('resuming requires a checkpoint run')
+        saved = checkpoints.load_last()
+        model.load_state_dict(saved['model'], strict=True)
+        optimizer.load_state_dict(saved['optimizer'])
+        scheduler.load_state_dict(saved['scheduler'])
+        history = saved['history']
+        best_model = saved['best_model']
+        best_epoch = saved['best_epoch']
+        best_score = (saved['best_val_accuracy'], -saved['best_val_loss'])
+        elapsed = history[-1]['cumulative_seconds']
+        next_epoch = saved['epoch'] + 1
+        restore_rng(saved['rng'], device, loaders)
+        checkpoints.sync_outputs(saved)
     started = perf_counter()
 
-    for epoch in range(1, training['epochs'] + 1):
+    for epoch in range(next_epoch, training['epochs'] + 1):
         epoch_started = perf_counter()
         learning_rate = optimizer.param_groups[0]['lr']
         train_loader.dataset.set_epoch(epoch)
@@ -94,8 +120,12 @@ def _run_epochs(model, train_loader, val_loader, training: dict, device: torch.d
             raise RuntimeError(f'epoch {epoch} counts {counts} do not match configured budget {expected_counts}')
 
         score = (val_metrics['accuracy'], -val_metrics['loss'])
-        if best_score is None or score > best_score:
+        improved = best_score is None or score > best_score
+        if improved:
             best_score, best_epoch = score, epoch
+            if checkpoints is not None:
+                best_model = {name: value.detach().cpu().clone() if isinstance(value, torch.Tensor)
+                              else deepcopy(value) for name, value in model.state_dict().items()}
         finished = perf_counter()
         history.append({
             'epoch': epoch,
@@ -105,13 +135,20 @@ def _run_epochs(model, train_loader, val_loader, training: dict, device: torch.d
             'val_accuracy': val_metrics['accuracy'],
             'learning_rate': learning_rate,
             'epoch_seconds': finished - epoch_started,
-            'cumulative_seconds': finished - started,
+            'cumulative_seconds': elapsed + (finished - started),
             'best_epoch': best_epoch,
             'num_train': counts[0],
             'num_val': counts[1],
             'optimizer_steps': counts[2],
         })
         scheduler.step()
+        if checkpoints is not None:
+            checkpoints.save_epoch({
+                'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict(),
+                'scheduler': scheduler.state_dict(), 'rng': capture_rng(device, loaders),
+                'history': history, 'best_epoch': best_epoch, 'best_model': best_model,
+                'best_val_accuracy': best_score[0], 'best_val_loss': -best_score[1],
+            }, improved=improved)
 
     return {
         'history': history,
@@ -125,12 +162,13 @@ def _run_epochs(model, train_loader, val_loader, training: dict, device: torch.d
 
 @contextmanager
 def _training_runtime(device: torch.device, seed: int):
-    """Use the protocol's torch settings for this run, then restore the caller's."""
+    """Use the protocol's seeds and Torch settings, then restore the caller's."""
     cuda = device.type == 'cuda'
     if cuda and os.environ.get('CUBLAS_WORKSPACE_CONFIG') not in (':4096:8', ':16:8'):
         raise ValueError('set CUBLAS_WORKSPACE_CONFIG=:4096:8 before CUDA training')
     deterministic = torch.are_deterministic_algorithms_enabled()
     warn_only = torch.is_deterministic_algorithms_warn_only_enabled()
+    python_rng, numpy_rng = random.getstate(), np.random.get_state()
     if cuda:
         cudnn = torch.backends.cudnn
         matmul = torch.backends.cuda.matmul
@@ -139,6 +177,8 @@ def _training_runtime(device: torch.device, seed: int):
 
     with torch.random.fork_rng(devices=[torch.cuda.current_device()] if cuda else []):
         try:
+            random.seed(seed)
+            np.random.seed(seed)
             torch.default_generator.manual_seed(seed)
             torch.use_deterministic_algorithms(True)
             if cuda:
@@ -149,21 +189,53 @@ def _training_runtime(device: torch.device, seed: int):
                 matmul.fp32_precision = 'ieee'
             yield
         finally:
+            random.setstate(python_rng)
+            np.random.set_state(numpy_rng)
             torch.use_deterministic_algorithms(deterministic, warn_only=warn_only)
             if cuda:
                 (cudnn.benchmark, cudnn.deterministic,
                  cudnn.conv.fp32_precision, matmul.fp32_precision) = backend_settings
 
 
-def train_run(config: dict, seed: int) -> dict:
+def _checkpoint_identity(config: dict, seed: int, model: CompactCNN, device: torch.device,
+                         run_dir: Path) -> dict:
+    files = verify_cifar10_files(Path(config['dataset']['root']))['files']
+    model_state = {}
+    for name, value in model.state_dict().items():
+        if isinstance(value, torch.Tensor):
+            array = value.detach().cpu().numpy()
+            value = {'dtype': array.dtype.str, 'shape': list(array.shape),
+                     'sha256': hashlib.sha256(array.tobytes()).hexdigest()}
+        model_state[name] = value
+    environment = capture_environment(device, num_workers=config['runtime']['num_workers'])
+    return {
+        'run_id': run_dir.name, 'profile': 'core', 'model_name': config['model_name'], 'seed': seed,
+        'config_hash': config_hash(config),
+        'dataset_sha256': json_sha256({name: info['sha256'] for name, info in files.items()}),
+        'split_hash': config['dataset']['split_sha256'],
+        'normalization_hash': config['dataset']['normalization_sha256'],
+        'architecture': config['architecture'], 'classes': list(CLASSES),
+        'init_sha256': json_sha256(model_state),
+        **capture_code_identity(Path(__file__).resolve().parents[1]),
+        'environment_id': environment['environment_id'], 'device': environment['device'],
+    }
+
+
+def train_run(config: dict, seed: int, *, run_dir: Path | None = None,
+              resume: Path | None = None) -> dict:
     """Train a configured CompactCNN and return its history and best validation scores.
 
-    The caller receives epoch rows with train/validation metrics and step counts.
-    Run manifests, on-disk history, and checkpoints depend on REPRO-001/TRAIN-002.
+    Supply a new run_dir to save checkpoints or point resume at an existing last.pt.
+    Each call returns epoch rows with train/validation metrics and step counts.
     """
     validate_config(config)
     if type(seed) is not int or seed not in config['seeds']:
         raise ValueError(f"seed must be one of {config['seeds']}")
+    if resume is not None:
+        resume = Path(resume)
+        if resume.name != 'last.pt' or (run_dir is not None and Path(run_dir).resolve() != resume.parent.resolve()):
+            raise ValueError('resume must point to last.pt in the run directory')
+        run_dir = resume.parent
     device_name = config['runtime']['device']
     if device_name == 'auto':
         device_name = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -177,9 +249,18 @@ def train_run(config: dict, seed: int) -> dict:
     batch_size = training['batch_size']
     steps_per_epoch = (train_size + batch_size - 1) // batch_size
 
+    counts = (train_size, val_size, steps_per_epoch)
     with _training_runtime(device, seed):
         loaders = make_loaders(config, seed, 1, policy=policy, partitions=('train', 'val'))
         model = CompactCNN(num_classes=config['num_classes'], dropout=config['dropout']).to(device)
-        result = _run_epochs(model, loaders['train'], loaders['val'], training, device,
-                             expected_counts=(train_size, val_size, steps_per_epoch))
+        if run_dir is None:
+            result = _run_epochs(model, loaders['train'], loaders['val'], training, device,
+                                 expected_counts=counts)
+        else:
+            directory = Path(run_dir).resolve()
+            identity = _checkpoint_identity(config, seed, model, device, directory)
+            checkpoints = CheckpointRun(directory, identity, config)
+            with checkpoint_directory(directory, resume=resume is not None):
+                result = _run_epochs(model, loaders['train'], loaders['val'], training, device,
+                                     expected_counts=counts, checkpoints=checkpoints, resume=resume is not None)
     return {'model_name': config['model_name'], 'seed': seed, 'device': str(device), **result}
