@@ -363,16 +363,21 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 
 ### `src/utils.py`
 
-- **DATA-003 implemented:** `stable_seed` и top-level `seed_worker`; encoding в protocol §4. `seed_everything` и general identity/checkpoint helpers ниже — future REPRO-001.
+- **DATA-003 implemented:** `stable_seed` and top-level `seed_worker`, with encoding in protocol §4. REPRO-001 adds config, checkout, and environment identity helpers. General RNG/checkpoint serialization remains part of the training handoff.
 - `load_config(path: Path) -> dict`; `validate_config(cfg) -> None`: nonempty mapping, known keys, positive batch/epochs/lr, probabilities sum=1, exact severity maps; unknown schema → error.
 - `seed_everything(seed: int, deterministic=True) -> None`; `seed_worker(worker_id: int) -> None`; `stable_seed(*parts) -> int`: SHA-256 UTF-8 canonical representation, low 63 bits; не Python hash().
-- `config_hash(cfg: dict) -> str`; `sha256_file(path) -> str`; `capture_environment() -> dict`; `write_json_atomic(path, value)`; `save_checkpoint_atomic(path, state)`; `load_checkpoint(path, device) -> dict`.
-- Для atomic writes — temporary file в том же filesystem и replace после flush; отказ overwrite чужого run, incomplete files не считаются complete.
+- `config_hash(cfg: dict) -> str`, `sha256_file(path) -> str`, `capture_code_identity(repository) -> dict`, `capture_environment(device='cpu', *, num_workers=0) -> dict`, and `write_json_atomic(path, value)` support synthetic run records. Core protocol validation is the default for `load_config`; the run verifier reads resolved synthetic config with schema-only validation.
+- JSON is staged on the destination filesystem and published after flush with exclusive creation. `save_checkpoint_atomic(path, state)` and `load_checkpoint(path, device)` are planned in TRAIN-002.
 - `validate_controlled_configs(clean, robust) -> None`: разрешены только model_name,
   augmentation.enabled/probabilities и output paths; остальные settings равны,
   включая dataset paths/hashes и runtime. Unknown identity metadata keys запрещены.
 - `load_checkpoint` только для собственных trusted артефактов; явные map_location и serialization policy для version-locked PyTorch. RNG states сериализовать совместимыми primitive/tensor types и проверить round trip.
 - Tests TEST-U01..04, integration checkpoint/resume. DoD: config errors до GPU work, repeatable hashes, environment provenance, safe output paths и recovery evidence.
+
+### `src/repro.py`
+
+- `write_run_record(...)` publishes a completed synthetic run with a resolved config, environment snapshot, and checksummed artifacts. It writes `run_manifest.json` after the artifacts have passed verification.
+- `verify_run_record(run_dir)` validates config and environment links and the artifact inventory. `backup_run_record(run_dir, destination)` copies the verified artifacts to a new local directory and checks the copy before publishing its manifest.
 
 ### `src/train.py`
 

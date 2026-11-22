@@ -463,6 +463,30 @@ Optional benchmark после BENCH-001: `python -m scripts.run_all_evaluations 
 
 ## Provenance и verification
 
+### Local synthetic run records (REPRO-001)
+
+The config hash uses canonical JSON for settings and data identities and omits
+data and output file locations. The raw dataset checksum is recorded separately
+in the manifest. The checkout hash covers raw bytes of tracked and non-ignored
+untracked files, so Git status and the checkout hash identify local changes
+alongside `git_sha`. Capture `environment.json` on the actual device inside the
+active training settings so its flags reflect the run.
+
+`src.repro.write_run_record` writes a new synthetic run directory from a completed
+trainer result, its exact resolved config, environment and checkout identities,
+and artifact paths. The manifest appears after all listed files and links verify.
+`verify_run_record` reads and checks the complete directory. `backup_run_record`
+copies a verified run into a new local directory and checks its file inventory
+against the source manifest. A directory left before the manifest is written is
+incomplete. The backup retains the original run ID even if its folder name differs.
+
+The TRAIN-002 handoff uses `run_id`, `model_name`, `seed`, `profile`, `config_hash`,
+`dataset_sha256`, `split_hash`, `normalization_hash`, `init_sha256`, `git_sha`,
+`git_dirty`, `code_snapshot_sha256`, and `environment_id` to associate a checkpoint
+with a run. TRAIN-002 will add the checkpoint format, restore state at an epoch
+boundary, and connect on-disk epoch history to the resumed run. The synthetic
+record and backup tests run with `python -m pytest tests/test_repro.py -q`.
+
 Per epoch, per run и per condition schemas canonical в EXPERIMENT_PROTOCOL §6. Обязательные identity links: data checksum → split hash → stats hash → resolved config hash → code identity → checkpoint hash → condition hash → predictions hash → metric row → figure/table manifest. Git SHA без dirty status недостаточен; core release должен ссылаться на stable code revision и record any local patch hash.
 
 Run outputs ignored в Git должны иметь artifact_manifest и backup, доступный всем six teammates. После каждого complete epoch last atomic; после run backup best/last/history/config/env, проверить hashes после copy. Каждую ночь активных runs проверять свободное место и archive status. Dataset можно повторно скачать по checksum; unique checkpoints нельзя заменить обещанием retrain.

@@ -539,12 +539,12 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** REPRO-001.
 - **2. Title:** Identity/metadata/backup infrastructure.
 - **3. Purpose:** Связать outputs с inputs/code.
-- **4. Current status:** TODO — DATA-001..003 реализуют только data-specific hashes/publication и stable_seed/seed_worker; general config/environment/run identity, checkpoint/RNG/resume и backup acceptance не закрыты.
+- **4. Current status:** PARTIAL — config, environment, and checkout identities and verified synthetic run records and local backups are implemented. Production integration and team backup review are pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 6 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** SETUP-002; SETUP-003.
 - **8. Steps:** 1) environment/config/code hashes; 2) run/condition manifests; 3) ignore new raw outputs, define backup and verify copy.
-- **9. Files:** src/utils.py; .gitignore; outputs/runs/; tests/test_utils.py.
+- **9. Files:** src/utils.py; src/repro.py; .gitignore; outputs/runs/; tests/test_utils.py; tests/test_repro.py.
 - **10. Functions/classes:** config_hash; capture_environment; write_json_atomic.
 - **11. Inputs:** config+Git/device+paths.
 - **12. Outputs:** identity functions+artifact manifest.

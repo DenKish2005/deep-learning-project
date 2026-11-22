@@ -1,5 +1,27 @@
 # CURRENT PROJECT STATUS
 
+## REPRO-001 — 22.11.2026 · local run records and backup milestone
+
+`src/utils.py` fingerprints resolved configs, the Git checkout, and the active
+environment. The config hash includes split and normalization identities and
+excludes their file locations. The checkout record includes the Git commit,
+dirty status, and a fingerprint of Git-visible file contents.
+
+`src/repro.py` writes and verifies a synthetic run's resolved config, environment,
+and artifact inventory. It writes the complete manifest last. Existing run and
+backup directories are preserved. `tests/test_repro.py` records an actual
+two-epoch synthetic CompactCNN run and verifies a local backup. It also checks
+source and config identity, changed and missing artifacts, collisions, and failed
+writes. Git ignores generated run records under `outputs/runs/`.
+
+All nine run-record tests passed. The full local suite on Python 3.14.4 finished
+with 1,037 passed and 20 skipped. A separate metadata check captured the active
+checkout and CUDA environment on an RTX 4060 Ti.
+
+Production checkpoint integration, a team-accessible backup, and human review
+are pending. `TRAIN-002` will use the run identities when saving and resuming
+checkpoints. See [reproducibility handoff](REPRODUCIBILITY.md).
+
 ## TRAIN-001 — 22.11.2026 · shared trainer synthetic milestone
 
 `src/train.py` implements the training loop for both CompactCNN configs. It

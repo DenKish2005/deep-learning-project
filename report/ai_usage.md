@@ -1,5 +1,13 @@
 # AI assistance record
 
+## REPRO-001 — 22.11.2026
+
+At the user's request, Codex planned and implemented local experiment identity,
+run records, and backup verification. Codex wrote and ran synthetic tests,
+including a run record and backup from two epochs of CompactCNN training.
+Production integration and independent human review are pending.
+[Verification record](../docs/CURRENT_STATUS.md)
+
 ## TRAIN-001 — 22.11.2026
 
 At the user's request, Codex planned and implemented the shared training and
