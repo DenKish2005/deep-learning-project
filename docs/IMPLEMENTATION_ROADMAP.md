@@ -470,12 +470,12 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** TRAIN-002.
 - **2. Title:** Checkpoint и epoch resume.
 - **3. Purpose:** Защита от потери training.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — epoch checkpoints and exact synthetic CPU resume implemented. Core run artifacts and independent review are pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** TRAIN-001; REPRO-001.
 - **8. Steps:** 1) atomic best/last; 2) RNG+optimizer/scheduler/config identity; 3) epoch-boundary resume и append history.
-- **9. Files:** src/train.py; src/utils.py; tests/test_training.py; tests/test_utils.py.
+- **9. Files:** src/train.py; src/checkpoints.py; tests/test_checkpoints.py.
 - **10. Functions/classes:** save_checkpoint_atomic; load_checkpoint.
 - **11. Inputs:** run state + last checkpoint.
 - **12. Outputs:** recoverable best.pt/last.pt.

@@ -480,12 +480,26 @@ copies a verified run into a new local directory and checks its file inventory
 against the source manifest. A directory left before the manifest is written is
 incomplete. The backup retains the original run ID even if its folder name differs.
 
-The TRAIN-002 handoff uses `run_id`, `model_name`, `seed`, `profile`, `config_hash`,
+The training checkpoint uses `run_id`, `model_name`, `seed`, `profile`, `config_hash`,
 `dataset_sha256`, `split_hash`, `normalization_hash`, `init_sha256`, `git_sha`,
 `git_dirty`, `code_snapshot_sha256`, and `environment_id` to associate a checkpoint
-with a run. TRAIN-002 will add the checkpoint format, restore state at an epoch
-boundary, and connect on-disk epoch history to the resumed run. The synthetic
-record and backup tests run with `python -m pytest tests/test_repro.py -q`.
+with a run. The synthetic record and backup tests run with
+`python -m pytest tests/test_repro.py -q`.
+
+### Local checkpoints and resume (TRAIN-002)
+
+Use `train_run(config, seed, run_dir=Path(...))` for a fresh checkpointed run and
+`train_run(config, seed, resume=Path(...)/'last.pt')` to continue it. Use a new
+directory under the ignored `outputs/runs/` tree or outside the checkout so that
+generated files stay outside the checkout fingerprint. Keep the run directory
+name when relocating the files because it is the run ID.
+
+`last.pt` contains the completed epoch, history, optimizer and scheduler states,
+Python, NumPy, Torch and loader random states, and the best model. Resume compares
+the run identity, restores state, rebuilds `best.pt` and `history.csv`, and starts
+at the next epoch. Load a trusted `best.pt` with `load_checkpoint(path, kind='best')`
+and load its `model` into a compatible `CompactCNN` with `strict=True`. The synthetic
+CPU acceptance checks run with `python -m pytest tests/test_checkpoints.py -q`.
 
 Per epoch, per run и per condition schemas canonical в EXPERIMENT_PROTOCOL §6. Обязательные identity links: data checksum → split hash → stats hash → resolved config hash → code identity → checkpoint hash → condition hash → predictions hash → metric row → figure/table manifest. Git SHA без dirty status недостаточен; core release должен ссылаться на stable code revision и record any local patch hash.
 

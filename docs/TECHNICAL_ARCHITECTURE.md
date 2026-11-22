@@ -367,7 +367,7 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 - `load_config(path: Path) -> dict`; `validate_config(cfg) -> None`: nonempty mapping, known keys, positive batch/epochs/lr, probabilities sum=1, exact severity maps; unknown schema → error.
 - `seed_everything(seed: int, deterministic=True) -> None`; `seed_worker(worker_id: int) -> None`; `stable_seed(*parts) -> int`: SHA-256 UTF-8 canonical representation, low 63 bits; не Python hash().
 - `config_hash(cfg: dict) -> str`, `sha256_file(path) -> str`, `capture_code_identity(repository) -> dict`, `capture_environment(device='cpu', *, num_workers=0) -> dict`, and `write_json_atomic(path, value)` support synthetic run records. Core protocol validation is the default for `load_config`; the run verifier reads resolved synthetic config with schema-only validation.
-- JSON is staged on the destination filesystem and published after flush with exclusive creation. `save_checkpoint_atomic(path, state)` and `load_checkpoint(path, device)` are planned in TRAIN-002.
+- JSON is staged on the destination filesystem and published after flush with exclusive creation. Checkpoint storage is in `src/checkpoints.py`.
 - `validate_controlled_configs(clean, robust) -> None`: разрешены только model_name,
   augmentation.enabled/probabilities и output paths; остальные settings равны,
   включая dataset paths/hashes и runtime. Unknown identity metadata keys запрещены.
@@ -383,10 +383,15 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 
 - `train_one_epoch(model, loader, optimizer, criterion, device) -> dict`: weighted loss sum/N, correct/N, elapsed seconds; finite checks loss/gradients.
 - `validate(model, loader, criterion, device) -> dict`: eval + inference_mode, no state update, deterministic clean val.
-- Current `train_run(config: dict, seed: int) -> dict`: returns in-memory epoch metrics, best validation scores, and optimizer counts. Both models use the same engine. The Robust policy is injected into the training partition. The loader request includes train and validation only.
-- `main(argv=None)`, manifests, and checkpoint-backed run output follow with `REPRO-001` and `TRAIN-002`. The future CLI flags are in REPRODUCIBILITY.
+- `train_run(config: dict, seed: int, *, run_dir=None, resume=None) -> dict` returns epoch metrics, best validation scores, and optimizer counts. Supply a new `run_dir` to save epoch checkpoints or point `resume` at an existing `last.pt`. Both models share the engine and request train and validation only. The Robust policy is injected into the training partition.
+- The training CLI and completed-run manifests remain integration work. The planned CLI flags are in REPRODUCIBILITY.
 - Inputs cfg + saved split/stats; outputs history.csv, manifests, best/last checkpoint. Epoch loop 1..40, scheduler.step один раз после epoch, logs содержат LR, использованный в текущем epoch. Best: maximum val_acc, ties lower val_loss, remaining ties earlier epoch.
 - NaN/Inf → run failed, сохранить diagnostic manifest, не публиковать partial как complete. KeyboardInterrupt сохраняет status interrupted; resume только с последнего complete epoch. Tests TEST-T01..03; integration 2 epochs on fixture, checkpoint → eval. DoD: valid logs, unchanged val BN stats, 352 updates/epoch, resume equality reference CPU.
+
+### `src/checkpoints.py`
+
+- `save_checkpoint_atomic(path, state)` flushes a staged file before replacing the previous checkpoint. `load_checkpoint(path, device='cpu', *, identity=None, kind=None)` reads trusted model artifacts with `weights_only=True` and validates the version, kind, and config fingerprint.
+- The trainer commits the complete epoch to `last.pt` and derives `best.pt` and `history.csv` from it. Resume restores model, optimizer, scheduler, and random states and rebuilds these outputs before starting the next epoch. An advisory lock permits one active writer per run.
 
 ### `src/evaluate.py`
 

@@ -1,5 +1,22 @@
 # CURRENT PROJECT STATUS
 
+## TRAIN-002 — 22.11.2026 · synthetic checkpoint and resume milestone
+
+`src/train.py` now supports saving `last.pt`, `best.pt`, and `history.csv` in a
+local run directory. `last.pt` commits each completed epoch after validation and
+the learning-rate update. It includes the model, optimizer, scheduler, random
+states, history, and best model so resume can rebuild the other files. Resume
+checks the config, dataset, split, Git checkout, and environment identities.
+
+The synthetic CPU test interrupts training after epoch 1 and resumes into epoch
+2. Model, optimizer, scheduler, random states, and history fields other than
+timing match uninterrupted training. The test also loads the best model for
+inference. Tests cover rejected identities, interrupted writes, output repair,
+and competing writers. All four checkpoint tests passed. The full local suite
+on Python 3.14.4 finished with 1,041 passed and 20 skipped. The CIFAR-10 pilot,
+completed-run manifest integration,
+the evaluator's checkpoint CLI, and independent review are pending.
+
 ## REPRO-001 — 22.11.2026 · local run records and backup milestone
 
 `src/utils.py` fingerprints resolved configs, the Git checkout, and the active

@@ -1,5 +1,13 @@
 # AI assistance record
 
+## TRAIN-002 — 22.11.2026
+
+At the user's request, Codex planned and implemented epoch checkpoint saving,
+resume, and history recovery. Codex wrote and ran synthetic tests for exact CPU
+resume, checkpoint identity, interrupted writes, and best-model inference.
+The CIFAR-10 pilot and independent human review are pending.
+[Verification record](../docs/CURRENT_STATUS.md)
+
 ## REPRO-001 — 22.11.2026
 
 At the user's request, Codex planned and implemented local experiment identity,
