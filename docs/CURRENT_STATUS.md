@@ -1,5 +1,22 @@
 # CURRENT PROJECT STATUS
 
+## TRAIN-003 — 22.11.2026 · local CIFAR-10 debug and pilot checks
+
+The 64-image training check reached 100% accuracy after 30 optimizer updates.
+Cross-entropy dropped from 2.302 to 0.512. Both seed-42 pilots completed one epoch
+with 4,096 training images, 512 clean validation images, and 32 optimizer updates
+on an RTX 4060 Ti. Saved IDs, initial weights, training order, and environment
+matched across Clean and Robust. Their measured epochs took 0.815 s and 1.493 s,
+with 323 MiB of peak CUDA memory allocated in each run. The full local suite
+finished with 1,044 passed and 20 skipped.
+
+The new `debug` and `pilot` commands write separate local summaries. They use
+the frozen split and normalization. The existing dataset integrity check reads
+file checksums, and only training-partition images are decoded. The paired
+timings support rough 40-epoch estimates of 6.0 minutes for Clean and 10.9 minutes
+for Robust on this machine. Independent review and the core-run gates are
+pending. [Commands and measurements](../report/reproduction.md).
+
 ## TRAIN-002 — 22.11.2026 · synthetic checkpoint and resume milestone
 
 `src/train.py` now supports saving `last.pt`, `best.pt`, and `history.csv` in a
@@ -13,9 +30,8 @@ The synthetic CPU test interrupts training after epoch 1 and resumes into epoch
 timing match uninterrupted training. The test also loads the best model for
 inference. Tests cover rejected identities, interrupted writes, output repair,
 and competing writers. All four checkpoint tests passed. The full local suite
-on Python 3.14.4 finished with 1,041 passed and 20 skipped. The CIFAR-10 pilot,
-completed-run manifest integration,
-the evaluator's checkpoint CLI, and independent review are pending.
+on Python 3.14.4 finished with 1,041 passed and 20 skipped. Completed-run manifest
+integration, the evaluator's checkpoint CLI, and independent review are pending.
 
 ## REPRO-001 — 22.11.2026 · local run records and backup milestone
 

@@ -384,7 +384,7 @@ BN running buffers не trainable parameters. `train()` обновляет BN st
 - `train_one_epoch(model, loader, optimizer, criterion, device) -> dict`: weighted loss sum/N, correct/N, elapsed seconds; finite checks loss/gradients.
 - `validate(model, loader, criterion, device) -> dict`: eval + inference_mode, no state update, deterministic clean val.
 - `train_run(config: dict, seed: int, *, run_dir=None, resume=None) -> dict` returns epoch metrics, best validation scores, and optimizer counts. Supply a new `run_dir` to save epoch checkpoints or point `resume` at an existing `last.pt`. Both models share the engine and request train and validation only. The Robust policy is injected into the training partition.
-- The training CLI and completed-run manifests remain integration work. The planned CLI flags are in REPRODUCIBILITY.
+- The diagnostic CLI in `src/training_profiles.py` runs via `python -m src.train --profile debug` or `--profile pilot`. The core CLI and completed-run manifests remain integration work.
 - Inputs cfg + saved split/stats; outputs history.csv, manifests, best/last checkpoint. Epoch loop 1..40, scheduler.step один раз после epoch, logs содержат LR, использованный в текущем epoch. Best: maximum val_acc, ties lower val_loss, remaining ties earlier epoch.
 - NaN/Inf → run failed, сохранить diagnostic manifest, не публиковать partial как complete. KeyboardInterrupt сохраняет status interrupted; resume только с последнего complete epoch. Tests TEST-T01..03; integration 2 epochs on fixture, checkpoint → eval. DoD: valid logs, unchanged val BN stats, 352 updates/epoch, resume equality reference CPU.
 

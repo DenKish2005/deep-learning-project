@@ -493,12 +493,12 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** TRAIN-003.
 - **2. Title:** 64-image overfit и pilot profiling.
 - **3. Purpose:** Не тратить budget на broken pipeline.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — the local real-data debug and paired pilots passed. Independent review and the core-run gates remain pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** TRAIN-002; CORR-003.
 - **8. Steps:** 1) отдельный debug no aug/dropout; 2) ≥95%train on64 до 300 steps; 3) pilot epoch timings/memory.
-- **9. Files:** src/train.py; outputs/runs/debug-*; outputs/runs/pilot-*.
+- **9. Files:** src/train.py; src/training_profiles.py; tests/test_training_profiles.py; outputs/runs/debug-*; outputs/runs/pilot-*.
 - **10. Functions/classes:** debug profile; train_run.
 - **11. Inputs:** train-only subset.
 - **12. Outputs:** diagnostic curves + runtime estimate.

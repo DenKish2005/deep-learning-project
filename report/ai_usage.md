@@ -1,5 +1,12 @@
 # AI assistance record
 
+## TRAIN-003 — 22.11.2026
+
+At the user's request, Codex implemented and tested the diagnostic and pilot
+profiles. Codex ran the local 64-image learning check and paired CUDA pilots,
+verified the run records, and documented the measured results and time estimates.
+Independent review is pending. [Verification record](reproduction.md)
+
 ## TRAIN-002 — 22.11.2026
 
 At the user's request, Codex planned and implemented epoch checkpoint saving,

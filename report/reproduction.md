@@ -1,5 +1,46 @@
 # Verification record
 
+## TRAIN-003 local CIFAR-10 verification — 22.11.2026
+
+The real-data checks ran locally on an NVIDIA GeForce RTX 4060 Ti with Python
+3.14.4 and Torch 2.9.0+cu126. They used Git revision `43c4c47` with the local
+implementation and checkout fingerprint
+`8fc128d01453b851ded653d2f9d066d74965552c38b5abc76040eb20791ebd39`.
+
+All selected IDs were verified against the saved split. The loader applied the
+frozen train-only normalization. Its existing dataset integrity checks read file
+checksums, and it decoded only the original training partition. Both pilots used
+seed 42, 4,096 training images, 512 clean validation images, and 32 updates.
+The shared config fields, selected IDs, starting weights, training order, and
+environment matched across the pair.
+
+The 64-image check used a fixed AdamW learning rate of 0.001 and one batch of
+64 images per update, with crop, flip, corruption, and dropout disabled. It
+scored the full subset in inference mode every five updates. Accuracy rose from
+10.94% to 100% after 30 updates and loss fell from 2.302 to 0.512. The project
+threshold was 95% within 300 updates.
+
+| Pilot | Training time | Clean validation time | Clean validation accuracy | Peak CUDA allocated | Peak process RSS | Estimated 40-epoch run |
+|---|---:|---:|---:|---:|---:|---:|
+| Clean | 0.784 s | 0.031 s | 26.17% | 323 MiB | 1,573 MiB | 6.0 min |
+| Robust | 1.461 s | 0.032 s | 34.38% | 323 MiB | 1,579 MiB | 10.9 min |
+
+Each estimate scales measured phase times by the full-run training and validation
+batch counts. Each pilot measured one short epoch. Startup, checkpoint writes,
+and device contention are outside the estimate. The validation scores are
+diagnostic measurements on 512 images.
+
+Local summaries are under `outputs/runs/` in `debug-train003-final-s42`,
+`pilot-train003-final-clean-s42`, and `pilot-train003-final-robust-s42`. Run these
+Bash commands from the repo root to repeat the checks in new local directories.
+
+```bash
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+python -m src.train --config configs/clean_cnn.yaml --seed 42 --profile debug --max-steps 300 --device cuda --run-dir outputs/runs/debug-train003-replay-s42
+python -m src.train --config configs/clean_cnn.yaml --seed 42 --profile pilot --device cuda --run-dir outputs/runs/pilot-train003-replay-clean-s42
+python -m src.train --config configs/robust_cnn.yaml --seed 42 --profile pilot --device cuda --run-dir outputs/runs/pilot-train003-replay-robust-s42
+```
+
 ## METRIC-001 technical verification — 19.11.2026
 
 Baseline was clean local `main` at `58abc4b`. Checks ran sequentially in the
