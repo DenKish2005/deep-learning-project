@@ -1,0 +1,250 @@
+"""Single-condition inference and prediction artifacts for CIFAR-10."""
+
+from collections.abc import Iterable, Sequence
+from dataclasses import asdict, dataclass
+import hashlib
+import json
+import os
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from time import perf_counter
+
+import numpy as np
+import torch
+from torch import nn
+from torch.nn import functional as F
+
+from src.corruptions import apply_corruption, keyed_test_generator, severity_params
+from src.data import CLASSES, PARTITION_SIZE, validate_normalization
+from src.metrics import classification_metrics
+
+
+_TEST_SIZE = PARTITION_SIZE[False]
+_TEST_NAMESPACE = 'cifar10-python/original-test'
+_EVAL_SEED = 100494
+
+
+@dataclass(frozen=True)
+class EvaluationProvenance:
+    """Identity supplied by the caller's fixture or future checkpoint adapter."""
+
+    run_id: str
+    model_name: str
+    seed: int
+    dataset: str
+    checkpoint_sha256: str
+    config_hash: str
+    split_hash: str
+    normalization_hash: str
+    git_sha: str
+    environment_id: str
+
+    def __post_init__(self):
+        for name in ('run_id', 'model_name', 'dataset', 'git_sha', 'environment_id'):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f'{name} must be a nonempty string')
+        if type(self.seed) is not int or self.seed < 0:
+            raise ValueError('seed must be a nonnegative integer')
+        for name in ('checkpoint_sha256', 'config_hash', 'split_hash', 'normalization_hash'):
+            value = getattr(self, name)
+            if (not isinstance(value, str) or len(value) != 64
+                    or any(char not in '0123456789abcdef' for char in value)):
+                raise ValueError(f'{name} must be a lowercase SHA-256 digest')
+
+
+@dataclass(frozen=True)
+class EvaluationResult:
+    summary: dict
+    indices: np.ndarray
+    targets: np.ndarray
+    logits: np.ndarray
+
+
+def _condition(corruption: str, severity: int) -> dict:
+    if type(corruption) is str and corruption == 'clean':
+        if type(severity) is not int or severity != 0:
+            raise ValueError('clean severity must be the integer 0')
+        parameters = None
+    else:
+        parameters = severity_params(corruption, severity)
+    return {'corruption': corruption, 'severity': severity, 'parameter_value': parameters}
+
+
+def build_conditions() -> list[dict]:
+    """Return the sixteen conditions in protocol order, with fresh parameters."""
+    return [_condition('clean', 0)] + [
+        _condition(family, severity)
+        for family in ('gaussian_noise', 'gaussian_blur', 'brightness')
+        for severity in range(1, 6)
+    ]
+
+
+def _ordered_ids(expected_indices: Sequence[int] | np.ndarray) -> np.ndarray:
+    indices = np.asarray(expected_indices)
+    if (indices.ndim != 1 or not indices.size or indices.dtype.kind not in 'iu'
+            or (not isinstance(expected_indices, np.ndarray)
+                and any(isinstance(index, (bool, np.bool_)) for index in expected_indices))
+            or np.any(indices < 0) or np.any(indices >= _TEST_SIZE)
+            or np.unique(indices).size != indices.size):
+        raise ValueError('expected_indices must contain unique integer test IDs in [0, 9999]')
+    return np.sort(indices.astype(np.int64))
+
+
+def _check_batch(images: torch.Tensor, targets: torch.Tensor, indices: torch.Tensor) -> None:
+    if (not isinstance(images, torch.Tensor) or images.layout != torch.strided
+            or images.device.type != 'cpu' or images.dtype != torch.uint8 or images.ndim != 4
+            or images.shape[1:] != (3, 32, 32) or not len(images)):
+        raise ValueError('images must be a nonempty CPU uint8 tensor shaped [N, 3, 32, 32]')
+    for name, values in (('targets', targets), ('indices', indices)):
+        if (not isinstance(values, torch.Tensor) or values.layout != torch.strided
+                or values.device.type != 'cpu' or values.dtype != torch.int64
+                or values.shape != (len(images),)):
+            raise ValueError(f'{name} must be a CPU int64 vector aligned with images')
+    if not ((targets >= 0) & (targets < len(CLASSES))).all():
+        raise ValueError('targets contain an invalid CIFAR-10 class ID')
+
+
+def _condition_hash(condition: dict, provenance: EvaluationProvenance, indices: np.ndarray,
+                    targets: np.ndarray, image_digests: list[bytes]) -> str:
+    metadata = {
+        'version': 'cifar10-evaluation-input-v1',
+        'dataset': provenance.dataset,
+        'namespace': _TEST_NAMESPACE,
+        'condition': condition,
+        'eval_seed': _EVAL_SEED,
+        'normalization_hash': provenance.normalization_hash,
+    }
+    digest = hashlib.sha256(json.dumps(metadata, sort_keys=True, separators=(',', ':')).encode())
+    digest.update(indices.astype('<i8', copy=False).tobytes())
+    digest.update(targets.astype('<i8', copy=False).tobytes())
+    for image_digest in image_digests:
+        digest.update(image_digest)
+    return digest.hexdigest()
+
+
+@torch.inference_mode()
+def evaluate_condition(model: nn.Module, batches: Iterable[Sequence[torch.Tensor]],
+                       condition: dict, *, normalization: dict,
+                       expected_indices: Sequence[int] | np.ndarray, provenance: EvaluationProvenance,
+                       device: str | torch.device = 'cpu') -> EvaluationResult:
+    """Evaluate raw (NCHW uint8 images, int64 targets, int64 original IDs) batches.
+
+    The caller supplies the model and the expected test IDs. This entry point
+    marks results synthetic while production checkpoint verification is pending.
+    """
+    started = perf_counter()
+    if not isinstance(condition, dict):
+        raise ValueError('condition must be a mapping from build_conditions()')
+    canonical = _condition(condition.get('corruption'), condition.get('severity'))
+    if canonical != condition:
+        raise ValueError('condition parameters must match build_conditions()')
+    validate_normalization(normalization)
+    ordered_ids = _ordered_ids(expected_indices)
+    positions = {original_id: position for position, original_id in enumerate(ordered_ids.tolist())}
+    seen = np.zeros(len(ordered_ids), dtype=bool)
+    targets_by_id = np.empty(len(ordered_ids), dtype=np.int64)
+    logits_by_id = np.empty((len(ordered_ids), len(CLASSES)), dtype=np.float32)
+    image_digests = [b''] * len(ordered_ids)
+    mean = torch.tensor(normalization['mean'], dtype=torch.float32, device='cpu').view(3, 1, 1)
+    std = torch.tensor(normalization['std'], dtype=torch.float32, device='cpu').view(3, 1, 1)
+    corruption, severity = canonical['corruption'], canonical['severity']
+    model.to(device).eval()
+
+    for images, targets, indices in batches:
+        _check_batch(images, targets, indices)
+        normalized = []
+        batch_positions = []
+        pixels = images.to(torch.float32).div_(255.0)
+        for pixel, original_id in zip(pixels, indices.tolist(), strict=True):
+            if original_id not in positions:
+                raise ValueError(f'unexpected original test ID {original_id}')
+            position = positions[original_id]
+            if seen[position]:
+                raise ValueError(f'duplicate original test ID {original_id}')
+            seen[position] = True
+            generator = (keyed_test_generator(original_id, namespace=_TEST_NAMESPACE)
+                         if corruption == 'gaussian_noise' else None)
+            image = (apply_corruption(pixel, corruption, severity, generator) - mean) / std
+            image_bytes = image.numpy().astype('<f4', copy=False).tobytes()
+            image_digests[position] = hashlib.sha256(image_bytes).digest()
+            normalized.append(image)
+            batch_positions.append(position)
+
+        inputs = torch.stack(normalized)
+        if not torch.isfinite(inputs).all():
+            raise ValueError('normalized inputs must be finite')
+        logits = model(inputs.to(device))
+        if (not isinstance(logits, torch.Tensor) or logits.layout != torch.strided
+                or not logits.is_floating_point() or logits.shape != (len(images), len(CLASSES))):
+            raise ValueError('model must return floating-point logits shaped [N, 10]')
+        logits = logits.to(device='cpu', dtype=torch.float32)
+        if not torch.isfinite(logits).all():
+            raise ValueError('model logits must be finite in float32')
+        targets_by_id[batch_positions] = targets.numpy()
+        logits_by_id[batch_positions] = logits.numpy()
+
+    if not seen.all():
+        raise ValueError(f'missing {int((~seen).sum())} expected original test IDs')
+    metrics = classification_metrics(targets_by_id, logits_by_id.argmax(axis=1))
+    # Compute over the persisted logits with equal weight per image, in original ID order.
+    loss = F.cross_entropy(torch.from_numpy(logits_by_id).double(), torch.from_numpy(targets_by_id))
+    summary = {
+        'schema_version': 1,
+        **asdict(provenance),
+        'profile': 'synthetic',
+        **canonical,
+        **metrics,
+        'loss': loss.item(),
+        'per_class_accuracy': metrics['per_class_accuracy'].tolist(),
+        'confusion_matrix': metrics['confusion_matrix'].tolist(),
+        'condition_hash': _condition_hash(canonical, provenance, ordered_ids, targets_by_id, image_digests),
+        'eval_seed': _EVAL_SEED,
+        'duration_seconds': perf_counter() - started,
+    }
+    return EvaluationResult(summary, ordered_ids, targets_by_id, logits_by_id)
+
+
+def save_predictions(path: Path, indices: np.ndarray, targets: np.ndarray, logits: np.ndarray) -> None:
+    """Write one NPZ with aligned, sorted original IDs; reject existing files."""
+    if (indices.dtype != np.int64 or not np.array_equal(indices, _ordered_ids(indices))
+            or targets.dtype != np.int64 or targets.shape != indices.shape
+            or not np.all((targets >= 0) & (targets < len(CLASSES)))
+            or logits.dtype != np.float32 or logits.shape != (len(indices), len(CLASSES))
+            or not np.isfinite(logits).all()):
+        raise ValueError('predictions must have sorted int64 IDs, aligned int64 targets, and finite float32 logits')
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(prefix='.evaluation-', dir=path.parent) as temporary:
+        staged = Path(temporary) / 'predictions.npz'
+        np.savez_compressed(staged, indices=indices, targets=targets, logits=logits)
+        os.link(staged, path)
+
+
+def save_evaluation(summary_path: Path, predictions_path: Path, result: EvaluationResult) -> dict:
+    """Write a prediction pair without replacement; the complete summary is written last."""
+    summary_path, predictions_path = Path(summary_path), Path(predictions_path)
+    if summary_path.resolve() == predictions_path.resolve():
+        raise ValueError('summary and predictions paths must be different')
+    if summary_path.exists() or summary_path.is_symlink():
+        raise FileExistsError(f'evaluation summary already exists: {summary_path}')
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(prefix='.evaluation-', dir=summary_path.parent) as temporary:
+        staged = Path(temporary) / 'summary.json'
+        save_predictions(predictions_path, result.indices, result.targets, result.logits)
+        try:
+            with predictions_path.open('rb') as stream:
+                predictions_sha256 = hashlib.file_digest(stream, 'sha256').hexdigest()
+            summary = {
+                **result.summary,
+                'predictions_path': str(predictions_path),
+                'predictions_sha256': predictions_sha256,
+                'status': 'complete',
+            }
+            staged.write_text(json.dumps(summary, indent=2, sort_keys=True, allow_nan=False) + '\n',
+                              encoding='utf-8')
+            os.link(staged, summary_path)
+        except (OSError, TypeError, ValueError):
+            predictions_path.unlink()
+            raise
+    return summary
