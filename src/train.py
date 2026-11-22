@@ -57,6 +57,8 @@ def _run_epoch(model, loader, criterion, device, optimizer=None) -> dict:
 
     if samples == 0:
         raise ValueError('epoch loader must contain at least one example')
+    if device.type == 'cuda':
+        torch.cuda.synchronize(device)
     return {
         'loss': loss_sum / samples,
         'accuracy': correct / samples,
@@ -76,12 +78,17 @@ def validate(model, loader, criterion, device) -> dict:
     return _run_epoch(model, loader, criterion, device)
 
 
+def _make_optimizer(model, training: dict):
+    return torch.optim.AdamW(model.parameters(), lr=training['lr'],
+                             betas=tuple(training['betas']), eps=training['eps'],
+                             weight_decay=training['weight_decay'])
+
+
 def _run_epochs(model, train_loader, val_loader, training: dict, device: torch.device, *,
                 expected_counts: tuple[int, int, int] | None = None,
-                checkpoints: CheckpointRun | None = None, resume: bool = False) -> dict:
-    optimizer = torch.optim.AdamW(model.parameters(), lr=training['lr'],
-                                  betas=tuple(training['betas']), eps=training['eps'],
-                                  weight_decay=training['weight_decay'])
+                checkpoints: CheckpointRun | None = None, resume: bool = False,
+                record_phase_times: bool = False) -> dict:
+    optimizer = _make_optimizer(model, training)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, T_max=training['t_max'], eta_min=training['eta_min'])
     criterion = nn.CrossEntropyLoss()
@@ -141,6 +148,9 @@ def _run_epochs(model, train_loader, val_loader, training: dict, device: torch.d
             'num_val': counts[1],
             'optimizer_steps': counts[2],
         })
+        if record_phase_times:
+            history[-1].update(train_seconds=train_metrics['elapsed_seconds'],
+                               validation_seconds=val_metrics['elapsed_seconds'])
         scheduler.step()
         if checkpoints is not None:
             checkpoints.save_epoch({
@@ -197,9 +207,7 @@ def _training_runtime(device: torch.device, seed: int):
                  cudnn.conv.fp32_precision, matmul.fp32_precision) = backend_settings
 
 
-def _checkpoint_identity(config: dict, seed: int, model: CompactCNN, device: torch.device,
-                         run_dir: Path) -> dict:
-    files = verify_cifar10_files(Path(config['dataset']['root']))['files']
+def _initial_state_sha256(model: CompactCNN) -> str:
     model_state = {}
     for name, value in model.state_dict().items():
         if isinstance(value, torch.Tensor):
@@ -207,6 +215,12 @@ def _checkpoint_identity(config: dict, seed: int, model: CompactCNN, device: tor
             value = {'dtype': array.dtype.str, 'shape': list(array.shape),
                      'sha256': hashlib.sha256(array.tobytes()).hexdigest()}
         model_state[name] = value
+    return json_sha256(model_state)
+
+
+def _checkpoint_identity(config: dict, seed: int, model: CompactCNN, device: torch.device,
+                         run_dir: Path) -> dict:
+    files = verify_cifar10_files(Path(config['dataset']['root']))['files']
     environment = capture_environment(device, num_workers=config['runtime']['num_workers'])
     return {
         'run_id': run_dir.name, 'profile': 'core', 'model_name': config['model_name'], 'seed': seed,
@@ -215,10 +229,19 @@ def _checkpoint_identity(config: dict, seed: int, model: CompactCNN, device: tor
         'split_hash': config['dataset']['split_sha256'],
         'normalization_hash': config['dataset']['normalization_sha256'],
         'architecture': config['architecture'], 'classes': list(CLASSES),
-        'init_sha256': json_sha256(model_state),
+        'init_sha256': _initial_state_sha256(model),
         **capture_code_identity(Path(__file__).resolve().parents[1]),
         'environment_id': environment['environment_id'], 'device': environment['device'],
     }
+
+
+def _resolve_training_device(config: dict) -> torch.device:
+    name = config['runtime']['device']
+    if name == 'auto':
+        name = 'cuda' if torch.cuda.is_available() else 'cpu'
+    if name == 'cuda' and not torch.cuda.is_available():
+        raise ValueError('CUDA was requested but is unavailable')
+    return torch.device(name)
 
 
 def train_run(config: dict, seed: int, *, run_dir: Path | None = None,
@@ -236,12 +259,7 @@ def train_run(config: dict, seed: int, *, run_dir: Path | None = None,
         if resume.name != 'last.pt' or (run_dir is not None and Path(run_dir).resolve() != resume.parent.resolve()):
             raise ValueError('resume must point to last.pt in the run directory')
         run_dir = resume.parent
-    device_name = config['runtime']['device']
-    if device_name == 'auto':
-        device_name = 'cuda' if torch.cuda.is_available() else 'cpu'
-    if device_name == 'cuda' and not torch.cuda.is_available():
-        raise ValueError('CUDA was requested but is unavailable')
-    device = torch.device(device_name)
+    device = _resolve_training_device(config)
     augmentation = config['augmentation']
     policy = CorruptionPolicy(augmentation['probabilities']) if augmentation['enabled'] else None
     training = config['training']
@@ -264,3 +282,9 @@ def train_run(config: dict, seed: int, *, run_dir: Path | None = None,
                 result = _run_epochs(model, loaders['train'], loaders['val'], training, device,
                                      expected_counts=counts, checkpoints=checkpoints, resume=resume is not None)
     return {'model_name': config['model_name'], 'seed': seed, 'device': str(device), **result}
+
+
+if __name__ == '__main__':
+    from src.training_profiles import main
+
+    raise SystemExit(main())
