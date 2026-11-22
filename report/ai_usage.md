@@ -1,5 +1,14 @@
 # AI assistance record
 
+## EVAL-001 — 22.11.2026
+
+At the user's request, Codex planned and implemented the synthetic milestone for
+single-condition evaluation, wrote and ran the evaluator tests, and documented
+the verification results. The tests exercised known logits, prediction export
+and metric reconstruction, and a CompactCNN state-dict round trip on synthetic
+images. Production checkpoint integration, official CIFAR-10 evaluation, and
+independent human review are pending. [Verification record](../docs/CURRENT_STATUS.md)
+
 ## METRIC-001 — 19.11.2026
 
 At the user's request, Codex planned and implemented the classification and

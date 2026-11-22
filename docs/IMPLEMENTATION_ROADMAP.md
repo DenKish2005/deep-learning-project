@@ -723,7 +723,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** EVAL-001.
 - **2. Title:** Single-condition evaluator.
 - **3. Purpose:** Детерминированная inference/metrics.
-- **4. Current status:** TODO.
+- **4. Current status:** PARTIAL — synthetic inference and JSON/NPZ export implemented. Production checkpoint loading and official evaluation are pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 5 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** DATA-003; MODEL-001; CORR-002; METRIC-001; TRAIN-002.

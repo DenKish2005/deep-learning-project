@@ -1,5 +1,24 @@
 # CURRENT PROJECT STATUS
 
+## EVAL-001 — 22.11.2026 · synthetic evaluator milestone
+
+`src/evaluate.py` builds the 16 protocol conditions and evaluates one condition
+from raw CPU image batches and an in-memory model. It applies the fixed pixel
+corruption before train-only normalization and writes a JSON summary and an NPZ
+of original IDs, labels, and logits sorted by ID. The condition hash binds the
+indexed, normalized inputs to the dataset, corruption, and normalization identity.
+The summary records the prediction file's SHA-256. Artifacts use `profile=synthetic`.
+
+`tests/test_evaluation.py` covers known-logit evaluations, metric reconstruction,
+repeated evaluation with different batch sizes and input order, a CompactCNN
+state-dict round trip on synthetic images, and output collision and retry behavior.
+All 11 evaluator tests passed. The full local suite on Python 3.14.4 finished
+with 1,023 passed and 20 skipped. The pinned course environment still needs replay.
+The checkpoint-loading CLI and provenance checks depend on the `TRAIN-002`
+checkpoint contract. Official CIFAR-10 inference also depends on `TEST-002` and a
+validation-selected checkpoint. The synthetic milestone advances EVAL-001, whose
+full acceptance is pending.
+
 ## METRIC-002 — 21.11.2026 · technical implementation ready for review
 
 Added strict validation and aggregation for the complete 2-model × 3-seed ×
