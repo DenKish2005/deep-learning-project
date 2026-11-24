@@ -14,7 +14,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from src.corruptions import apply_corruption, keyed_test_generator, severity_params
+from src.corruptions import CorruptionPolicy, apply_corruption, keyed_test_generator, severity_params
 from src.checkpoints import load_checkpoint
 from src.data import (CLASSES, PARTITION_SIZE, make_loaders, validate_normalization,
                      verify_cifar10_files)
@@ -314,8 +314,10 @@ def evaluate_checkpoint(checkpoint_path: Path, config_path: Path, output_dir: Pa
 
     # This performs the frozen split and train-only normalization checks without
     # changing either artifact. Only its raw test partition is used below.
+    policy = (CorruptionPolicy(config['augmentation']['probabilities'])
+              if config['augmentation']['enabled'] else None)
     loaders = make_loaders(
-        config, identity['seed'], 0, partitions=('test',)
+        config, identity['seed'], 0, policy=policy, partitions=('test',)
     )
     test_dataset = loaders['test'].dataset
     normalization = {
