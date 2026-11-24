@@ -15,8 +15,12 @@ from torch import nn
 from torch.nn import functional as F
 
 from src.corruptions import apply_corruption, keyed_test_generator, severity_params
-from src.data import CLASSES, PARTITION_SIZE, validate_normalization
+from src.checkpoints import load_checkpoint
+from src.data import (CLASSES, PARTITION_SIZE, make_loaders, validate_normalization,
+                     verify_cifar10_files)
 from src.metrics import classification_metrics
+from src.models import CompactCNN
+from src.utils import capture_environment, config_hash, json_sha256, load_config, sha256_file
 
 
 _TEST_SIZE = PARTITION_SIZE[False]
@@ -127,13 +131,16 @@ def _condition_hash(condition: dict, provenance: EvaluationProvenance, indices: 
 def evaluate_condition(model: nn.Module, batches: Iterable[Sequence[torch.Tensor]],
                        condition: dict, *, normalization: dict,
                        expected_indices: Sequence[int] | np.ndarray, provenance: EvaluationProvenance,
-                       device: str | torch.device = 'cpu') -> EvaluationResult:
+                       device: str | torch.device = 'cpu',
+                       profile: str = 'synthetic') -> EvaluationResult:
     """Evaluate raw (NCHW uint8 images, int64 targets, int64 original IDs) batches.
 
     The caller supplies the model and the expected test IDs. This entry point
     marks results synthetic while production checkpoint verification is pending.
     """
     started = perf_counter()
+    if profile not in ('synthetic', 'core'):
+        raise ValueError("profile must be 'synthetic' or 'core'")
     if not isinstance(condition, dict):
         raise ValueError('condition must be a mapping from build_conditions()')
     canonical = _condition(condition.get('corruption'), condition.get('severity'))
@@ -192,7 +199,7 @@ def evaluate_condition(model: nn.Module, batches: Iterable[Sequence[torch.Tensor
     summary = {
         'schema_version': 1,
         **asdict(provenance),
-        'profile': 'synthetic',
+        'profile': profile,
         **canonical,
         **metrics,
         'loss': loss.item(),
@@ -248,3 +255,134 @@ def save_evaluation(summary_path: Path, predictions_path: Path, result: Evaluati
             predictions_path.unlink()
             raise
     return summary
+
+
+def _raw_test_batches(dataset, batch_size: int):
+    """Yield verified test images as raw CPU uint8 NCHW batches with original IDs."""
+    base = dataset.base
+    labels = dataset.labels
+    for start in range(0, len(dataset.indices), batch_size):
+        stop = min(start + batch_size, len(dataset.indices))
+        indices = dataset.indices[start:stop]
+        images = torch.from_numpy(base.data[indices].copy()).permute(0, 3, 1, 2).contiguous()
+        targets = torch.as_tensor(labels[indices].copy(), dtype=torch.int64)
+        original_ids = torch.as_tensor(indices.copy(), dtype=torch.int64)
+        yield images, targets, original_ids
+
+
+def evaluate_checkpoint(checkpoint_path: Path, config_path: Path, output_dir: Path, *,
+                        device: str = 'auto') -> list[dict]:
+    """Run all 16 protocol conditions for one validation-selected core checkpoint."""
+    checkpoint_path = Path(checkpoint_path)
+    if checkpoint_path.name != 'best.pt' or checkpoint_path.is_symlink() or not checkpoint_path.is_file():
+        raise ValueError('checkpoint must be a regular best.pt file')
+    config = load_config(config_path)
+    resolved = 'cuda' if device == 'auto' and torch.cuda.is_available() else (
+        'cpu' if device == 'auto' else device)
+    if resolved not in ('cpu', 'cuda'):
+        raise ValueError("device must be 'auto', 'cpu', or 'cuda'")
+    if resolved == 'cuda' and not torch.cuda.is_available():
+        raise ValueError('CUDA was requested but is unavailable')
+    torch_device = torch.device(resolved)
+
+    checkpoint = load_checkpoint(checkpoint_path, device=torch_device, kind='best')
+    identity = checkpoint['identity']
+    expected_config_hash = config_hash(config)
+    checks = {
+        'profile': 'core',
+        'model_name': config['model_name'],
+        'config_hash': expected_config_hash,
+        'split_hash': config['dataset']['split_sha256'],
+        'normalization_hash': config['dataset']['normalization_sha256'],
+        'architecture': config['architecture'],
+        'classes': list(CLASSES),
+    }
+    mismatches = [key for key, value in checks.items() if identity.get(key) != value]
+    if mismatches:
+        raise ValueError(f'checkpoint does not match evaluation config: {", ".join(mismatches)}')
+    if type(identity.get('seed')) is not int or identity['seed'] not in config['seeds']:
+        raise ValueError('checkpoint seed is not one of the configured core seeds')
+    run_id = identity.get('run_id')
+    if (not isinstance(run_id, str) or not run_id.strip()
+            or Path(run_id).name != run_id or run_id in ('.', '..')):
+        raise ValueError('checkpoint has an invalid run_id')
+
+    files = verify_cifar10_files(Path(config['dataset']['root']))['files']
+    dataset_sha256 = json_sha256({name: info['sha256'] for name, info in files.items()})
+    if identity.get('dataset_sha256') != dataset_sha256:
+        raise ValueError('checkpoint CIFAR-10 file identity does not match the verified dataset')
+
+    # This performs the frozen split and train-only normalization checks without
+    # changing either artifact. Only its raw test partition is used below.
+    loaders = make_loaders(
+        config, identity['seed'], 0, partitions=('test',)
+    )
+    test_dataset = loaders['test'].dataset
+    normalization = {
+        'mean': test_dataset.mean[:, 0, 0].tolist(),
+        'std': test_dataset.std[:, 0, 0].tolist(),
+    }
+    expected_indices = np.arange(_TEST_SIZE, dtype=np.int64)
+
+    model = CompactCNN(num_classes=config['num_classes'], dropout=config['dropout'])
+    model.load_state_dict(checkpoint['model'], strict=True)
+    model.to(torch_device).eval()
+
+    environment_id = capture_environment(torch_device, num_workers=0)['environment_id']
+    provenance = EvaluationProvenance(
+        run_id=run_id,
+        model_name=identity['model_name'],
+        seed=identity['seed'],
+        dataset=f"cifar10:{dataset_sha256}",
+        checkpoint_sha256=sha256_file(checkpoint_path),
+        config_hash=identity['config_hash'],
+        split_hash=identity['split_hash'],
+        normalization_hash=identity['normalization_hash'],
+        git_sha=identity['git_sha'],
+        environment_id=environment_id,
+    )
+    root = Path(output_dir)
+    metrics_dir = root / 'metrics' / run_id
+    predictions_dir = root / 'predictions' / run_id
+    batch_size = config['evaluation']['batch_size']
+    summaries = []
+    for condition in build_conditions():
+        condition_id = f"{condition['corruption']}-s{condition['severity']}"
+        result = evaluate_condition(
+            model,
+            _raw_test_batches(test_dataset, batch_size),
+            condition,
+            normalization=normalization,
+            expected_indices=expected_indices,
+            provenance=provenance,
+            device=torch_device,
+            profile='core',
+        )
+        summary_path = metrics_dir / f'{condition_id}.json'
+        prediction_path = predictions_dir / f'{condition_id}.npz'
+        summaries.append(save_evaluation(summary_path, prediction_path, result))
+    return summaries
+
+
+def main(argv=None) -> int:
+    """Evaluate one core checkpoint on clean and all fifteen corruption conditions."""
+    import argparse
+
+    parser = argparse.ArgumentParser(description=main.__doc__)
+    parser.add_argument('--checkpoint', required=True, type=Path,
+                        help='validation-selected best.pt from one completed core run')
+    parser.add_argument('--config', required=True, type=Path,
+                        help='matching clean_cnn.yaml or robust_cnn.yaml')
+    parser.add_argument('--output-dir', type=Path, default=Path('outputs'),
+                        help='root for separate metrics/ and predictions/ run folders')
+    parser.add_argument('--device', choices=('auto', 'cpu', 'cuda'), default='auto')
+    args = parser.parse_args(argv)
+    summaries = evaluate_checkpoint(
+        args.checkpoint, args.config, args.output_dir, device=args.device
+    )
+    print(f"Saved {len(summaries)} core conditions for {summaries[0]['run_id']}")
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
