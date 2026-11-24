@@ -1,14 +1,15 @@
 # Подробный implementation roadmap
 
-## Current update — 21.11.2026
+## Current update — 24.11.2026
 
-Person 5 has implemented METRIC-001/002 technical APIs and synthetic matrix
-aggregation. Real evaluation remains TODO: `src/evaluate.py`, `src/train.py`, and
-`scripts/run_all_evaluations.py` are empty; Git contains no raw CIFAR-10 files or
-checkpoints. Next Person 5 task is EVAL-001 synthetic evaluator implementation,
-coordinated with Person 3/4 on the TRAIN-002 checkpoint schema and Person 2 on
-verified test-data availability. See [current status](CURRENT_STATUS.md) and the
-[next-step prompt](NEXT_STEP_PROMPT.md). Dated summaries below are historical.
+Person 5 implemented production checkpoint loading and one-run evaluation in
+`src/evaluate.py`. The CLI validates the core checkpoint/config/data identities
+and emits all 16 condition summaries and prediction files. This is an
+implementation milestone only: no production checkpoint run has been performed,
+and the full 96-result matrix is not available. Next: verify the command after
+the core checkpoint and TEST-002 gate are ready; then implement matrix
+orchestration and produce the final metrics tables. See [current status](CURRENT_STATUS.md)
+and [next step](NEXT_STEP_PROMPT.md). Earlier dated summaries below are historical.
 
 MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
 full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired

@@ -1,5 +1,24 @@
 # CURRENT PROJECT STATUS
 
+## EVAL-001 — 24.11.2026 · core checkpoint evaluator implemented
+
+`src/evaluate.py` now loads a validation-selected `best.pt`, checks its core
+profile, model/config, dataset files, split and normalization identities, then
+evaluates clean plus all 15 frozen corruption conditions. It saves one JSON
+summary and one NPZ of indexed logits per condition under
+`outputs/metrics/<run_id>/` and `outputs/predictions/<run_id>/`.
+
+Example, from the repository root:
+
+```bash
+python -m src.evaluate --checkpoint outputs/runs/<run_id>/best.pt --config configs/clean_cnn.yaml --output-dir outputs --device auto
+```
+
+The same command accepts `configs/robust_cnn.yaml` for a Robust checkpoint.
+The implementation has not yet been run on a core checkpoint; no production
+evaluation artifacts or scientific results exist from this change. Full
+96-condition-pair orchestration and metric aggregation remain pending.
+
 ## TRAIN-003 — 22.11.2026 · local CIFAR-10 debug and pilot checks
 
 The 64-image training check reached 100% accuracy after 30 optimizer updates.

@@ -18,10 +18,12 @@ train-only 10x16 corruption grid, PNG/PDF, source manifest and agent visual audi
 ROBUST-001 adds production CorruptionPolicy through the existing explicit
 train-only hook. MODEL-001 adds CompactCNN v1 and independent synthetic model tests.
 Classification, per-run robustness metrics, and synthetic 96-row seed aggregation
-are implemented. The shared training and validation loop, single-condition
-inference, and prediction export work on synthetic inputs. Checkpoint-backed
-training and evaluation on CIFAR-10, the 96 real test evaluations, and final
-result plots remain future work.
+are implemented. The shared trainer and checkpoint/resume flow are implemented. Person 5's
+single-run evaluator now loads a validation-selected core checkpoint, checks its
+config and dataset identities, and writes clean plus 15 corruption-condition
+summaries and predictions. The production CLI is available as
+`python -m src.evaluate`. Real checkpoint evaluation, the complete 96-result
+matrix, and final result plots remain future work.
 Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
 RGB32×32, all archive/file checksums and class counts pass. Historical ROBUST-001 checks:
 914 offline tests pass (19 opt-in tests skipped); separately 6 actual checks pass
