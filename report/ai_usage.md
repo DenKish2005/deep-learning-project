@@ -1,5 +1,15 @@
 # AI assistance record
 
+## Per-class analysis — 26.11.2026
+
+At the user's request, Codex wrote the saved-count analysis and seven focused
+tests, compared both models across all three seeds, generated per-class recall
+drop and seed-42 confusion figures, and drafted the findings. Codex checked
+the matrices against saved test class counts, rebuilt the existing summaries,
+and verified the six checkpoint hashes. Original prediction files are absent
+from this checkout; no training or inference was performed. Independent
+human review remains pending. [Verification record](reproduction.md)
+
 ## Core training and evaluation — 26.11.2026
 
 At the user's request, Codex implemented and tested the training launcher,

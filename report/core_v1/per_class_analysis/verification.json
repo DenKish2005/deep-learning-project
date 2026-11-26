@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "status": "PASS: saved-count analysis",
+  "inputs_sha256": {
+    "report/core_v1/raw_results.csv": "e7095d2748a3a6ff387bc5c64f29a7e9b6650ebbe01eac8eccd649722efb42a2",
+    "report/data003_evidence.json": "9ddab759288fd01f8d8d0055533339904c1a9e6e1db44a8def36447514b70d5a",
+    "data/splits/split_manifest.json": "8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21",
+    "scripts/analyze_per_class.py": "3c48151470d7dc0a734873acfabd83fdaae95532d2834bcb4b0552d912d321d3",
+    "src/metrics.py": "b0d6d02f1ea13ad5af827f7d012de7657bfa6447eaa1834841ecf5232606f3ce",
+    "report/core_v1/tables/run_summary.csv": "1cb169636275b6dcbd67cbd37e1de6c9e8cb3fb09c8342b3f219cb401b4c5d29",
+    "report/core_v1/tables/condition_summary.csv": "2a85f71b280e75f83d5acba262e88821f56c01f4312d0e021ccdd5fc7d75adb0",
+    "report/core_v1/tables/model_summary.csv": "1a9401050c9c0150f4b3d4e30e7b2198747ed96a582948830c9b9e7022765c8a",
+    "report/core_v1/tables/paired_deltas.csv": "b7122a3f696f6fb7df91ba5d4ce92e539196045b55a99c82895165dea8a8aaf0",
+    "report/core_v1/tables/paired_summary.csv": "0d445e2706bbf133b7e40a0600c316d32d2a3e085d4b19317b7c8d5d9b6fc6b5",
+    "report/core_v1/tables/per_class_summary.csv": "6cf1658a813ec3f18d9c48de470bf12cb9578d60888c52a0b0091c8d6400accf"
+  },
+  "runtime": {
+    "python": "3.14.7",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "matplotlib": "3.11.1"
+  },
+  "classes": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ],
+  "saved_test_class_counts": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+  ],
+  "evaluations": 96,
+  "class_rows": 960,
+  "confusion_cells": 9600,
+  "total_repeated_views": 960000,
+  "aggregate_tables_verified": [
+    "run_summary",
+    "condition_summary",
+    "model_summary",
+    "paired_deltas",
+    "paired_summary",
+    "per_class_summary"
+  ],
+  "max_recall_abs_error": 0.0,
+  "checkpoints": [
+    {
+      "model_name": "clean_cnn",
+      "seed": 42,
+      "path": "outputs/checkpoints/core-v1/core-v1-clean_cnn-s42-20abe0df/best.pt",
+      "sha256": "20c423b970712c34eead60f53bf3443ba38a2ce31cc5145c6376e3eab2fa5a52"
+    },
+    {
+      "model_name": "clean_cnn",
+      "seed": 123,
+      "path": "outputs/checkpoints/core-v1/core-v1-clean_cnn-s123-20abe0df/best.pt",
+      "sha256": "35c45f637dcde78448261ea33d7bf010552e35e6cd99f173a776ef8c806492bd"
+    },
+    {
+      "model_name": "clean_cnn",
+      "seed": 2026,
+      "path": "outputs/checkpoints/core-v1/core-v1-clean_cnn-s2026-20abe0df/best.pt",
+      "sha256": "84fa211971595044ffffb49951d036b8a7d0bdc482d4328adc929a82f1df659f"
+    },
+    {
+      "model_name": "robust_cnn",
+      "seed": 42,
+      "path": "outputs/checkpoints/core-v1/core-v1-robust_cnn-s42-52bf0744/best.pt",
+      "sha256": "febadadac50d1420fa40a7e8521466f413b0f467f81ddb8d58ca10e973605be4"
+    },
+    {
+      "model_name": "robust_cnn",
+      "seed": 123,
+      "path": "outputs/checkpoints/core-v1/core-v1-robust_cnn-s123-52bf0744/best.pt",
+      "sha256": "4f36caa37a6a59e096c901aaac5276d98feee9884f1f590d1c4ec7840a68015e"
+    },
+    {
+      "model_name": "robust_cnn",
+      "seed": 2026,
+      "path": "outputs/checkpoints/core-v1/core-v1-robust_cnn-s2026-52bf0744/best.pt",
+      "sha256": "70f5549ffbc48a545932494851101ac2e8c50b4f2ed3cbbcc447ce81063acf68"
+    }
+  ],
+  "prediction_files_present": 0,
+  "prediction_files_expected": 96,
+  "verification_scope": "saved confusion counts, class supports, summaries and checkpoint bytes; no logits replay",
+  "outputs_sha256": {
+    "figures/confusion_seed42.pdf": "7458aa4a7c6b60cf797666fa6415f292773312b6c24fc1e937e3ebceb8f4c107",
+    "figures/confusion_seed42.png": "60bcfce9b8f21925517c7a9e420f1c7926c0ead7584658ad8709967158d5c70c",
+    "figures/per_class_drop.pdf": "6185b3912f871be62f404db2663c7e32ca4e28f9f9e61eca15d040d0ef30911b",
+    "figures/per_class_drop.png": "750636aa771926e6c3b0bc098b6045d79f61b2e7b14d63596c8a2c88f005695c",
+    "findings.md": "835ef7a984ab6ea4bcd61b287ad808eac5a916c0ebec5fae2658492877b0f72f",
+    "tables/class_condition_summary.csv": "47f161f08331ca45ffaaa070ebb08b651f7adce59b9890492f556e210110ab25",
+    "tables/common_misclassifications.csv": "e813ce360201cc085b13373b3eea0e2b6dc64625614cdb0510a7652640bde5a1",
+    "tables/confusion_counts.csv": "453b5c193d7303113bcba8ae76a5464afc550d9a69f4ebd824b316164b72a333",
+    "tables/corrupted_confusion_run_summary.csv": "a21b3c1e1edd20e878012d079f69888c53f1b36071d47076653e58960815b95e",
+    "tables/corrupted_confusion_summary.csv": "e81133f4334bdad636da921230888ac61457178d9018fd9cc3edaaf95fa1a590",
+    "tables/count_verification.csv": "74ab79e600789448521871d201b37c9d554f8b8d05dbd4e40db385000a42a3b3",
+    "tables/family_class_run_summary.csv": "54a4235a41b4d1017249af3a2d797456e0e0cec11e8c992bd903d7e4a7e444e0",
+    "tables/family_class_summary.csv": "b17f017afdab8228480b1610585db4f0c29802909d5cbb0ce5f4f85f7bc8d184",
+    "tables/per_class.csv": "6304607c060566cf96de145af3a0ee8309269485dac6e04813605b5714d14cbb",
+    "tables/per_class_paired_deltas.csv": "0d754007703ef1fc729b95477ba3fd8dd6312b93c655d1fb2486b560a5e0fb2c",
+    "tables/per_class_paired_summary.csv": "634e7174559f5cfce81ef4a7b833e8e4222f6ff941ad0e3275c681db4e3689d1",
+    "tables/per_class_run_summary.csv": "70ec8938525855e57774d8ef75b96038af53ff8a794659bb99983da47c4d8a9a",
+    "tables/per_class_summary.csv": "9ccf89218d641afeee6e33c414d85cba5190b0e6e372df83a5810de5d22f4c76"
+  }
+}

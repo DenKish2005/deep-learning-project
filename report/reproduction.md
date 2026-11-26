@@ -1,5 +1,39 @@
 # Verification record
 
+## Per-class saved-count analysis — 26.11.2026
+
+From the repository root:
+
+```bash
+python -m scripts.analyze_per_class
+python -m unittest tests.test_per_class_analysis -v
+```
+
+Both commands passed locally using
+`C:/Users/Alisher/AppData/Local/Python/pythoncore-3.14-64/python.exe`:
+Python 3.14.7, NumPy 2.5.2, pandas 3.0.5, Matplotlib 3.11.1. This is a
+count-analysis runtime, not the original locked training environment.
+No packages or training artifacts were changed.
+
+- All 96 confusion matrices match the ten saved test class supports in
+  `report/data003_evidence.json`: 1,000 per class, 10,000 per condition.
+  Diagonals reproduce 960 saved recalls and all saved accuracy/macro-F1 values.
+- Six existing summary tables reproduce within absolute tolerance 1e-12;
+  all six archived `best.pt` SHA-256 values match the result records.
+- Seven tests passed, covering matrix orientation, missing conditions,
+  changed recall, mismatched saved support, seed-first aggregation/sample SD,
+  directed error counts and deterministic ranking.
+- The PNG figures were visually inspected for labels, orientation, shared
+  color scale and readable annotations. The matching PDF exports are included.
+- No prediction NPZ files are present here. This check verifies saved counts
+  and checkpoint bytes; it does not rerun inference or reconstruct per-image
+  errors. Independent review and fresh-machine replay remain pending.
+
+The script requires only NumPy, pandas and Matplotlib from the project's
+dependencies. `--output-dir` can select a fresh export directory; reruns replace
+named generated exports. [Findings and captions](core_v1/per_class_analysis/findings.md),
+[source/output hashes](core_v1/per_class_analysis/verification.json).
+
 ## Core CIFAR-10 experiment — 26.11.2026
 
 - Six CUDA runs on an RTX 4060 Ti completed 40 epochs and 14,080 updates

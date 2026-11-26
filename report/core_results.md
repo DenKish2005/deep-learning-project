@@ -50,12 +50,20 @@ training intensities within the same corruption families.
 
 ## Evidence and review
 
+- [Per-class findings, source tables, and figures](core_v1/per_class_analysis/findings.md)
+  compare every class across seeds 42, 123, and 2026. Robust CNN improves mean
+  corrupted recall in all 30 class–seed pairs, with the largest mean gain for
+  automobile (+34.15 pp) and the smallest for bird (+2.73 pp). The report also
+  records severity-specific regressions and recurring misclassifications.
+  Figure 07 shows recall drops with sample SD; Figure 08 compares seed-42
+  clean/noise-5/blur-5/darkening-5 matrices for both models.
 - [Six checkpoints and training records](../outputs/checkpoints/core-v1/README.md)
   include the original histories and SHA-256 manifests.
 - [Full 96-row matrix](core_v1/raw_results.csv) includes per-class recall,
   confusion counts, checkpoint hashes, and prediction hashes. Prediction paths
   are relative to the repository root and refer to the original local exports.
-  The original NPZ files are retained under `outputs/predictions/`.
+  The original NPZ files are not included in this checkout; the per-class
+  analysis reconstructs metrics from the saved confusion counts.
 - [Condition summary](core_v1/tables/condition_summary.csv),
   [model summary](core_v1/tables/model_summary.csv),
   [paired deltas](core_v1/tables/paired_deltas.csv), and
@@ -64,8 +72,8 @@ training intensities within the same corruption families.
   `python -m src.metrics --input report/core_v1/raw_results.csv --output-dir outputs/metrics/aggregate/rebuilt`.
 - [Validation curves](core_v1/figures/core-training-validation.png) and
   [test accuracy by severity](core_v1/figures/core-test-results.png) are
-  preliminary summaries. The planned per-class and confusion-matrix figures
-  and report review are separate deliverables.
+  preliminary summaries. The per-class and confusion-matrix figures are now
+  available in the linked analysis; independent report review remains open.
 
 All six runs used Linux, Python 3.14.4, PyTorch 2.9.0+cu126, and an RTX 4060 Ti.
 Training took about 38 minutes. All 96 prediction files were checked against

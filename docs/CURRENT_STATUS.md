@@ -11,8 +11,19 @@ configs, environments, and original manifests are in the
 Across the three paired seeds, Robust CNN improved mean corrupted accuracy by
 21.91 percentage points and reduced clean accuracy by 0.57 percentage points.
 See the [results, tables, and figures](../report/core_results.md). The formal
-pre-test sign-off has no recorded approval. Independent replay, final failure
-analysis, and report review remain open.
+pre-test sign-off has no recorded approval. Independent replay, indexed failure
+examples, and report review remain open.
+
+## Per-class analysis — 26.11.2026 · local count verification complete
+
+The [analysis](../report/core_v1/per_class_analysis/findings.md) compares recall,
+recall drops, paired changes and common misclassifications for both models and
+all three seeds. Figures 07 and 08 are exported as PNG/PDF, including the
+preselected seed-42 confusion panel. All 96 matrices match the saved test class
+counts; 960 recalls, six aggregate summaries and six checkpoint hashes pass
+verification. Seven focused tests pass. The original logits are absent from
+this checkout, so individual failure IDs and a new logits replay are not part
+of this check. Independent human review and formal acceptance remain open.
 
 ## EVAL-004 — 26.11.2026 · local core evaluation complete
 

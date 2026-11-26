@@ -350,8 +350,13 @@ Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
 CSR and proposal candidates; submitted version, current rubric/LMS confirmation,
 AI-policy conflict and team approvals remain pending.
 
-The next report task is to analyze per-class failures and connect the measured
-results to the four research questions. The final figures, independent replay,
-and team review are pending. See the [analysis handoff](docs/NEXT_STEP_PROMPT.md)
-and [final deliverables](docs/FINAL_DELIVERABLES.md).
+The [per-class analysis](report/core_v1/per_class_analysis/findings.md) now
+compares both models across all three seeds and connects the findings to the
+four research questions. It includes recall-drop and seed-42 confusion figures,
+source tables, and verification against saved class counts. Rebuild it with
+`python -m scripts.analyze_per_class`; run its checks with
+`python -m unittest tests.test_per_class_analysis -v`.
+Indexed failure examples, independent replay, and team review remain pending.
+See the [analysis handoff](docs/NEXT_STEP_PROMPT.md) and
+[final deliverables](docs/FINAL_DELIVERABLES.md).
 All commits and ordinary pushes use `main`, per the user's current instruction.
