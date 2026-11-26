@@ -28,7 +28,7 @@ root with that model's config and a fresh output directory.
 python -m src.evaluate \
   --checkpoint outputs/checkpoints/core-v1/core-v1-clean_cnn-s42-20abe0df/best.pt \
   --config outputs/checkpoints/core-v1/core-v1-clean_cnn-s42-20abe0df/config_resolved.yaml \
-  --output-dir outputs/replay/clean-s42 --device auto
+  --output-dir tmp/core-v1-replay/clean-s42 --device auto
 ```
 
 This runs all 16 test conditions for the selected checkpoint. Repeat with the

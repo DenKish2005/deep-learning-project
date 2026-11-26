@@ -1,0 +1,2 @@
+n,clean_accuracy_change_pp_mean,mca_improvement_pp_mean,robustness_gap_change_pp_mean,clean_accuracy_change_pp_sample_sd,mca_improvement_pp_sample_sd,robustness_gap_change_pp_sample_sd
+3,-0.5733333333333294,21.91422222222222,-22.48755555555555,0.4523641600893356,0.9783070032421338,0.6915699798552939

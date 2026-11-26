@@ -437,7 +437,7 @@ To evaluate one validation-selected checkpoint on all 16 conditions, use its
 resolved config. Use a new output directory to compare another backend.
 
 ```bash
-python -m src.evaluate --checkpoint outputs/runs/RUN_ID/best.pt --config outputs/runs/RUN_ID/config_resolved.yaml --output-dir outputs/replay --device auto
+python -m src.evaluate --checkpoint outputs/runs/RUN_ID/best.pt --config outputs/runs/RUN_ID/config_resolved.yaml --output-dir tmp/core-v1-replay --device auto
 ```
 
 Replace `RUN_ID` with the actual directory name. `--resume` verifies and

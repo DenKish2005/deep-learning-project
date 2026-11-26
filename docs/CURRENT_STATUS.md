@@ -1,5 +1,19 @@
 # CURRENT PROJECT STATUS
 
+## Core experiment — 26.11.2026
+
+All six core runs finished 40 epochs with 14,080 optimizer updates each.
+The training launcher verified the validation-selected checkpoints and wrote
+one completion manifest per run. The six `best.pt` files, their histories,
+configs, environments, and original manifests are in the
+[checkpoint archive](../outputs/checkpoints/core-v1/README.md).
+
+Across the three paired seeds, Robust CNN improved mean corrupted accuracy by
+21.91 percentage points and reduced clean accuracy by 0.57 percentage points.
+See the [results, tables, and figures](../report/core_results.md). The formal
+pre-test sign-off has no recorded approval. Independent replay, final failure
+analysis, and report review remain open.
+
 ## EVAL-004 — 26.11.2026 · local core evaluation complete
 
 The launcher verified the six training manifests and completed all 96 test

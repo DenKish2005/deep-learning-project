@@ -1,6 +1,13 @@
 # MASTER PROJECT PLAN — CSCI 494 Robustness to Noise
 
-## Current update — 21.11.2026
+## Current update — 26.11.2026
+
+The six core runs and 96 test evaluations are complete. The remaining critical
+path covers failure analysis, final figures and tables, independent
+reproduction, the report and presentation, and release review. See
+[current status](CURRENT_STATUS.md) and the [results](../report/core_results.md).
+
+## Historical update — 21.11.2026
 
 Person 5's METRIC-001/002 technical APIs are implemented in `src/metrics.py`,
 including complete-matrix validation and paired seed aggregation. Synthetic metric
@@ -8,7 +15,7 @@ tests pass; no checkpoints, raw CIFAR-10 files, training runs, or real evaluatio
 are present in the Git repository. Next Person 5 step: EVAL-001 evaluator code and
 synthetic integration coverage, coordinated with the checkpoint schema from Person
 3/4 and verified test data from Person 2. See [current status](CURRENT_STATUS.md)
-and the refreshed [next-step prompt](NEXT_STEP_PROMPT.md).
+for the current handoff.
 
 The dated MODEL-001 and earlier updates below are historical snapshots.
 

@@ -1,5 +1,14 @@
 # AI assistance record
 
+## Core training and evaluation — 26.11.2026
+
+At the user's request, Codex implemented and tested the training launcher,
+fixed the evaluator's normalization input, added matrix orchestration, and
+ran the six CUDA training jobs and 96 evaluations. Codex verified the
+checkpoints and metrics, produced preliminary charts, prepared the model
+archive, and drafted the results and project documentation. Independent
+team review is pending. [Verification record](reproduction.md)
+
 ## TRAIN-003 — 22.11.2026
 
 At the user's request, Codex implemented and tested the diagnostic and pilot

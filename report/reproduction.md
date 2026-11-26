@@ -1,5 +1,27 @@
 # Verification record
 
+## Core CIFAR-10 experiment — 26.11.2026
+
+- Six CUDA runs on an RTX 4060 Ti completed 40 epochs and 14,080 updates
+  each in about 38 minutes. The run histories reproduce every selected epoch
+  using clean validation accuracy, then loss, then earliest epoch.
+- The trained models archive preserves the exact six selected checkpoints and
+  their original run metadata. All checkpoint and metadata hashes matched the
+  recorded values, and all six state dicts loaded strictly on CPU. The tree at
+  `4ac4ff7` matches the checkout fingerprint in the original manifests.
+- All 96 rows cover 10,000 test indices each. The prediction SHA-256 values
+  and classification metrics were checked against the saved predictions.
+  All seven aggregate tables matched a rebuild from the archived results CSV.
+- Same-machine CUDA replay using the archived Clean seed-42 checkpoint and
+  resolved config reproduced all 16 condition hashes and all 16 logit arrays
+  exactly. A second-machine replay and formal team sign-off remain pending.
+- Verification on the local environment: 21 targeted training tests,
+  77 targeted launcher/evaluation/metrics tests, both launcher dry-runs,
+  and 1,048 passing tests with 20 opt-in skips in the default suite.
+
+[Results and artifacts](core_results.md) ·
+[Reproduction commands](../docs/REPRODUCIBILITY.md#core-training-and-evaluation)
+
 ## TRAIN-003 local CIFAR-10 verification — 22.11.2026
 
 The real-data checks ran locally on an NVIDIA GeForce RTX 4060 Ti with Python

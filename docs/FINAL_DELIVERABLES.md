@@ -1,6 +1,6 @@
 # Итоговые deliverables и acceptance
 
-Это описание будущей готовности, не существующих результатов. Сейчас code, checkpoints, metrics, report и slides отсутствуют. См. [roadmap](IMPLEMENTATION_ROADMAP.md) и [protocol](EXPERIMENT_PROTOCOL.md).
+Core runs и test evaluations завершены 26.11.2026. См. [результаты и таблицы](../report/core_results.md), [модели](../outputs/checkpoints/core-v1/README.md) и [статус проверок](CURRENT_STATUS.md). Ниже требования к окончательному отчёту, графикам, воспроизводимости и сдаче.
 
 ## Source, models и research outputs
 
@@ -114,7 +114,7 @@ Backup: slides PDF, local figures, full tables, config/hyperparameters, all seed
 
 ## Final Acceptance Checklist
 
-Каждый item получает PASS/FAIL или OPTIONAL SKIPPED, evidence path и reviewer. **Сейчас implementation items NOT RUN.**
+Каждый item получает PASS/FAIL или OPTIONAL SKIPPED, evidence path и reviewer. Результаты локальной проверки записаны в [CURRENT_STATUS](CURRENT_STATUS.md). Этот список остаётся открытым для формальной приёмки.
 
 - [ ] **AC01 Sources:** original rubric, dates и AI policy verified; unresolved exceptions отмечены, compliance не объявлена confirmed без evidence.
 - [ ] **AC02 Data:** checksum,50k/10k, persisted disjoint/exhaustive stratified45k/5k split, train-only stats provenance.

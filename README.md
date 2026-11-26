@@ -17,13 +17,12 @@ Gaussian blur, progressive darkening and `apply_corruption`. CORR-003 adds the
 train-only 10x16 corruption grid, PNG/PDF, source manifest and agent visual audit.
 ROBUST-001 adds production CorruptionPolicy through the existing explicit
 train-only hook. MODEL-001 adds CompactCNN v1 and independent synthetic model tests.
-Classification, per-run robustness metrics, and synthetic 96-row seed aggregation
-are implemented. The shared trainer and checkpoint/resume flow are implemented. Person 5's
-single-run evaluator now loads a validation-selected core checkpoint, checks its
-config and dataset identities, and writes clean plus 15 corruption-condition
-summaries and predictions. The production CLI is available as
-`python -m src.evaluate`. Real checkpoint evaluation, the complete 96-result
-matrix, and final result plots remain future work.
+The core experiment completed on 26 November 2026 with six 40-epoch runs and
+all 96 held-out test evaluations. Robust CNN improved mean corrupted accuracy
+from **55.64% to 77.55%**. Clean test accuracy went from **87.17% to 86.60%**.
+See the [results and figures](report/core_results.md), the
+[six trained models](outputs/checkpoints/core-v1/README.md), and the
+[training and evaluation commands](docs/REPRODUCIBILITY.md#core-training-and-evaluation).
 Official CIFAR-10 is downloaded and verified locally: 50000 train / 10000 test,
 RGB32×32, all archive/file checksums and class counts pass. Historical ROBUST-001 checks:
 914 offline tests pass (19 opt-in tests skipped); separately 6 actual checks pass
@@ -52,15 +51,10 @@ with torch.inference_mode():
 ```
 
 [Evidence](report/model001_evidence.json), [replay commands](docs/REPRODUCIBILITY.md).
-No training or CIFAR model inference. Backend flags unchanged; same-device repeat
-eval only, no cross-device equality/training determinism/quality claim. Previous
-19actual opt-ins not rerun. Human review/formal prerequisites and course approvals
-pending; full scientific paired budget and general REPRO-001 remain open.
-METRIC-001/002 technical implementations are in `main`. Full acceptance still
-needs formal protocol/environment review and real EVAL-004 results. EVAL-001 has
-a [synthetic evaluator milestone](docs/CURRENT_STATUS.md). The next step is to
-coordinate production evaluation with Person 2 on verified test data and
-Person 3/4 on the checkpoint contract.
+The MODEL-001 checks above were synthetic and scoped to the local backend.
+The later paired training and test results are recorded in
+[CURRENT_STATUS](docs/CURRENT_STATUS.md). Human review and formal approvals
+remain pending.
 
 ## Working train-only policy (ROBUST-001)
 
@@ -356,10 +350,8 @@ Start with [MASTER_PROJECT_PLAN](docs/MASTER_PROJECT_PLAN.md),
 CSR and proposal candidates; submitted version, current rubric/LMS confirmation,
 AI-policy conflict and team approvals remain pending.
 
-Next bounded technical candidate: MODEL-001 after current prerequisite review;
-[next-step prompt](docs/NEXT_STEP_PROMPT.md). Independent DATA-003 technical scope
-and ROBUST-001 integration PASS; full DoD PARTIAL pending formal gates and independent human
-review. Full DATA-001/002 DoD also remains PARTIAL; agent checks do not replace review.
+The next report task is to analyze per-class failures and connect the measured
+results to the four research questions. The final figures, independent replay,
+and team review are pending. See the [analysis handoff](docs/NEXT_STEP_PROMPT.md)
+and [final deliverables](docs/FINAL_DELIVERABLES.md).
 All commits and ordinary pushes use `main`, per the user's current instruction.
-Commands in the future-pipeline section of [REPRODUCIBILITY](docs/REPRODUCIBILITY.md)
-describe planned interfaces beyond the working data/split/stats/grid commands above.

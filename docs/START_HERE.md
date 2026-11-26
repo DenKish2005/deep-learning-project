@@ -1,15 +1,16 @@
 # С чего начать
 
-## Текущее состояние — 21.11.2026
+## Текущее состояние — 26.11.2026
 
-Person 5: технические части METRIC-001/002 добавлены в `main`; 62 синтетических
-теста метрик проходят. Реального оценщика, обученных чекпойнтов и CIFAR-10 в Git
-пока нет, поэтому настоящие 96 оценок не запускались. Следующая задача Person 5 —
-EVAL-001 и тесты на синтетических данных; для реального запуска нужны чекпойнты
-от Person 3/4 и тестовые данные от Person 2. Смотрите [текущий статус](CURRENT_STATUS.md)
-и [план оценщика](NEXT_STEP_PROMPT.md).
+- Core experiment: завершены шесть запусков по 40 эпох и все 96 test evaluations.
+  [Статус и проверки](CURRENT_STATUS.md)
+- Результаты: mCA 55.64% → 77.55%, clean test accuracy 87.17% → 86.60%.
+  [Таблицы и графики](../report/core_results.md)
+- [Шесть checkpoint-файлов](../outputs/checkpoints/core-v1/README.md) и
+  [команды воспроизведения](REPRODUCIBILITY.md#core-training-and-evaluation).
+- Следующий шаг: [анализ ошибок и подготовка результатов для отчёта](NEXT_STEP_PROMPT.md).
 
-Ниже сохранён исторический порядок задач от 18.11.2026.
+Ниже сохранены исторические milestones и очередь implementation phase.
 
 MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
 full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired
@@ -21,7 +22,7 @@ Human understanding/review, PROTO-001/SETUP-002/003 formal approvals, course/sou
 team gates and independent reproduction pending. Paired-init constructor QA does
 not establish optimizer budget/full TEST-S01 or training readiness.
 [Evidence](../report/model001_evidence.json), [current status](CURRENT_STATUS.md).
-Historical next candidate: METRIC-001; the current next task is EVAL-001 as noted above.
+Historical next candidate after MODEL-001 was METRIC-001.
 Earlier updates below are historical snapshots.
 
 Обновление18.11.2026 ROBUST-001: production policy/train-only integration —
@@ -30,7 +31,7 @@ independent technical PASS/full DoD PARTIAL. Default914PASS/19opt-in SKIP;
 sequential; initial memory-related failures and successful reruns disclosed.
 [Evidence](../report/robust001_evidence.json), [commands](REPRODUCIBILITY.md).
 Frozen CORR-003 replay at21ede65 PASS; current-source mismatch expected.
-Следующий bounded candidate — [MODEL-001 после prerequisite review](NEXT_STEP_PROMPT.md).
+Следующим шагом после ROBUST-001 был MODEL-001.
 Human/Person5 visual review, formal dependent acceptance, general REPRO-001,
 PROTO-001/team/course/source-policy approvals и independent reproduction pending.
 Training не запускался; scientific results и training readiness не заявляются.

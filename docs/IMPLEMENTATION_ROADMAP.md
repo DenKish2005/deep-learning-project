@@ -1,15 +1,14 @@
 # Подробный implementation roadmap
 
-## Current update — 24.11.2026
+## Current update — 26.11.2026
 
-Person 5 implemented production checkpoint loading and one-run evaluation in
-`src/evaluate.py`. The CLI validates the core checkpoint/config/data identities
-and emits all 16 condition summaries and prediction files. This is an
-implementation milestone only: no production checkpoint run has been performed,
-and the full 96-result matrix is not available. Next: verify the command after
-the core checkpoint and TEST-002 gate are ready; then implement matrix
-orchestration and produce the final metrics tables. See [current status](CURRENT_STATUS.md)
-and [next step](NEXT_STEP_PROMPT.md). Earlier dated summaries below are historical.
+The core training launcher completed all six 40-epoch runs. The evaluation
+launcher verified the checkpoints and completed all 96 test evaluations.
+See the [checkpoints](../outputs/checkpoints/core-v1/README.md),
+[results](../report/core_results.md), and [status and verification](CURRENT_STATUS.md).
+Per-class failure analysis, final figures, the independent replay, and human
+review remain open. The signed pre-test audit is still undocumented.
+Earlier dated summaries describe their original milestones.
 
 MODEL-001 — 18.11.2026: CompactCNN v1 independent synthetic technical QA **PASS**;
 full DoD **PARTIAL**. Exact288746 parameters, raw logits, protocol init, paired
@@ -448,7 +447,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** TRAIN-001.
 - **2. Title:** Shared training/validation engine.
 - **3. Purpose:** Одинаковый budget и selection.
-- **4. Current status:** PARTIAL — shared training and validation loop implemented and exercised on synthetic data. Core training and independent review are pending.
+- **4. Current status:** Implemented and exercised in six full training runs. Independent review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** SETUP-003; DATA-003; MODEL-001.
@@ -471,7 +470,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** TRAIN-002.
 - **2. Title:** Checkpoint и epoch resume.
 - **3. Purpose:** Защита от потери training.
-- **4. Current status:** PARTIAL — epoch checkpoints and exact synthetic CPU resume implemented. Core run artifacts and independent review are pending.
+- **4. Current status:** Implemented. All six core runs produced validation-selected and recovery checkpoints. Independent review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** TRAIN-001; REPRO-001.
@@ -494,7 +493,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** TRAIN-003.
 - **2. Title:** 64-image overfit и pilot profiling.
 - **3. Purpose:** Не тратить budget на broken pipeline.
-- **4. Current status:** PARTIAL — the local real-data debug and paired pilots passed. Independent review and the core-run gates remain pending.
+- **4. Current status:** Local real-data debug and paired pilots passed. The six core runs have since completed. Independent review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** TRAIN-002; CORR-003.
@@ -517,7 +516,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** TRAIN-004.
 - **2. Title:** Six-run orchestration.
 - **3. Purpose:** Управлять 6 runs без ручных ошибок.
-- **4. Current status:** Implemented locally. The launcher plans six core runs, trains sequentially, resumes from `last.pt`, and skips runs with verified completion manifests.
+- **4. Current status:** Implemented. All six runs completed with verified manifests. Independent review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 6 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** TRAIN-002; SETUP-003.
@@ -540,7 +539,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** REPRO-001.
 - **2. Title:** Identity/metadata/backup infrastructure.
 - **3. Purpose:** Связать outputs с inputs/code.
-- **4. Current status:** PARTIAL — config, environment, and checkout identities and verified synthetic run records and local backups are implemented. Production integration and team backup review are pending.
+- **4. Current status:** Core run metadata and archive checksums verified. Team backup retrieval and independent review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 6 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** SETUP-002; SETUP-003.
@@ -586,7 +585,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** CLEAN-001.
 - **2. Title:** Clean CNN seed 42 full training.
 - **3. Purpose:** Первый frozen baseline run.
-- **4. Current status:** TODO.
+- **4. Current status:** Core run complete. Seed 42 selected epoch 35 at 88.06% clean validation accuracy.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** TRAIN-003; TEST-001; PROTO-001.
@@ -609,7 +608,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** CLEAN-002.
 - **2. Title:** Clean CNN seed 123 full training.
 - **3. Purpose:** Второй independent training seed.
-- **4. Current status:** TODO.
+- **4. Current status:** Core run complete. Seed 123 selected epoch 38 at 87.64% clean validation accuracy.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** CLEAN-001.
@@ -632,7 +631,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** CLEAN-003.
 - **2. Title:** Clean CNN seed 2026 full training.
 - **3. Purpose:** Третий baseline repeat.
-- **4. Current status:** TODO.
+- **4. Current status:** Core run complete. Seed 2026 selected epoch 34 at 87.74% clean validation accuracy.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 3 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** CLEAN-001.
@@ -678,7 +677,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** ROBUST-002.
 - **2. Title:** Robust seed 42 pilot и full run.
 - **3. Purpose:** Первый robust counterpart.
-- **4. Current status:** TODO.
+- **4. Current status:** Core run complete. Seed 42 selected epoch 40 at 86.22% clean validation accuracy.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 4 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** CLEAN-001; ROBUST-001; TEST-001.
@@ -701,7 +700,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** ROBUST-003.
 - **2. Title:** Robust seeds 123 и 2026.
 - **3. Purpose:** Завершить six instances.
-- **4. Current status:** TODO.
+- **4. Current status:** Both core runs complete. Seed 123 selected epoch 40 at 86.38%, and seed 2026 selected epoch 39 at 86.74% clean validation accuracy.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 4 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** ROBUST-002; CLEAN-002; CLEAN-003.
@@ -724,7 +723,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** EVAL-001.
 - **2. Title:** Single-condition evaluator.
 - **3. Purpose:** Детерминированная inference/metrics.
-- **4. Current status:** PARTIAL — synthetic inference and JSON/NPZ export implemented. Production checkpoint loading and official evaluation are pending.
+- **4. Current status:** Production checkpoint evaluator ran on all six checkpoints. Its full-normalization and restart paths have regression coverage.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 5 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** DATA-003; MODEL-001; CORR-002; METRIC-001; TRAIN-002.
@@ -747,7 +746,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** EVAL-002.
 - **2. Title:** Baseline seed 42 corruption evaluation.
 - **3. Purpose:** Проверить first complete16.
-- **4. Current status:** TODO.
+- **4. Current status:** All 16 Clean seed-42 conditions evaluated. Same-machine CUDA replay from the archived model reproduced all logits exactly.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 5 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** CLEAN-001; EVAL-001; TEST-002.
@@ -770,7 +769,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** EVAL-003.
 - **2. Title:** Матрица и остальные baseline evaluations.
 - **3. Purpose:** Довести clean side до 48.
-- **4. Current status:** TODO.
+- **4. Current status:** All 48 Clean evaluations complete and included in the verified matrix.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 5 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** EVAL-002; CLEAN-002; CLEAN-003.
@@ -793,7 +792,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** EVAL-004.
 - **2. Title:** Robust evaluations и core 96 audit.
 - **3. Purpose:** Полный paired experiment.
-- **4. Current status:** TODO.
+- **4. Current status:** All 48 Robust evaluations complete. The full 96-row matrix and prediction hashes passed local verification. Team review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 5 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** EVAL-003; ROBUST-003.
@@ -816,7 +815,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** TEST-002.
 - **2. Title:** Scientific validity audit до test release.
 - **3. Purpose:** Остановить leakage и drift.
-- **4. Current status:** TODO.
+- **4. Current status:** Local artifact checks passed. No signed pre-test approval is recorded for the completed run.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 1 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** PROTO-001; TRAIN-003; ROBUST-001; REPRO-001.
@@ -862,7 +861,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** METRIC-002.
 - **2. Title:** Seed aggregation и result tables.
 - **3. Purpose:** Ответить RQ с uncertainty.
-- **4. Current status:** PARTIAL — validator, paired aggregation, CLI, and synthetic fixtures implemented; EVAL-004 real inputs and formal review pending.
+- **4. Current status:** Seven tables generated from the verified 96-row matrix and checked against a separate rebuild. Formal review pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 5 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** EVAL-004; METRIC-001.
@@ -908,7 +907,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** PLOT-001.
 - **2. Title:** Plot infrastructure и learning curves.
 - **3. Purpose:** Общий reproducible exporter.
-- **4. Current status:** TODO.
+- **4. Current status:** Preliminary validation accuracy and loss chart saved. Final train/validation exporters and figure provenance pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 6 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** REPRO-001; METRIC-001.
@@ -931,7 +930,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** PLOT-002.
 - **2. Title:** Robustness и trade-off figures.
 - **3. Purpose:** Показать RQ1/3/4.
-- **4. Current status:** TODO.
+- **4. Current status:** Preliminary severity and overall accuracy chart saved. Final figure exports and provenance pending.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 6 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** PLOT-001; METRIC-002.
