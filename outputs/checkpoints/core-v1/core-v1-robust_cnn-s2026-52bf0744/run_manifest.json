@@ -1,0 +1,30 @@
+{
+  "artifacts": {
+    "best.pt": "70f5549ffbc48a545932494851101ac2e8c50b4f2ed3cbbcc447ce81063acf68",
+    "config_resolved.yaml": "f87faa8c66626cff7c912a3555befeb1d7c36492a97299b357ccfadee73c8948",
+    "environment.json": "948c5b0282413ee117e45c2affe43908abc28ae40008e5988d3dbff163beeb85",
+    "history.csv": "fb2ba678877d11bda47fbf4ea3864189720ab75018de38dc52738e1462212972",
+    "last.pt": "4f7861bad9a192f7912d007989cc26cb691e2196677d6cda69a5546d03d8361b"
+  },
+  "best_epoch": 39,
+  "code_snapshot_sha256": "1a8093d1dbca2bff5089bd949355769ec9b0778f8baba58528c0fc030747da5f",
+  "config_hash": "52bf0744a6d5dc2adf3369a237a07b88613bd48eecc4baeaa756120d877a0273",
+  "dataset": "cifar10",
+  "dataset_sha256": "579602704524087ce8f3746acfd265c924a0c3ab99f01621cc1690dd5e58040a",
+  "environment_id": "61654aa52855504ec2bf8ce49071934ff24ed35d47792b535a042bc71a926598",
+  "finished_at": "2026-11-26T11:31:18.655325+00:00",
+  "git_dirty": true,
+  "git_sha": "5de701cf34fe6786a68db82b4fe36b905d0f7186",
+  "init_sha256": "040f7e9230a4a512bcf7da7538ca8ff70b7839100f6a15a6d061f1b31d81009f",
+  "model_name": "robust_cnn",
+  "normalization_hash": "332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688",
+  "profile": "core",
+  "protocol_version": 1,
+  "run_id": "core-v1-robust_cnn-s2026-52bf0744",
+  "schema_version": 1,
+  "seed": 2026,
+  "split_hash": "1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284",
+  "started_at": "2026-11-26T11:22:25.979798+00:00",
+  "status": "complete",
+  "total_steps": 14080
+}

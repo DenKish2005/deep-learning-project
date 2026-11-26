@@ -11,3 +11,9 @@ outputs/figures/corruption_examples.source.json text eol=lf
 report/corr003_evidence.json text eol=lf
 report/robust001_evidence.json text eol=lf
 report/model001_evidence.json text eol=lf
+
+# Preserve the original bytes referenced by the core training manifests.
+outputs/checkpoints/core-v1/*/*.pt binary
+outputs/checkpoints/core-v1/*/*.csv -text whitespace=cr-at-eol
+outputs/checkpoints/core-v1/*/*.json -text
+outputs/checkpoints/core-v1/*/*.yaml -text

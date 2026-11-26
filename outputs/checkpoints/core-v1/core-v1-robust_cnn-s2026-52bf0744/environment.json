@@ -1,0 +1,43 @@
+{
+  "cublas_workspace_config": ":4096:8",
+  "cuda_matmul_fp32_precision": "ieee",
+  "cudnn": 91002,
+  "cudnn_benchmark": false,
+  "cudnn_conv_fp32_precision": "ieee",
+  "cudnn_deterministic": true,
+  "deterministic_algorithms": true,
+  "deterministic_warn_only": false,
+  "device": "cuda:0",
+  "environment_id": "61654aa52855504ec2bf8ce49071934ff24ed35d47792b535a042bc71a926598",
+  "gpu": {
+    "capability": [
+      8,
+      9
+    ],
+    "name": "NVIDIA GeForce RTX 4060 Ti",
+    "vram_bytes": 8183676928
+  },
+  "machine": "x86_64",
+  "num_workers": 0,
+  "nvidia_driver": [
+    "595.99.02"
+  ],
+  "os_release": "7.0.0-44-generic",
+  "packages": {
+    "Pillow": "13.0.0",
+    "PyYAML": "6.0.3",
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "pytest": "9.2.0",
+    "scikit-learn": "1.9.1",
+    "torch": "2.9.0+cu126",
+    "torchvision": "0.24.0+cu126",
+    "tqdm": "4.70.1"
+  },
+  "platform": "Linux",
+  "python": "3.14.4",
+  "schema_version": 1,
+  "torch_cuda_build": "12.6",
+  "torch_num_threads": 6
+}

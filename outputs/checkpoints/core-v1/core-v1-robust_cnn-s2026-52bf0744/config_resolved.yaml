@@ -1,0 +1,95 @@
+architecture: compact_cnn_v1
+augmentation:
+  enabled: true
+  probabilities:
+  - 0.5
+  - 0.17
+  - 0.17
+  - 0.16
+  train_severities:
+  - 1
+  - 2
+  - 3
+corruptions:
+  blur_kernel_rule: 2*ceil(3*sigma)+1
+  blur_padding: reflect
+  blur_sigma:
+  - 0.3
+  - 0.7
+  - 1.1
+  - 1.5
+  - 2.0
+  brightness_factor:
+  - 0.9
+  - 0.8
+  - 0.7
+  - 0.55
+  - 0.4
+  noise_sigma:
+  - 0.02
+  - 0.05
+  - 0.08
+  - 0.12
+  - 0.18
+dataset:
+  name: cifar10
+  normalization_path: data/splits/normalization.json
+  normalization_sha256: 332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688
+  root: data/raw
+  split_path: data/splits/cifar10_split_v1.npz
+  split_seed: 494
+  split_sha256: 1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284
+  test_size: 10000
+  train_size: 45000
+  val_size: 5000
+dropout: 0.2
+evaluation:
+  batch_size: 256
+  seed: 100494
+  severities:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+model_name: robust_cnn
+num_classes: 10
+output:
+  checkpoint_root: outputs/checkpoints
+  figures_root: outputs/figures
+  metrics_root: outputs/metrics
+  predictions_root: outputs/predictions
+  root: outputs/runs
+runtime:
+  deterministic: true
+  device: auto
+  num_workers: 0
+  persistent_workers: false
+  pin_memory: auto
+schema_version: 1
+seeds:
+- 42
+- 123
+- 2026
+training:
+  amp: false
+  batch_size: 128
+  betas:
+  - 0.9
+  - 0.999
+  crop_padding: 4
+  crop_padding_mode: constant
+  crop_size: 32
+  early_stopping: false
+  epochs: 40
+  eps: 1.0e-08
+  eta_min: 0.0
+  gradient_clip: null
+  horizontal_flip_p: 0.5
+  loss: cross_entropy
+  lr: 0.001
+  optimizer: AdamW
+  scheduler: cosine
+  selection: clean_val_accuracy_then_loss_then_earliest
+  t_max: 40
+  weight_decay: 0.0001
