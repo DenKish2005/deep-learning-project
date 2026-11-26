@@ -907,3 +907,115 @@ lock после нормализации newlines к LF. Absolute local paths и
   package archive. Численная и training reproducibility не обещается.
 - CIFAR-10 не скачан; split/stats hashes null. Test set не использовался.
   Data/corruptions/model/train/eval/plots остаются вне выполненного этапа.
+
+## 2026-11-27 — REPRO-002 independent Windows replay, Clean CNN seed 42
+
+Local technical evidence prepared for the independent reviewer. Human review is pending. The checkout was clean at `82fdfdf902d16c491e6c01b3f26dfa3b77a7a12d` before setup. The bundled run is `core-v1-clean_cnn-s42-20abe0df`, best epoch 35. Its manifest records training base `5de701cf34fe6786a68db82b4fe36b905d0f7186` with local changes.
+
+### Environment and tests
+
+Windows 11 Home x64 build 26300, Intel Core i5-13450HX, NVIDIA GeForce RTX 5060 Laptop GPU (8151 MiB, driver 621.01). The launcher initially listed only Python 3.14. The Python install manager extracted CPython 3.12.10 to the ignored run directory and reported updating itself to 26.4. The new `.venv` has `include-system-site-packages = false`. All 38 installed package versions matched `requirements-lock.txt`, and `pip check` passed. The complete installed inventory is in `tmp/repro002-20261127/packages.log`.
+
+| Check | Observed |
+|---|---|
+| Runtime | Python 3.12.10 AMD64, torch 2.9.0+cu126, torchvision 0.24.0+cu126, CUDA build 12.6, cuDNN 91002 |
+| Other direct packages | NumPy 2.5.4, pandas 3.1.0, scikit-learn 1.9.1, matplotlib 3.11.2, tqdm 4.70.1, PyYAML 6.0.3, pytest 9.2.0, Pillow 13.0.0 |
+| Default environment smoke | **FAIL**, exit 1. CUDA reports compute capability 12.0. The wheel supports through 9.0 and CUDA raised “no kernel image is available for execution on the device.” |
+| CPU-only smoke | **PASS**, exit 0 with CUDA hidden for this process. PNG roundtrip, CPU forward/backward and torchvision NMS passed. GPU check skipped in this rerun. |
+| Default unit suite | **1,055 passed, 20 skipped, 0 failed**, exit 0 in 118.41 s. The skip reasons and opt-in flags are in `tests.log`. |
+
+The replay used the locked wheel on CPU after the CUDA failure. Before comparison, `tolerance.txt` recorded absolute and relative logit tolerances of `1e-5` for a GPU or cross-backend comparison, with published logits as reference and exact true/predicted labels by original image ID. Exact predictions are expected for an identical locked CPU backend.
+
+### Commands
+
+PowerShell from the repository root. The smoke, tests, acquisition, verification and evaluation ran sequentially. The CPU smoke ran in a separate process with CUDA hidden only for that invocation. The local `run.ps1` captures stdout/stderr in per-step logs and native exit codes in `status.log`. The commands below expand its invocations.
+
+```powershell
+git rev-parse HEAD
+git status --short
+python --version
+py -0p
+$base='tmp/repro002-20261127'
+New-Item -ItemType Directory "$base/setup" -ErrorAction Stop
+py install --target=tmp/repro002-20261127/python312 3.12.10
+$env:TEMP=(Resolve-Path "$base/setup").Path
+$env:TMP=$env:TEMP
+.\tmp\repro002-20261127\python312\python.exe --version
+.\tmp\repro002-20261127\python312\python.exe -m venv .venv
+$python='.\.venv\Scripts\python.exe'
+& $python -m pip install -r requirements-lock.txt --disable-pip-version-check --log "$base/install.log"
+$env:CUBLAS_WORKSPACE_CONFIG=':4096:8'
+$env:MPLCONFIGDIR=(Resolve-Path .venv).Path + '/mplconfig'
+& $python -m pip freeze --all
+& $python -m pip check
+& $python -m scripts.check_environment
+$env:CUDA_VISIBLE_DEVICES='-1'
+& $python -m scripts.check_environment
+Remove-Item Env:CUDA_VISIBLE_DEVICES
+& $python -m pytest tests -q -rs --basetemp=.venv/pytest-repro002
+& $python -m scripts.download_data --root data/raw
+& $python -m scripts.download_data --root data/raw --verify-only
+& $python -m scripts.download_data --root data/raw --verify-split
+& $python -m scripts.prepare_normalization --root data/raw --verify-only
+$bundle='outputs/checkpoints/core-v1/core-v1-clean_cnn-s42-20abe0df'
+Get-FileHash "$bundle/best.pt","$bundle/config_resolved.yaml","data/splits/cifar10_split_v1.npz","data/splits/normalization.json","data/splits/split_manifest.json"
+& $python -m src.evaluate --checkpoint "$bundle/best.pt" --config "$bundle/config_resolved.yaml" --output-dir "$base/eval-cpu" --device cpu
+& $python "$base/compare.py" eval-cpu ../deep-learning-project
+```
+
+### Data and checkpoint identity
+
+The repository downloader acquired the official archive from https://cave.cs.toronto.edu/kriz/cifar-10-python.tar.gz. Raw verification passed for 50,000 training and 10,000 test examples. The archive MD5 matched the upstream value `c58f30108f718f92721af3b95e74349a`. Its SHA-256 was `6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce`. The local integrity manifest is `data/raw/cifar10_integrity_v1.json`.
+
+The committed split passed protocol replay (seed 494, 45,000 train and 5,000 validation). Train-only normalization passed read-only verification on all 45,000 training images.
+
+| Input | Observed SHA-256 | Expected identity |
+|---|---|---|
+| `best.pt` | `20c423b970712c34eead60f53bf3443ba38a2ce31cc5145c6376e3eab2fa5a52` | Both selected raw_results.csv rows and run manifest, match |
+| `config_resolved.yaml` | `8c9e2528c717f4893afca4944f0438c73cf6a1ceee46d14fbde0c178fc10a347` | Bundled run manifest, match |
+| `cifar10_split_v1.npz` | `1dc8e61a237d7e8fd3ac3c2dea4787e6a82f8f235d74993386af9074f6e1d284` | Published split hash, match |
+| `split_manifest.json` | `8742e5d48e4001e7f6a61f924bc524ab33f2276a256bc716407a98fc9bc86a21` | Frozen normalization provenance, match |
+| `normalization.json` | `332c2958a59036b68b6db2b71020dcd2aa0ab021f2a91a32cb351bf446095688` | Published normalization hash, match |
+
+### Independent comparisons
+
+The CPU evaluation completed all 16 conditions. Expected values come from the two published `clean_cnn`, seed 42 rows in `report/core_v1/raw_results.csv`. Observations come from the corresponding fresh summaries. The comparison script independently hashed every regenerated NPZ from disk and checked each hash against its fresh summary and the published CSV.
+
+#### clean-s0
+
+| Quantity | Published | Observed on CPU | Difference (observed minus published) |
+|---|---|---|---|
+| condition_hash | `07e20c4285619e1c421e40b8e499ba2a66a2f83abec0c74987e081f29c2123c1` | `07e20c4285619e1c421e40b8e499ba2a66a2f83abec0c74987e081f29c2123c1` | Exact |
+| n_samples | `10000` | `10000` | Exact |
+| n_correct | `8712` | `8712` | Exact |
+| accuracy | `0.8712` | `0.8712` | Exact |
+| macro_f1 | `0.870729459886706` | `0.870729459886706` | Exact |
+| loss | `0.405768300575994` | `0.4057649027973075` | -3.3977786865202475e-06 |
+| Prediction NPZ SHA-256 | `d30481f06584a95bdc77f1d26a7075f594747b3e1dc7edeafd83f8edb2286fc6` | `771060e7ce31d1a92afef1ae26fddcf84b3c0f47ee00818aeaed6060e36aac85` | Different |
+
+Per-image comparison: Unverified (published NPZ unavailable).
+
+#### gaussian_noise-s5
+
+| Quantity | Published | Observed on CPU | Difference (observed minus published) |
+|---|---|---|---|
+| condition_hash | `658a529dbda48f66c4992ee6fa1ba8278874bd53867704f6488151ddf857ec29` | `1d22482b0d41915a26a73f60063db09d665475409a57c1dc13e8ebd9b5173025` | Different |
+| n_samples | `10000` | `10000` | Exact |
+| n_correct | `1395` | `1394` | -1 |
+| accuracy | `0.1395` | `0.1394` | -0.00010000000000001674 |
+| macro_f1 | `0.07157846783704172` | `0.07153934090237683` | -3.912693466488759e-05 |
+| loss | `4.793720933265497` | `4.793162145633204` | -0.0005587876322934449 |
+| Prediction NPZ SHA-256 | `614de482eb8d00424201cdef92705b87a7d72a8c5978e03fefe88d5e0c239644` | `d188e300f57eea88d8b6b65a383a7b21027af59ab6550c17ecd88e1de05c9387` | Different |
+
+Per-image comparison: Unverified (published NPZ unavailable).
+
+Clean accuracy and macro-F1 reproduced exactly. Clean loss differed despite a matching condition hash. Gaussian noise severity 5 yielded one fewer correct classification, and its condition hash also differed. Both noise records specify evaluation seed 100494, sigma 0.18 and identical dataset and normalization identities. The evaluator hashes the ordered IDs, targets and normalized float32 images before model inference. The noise discrepancy therefore reaches the input comparison. These artifacts do not identify its precise cause. The CPU evaluation environment ID was `cc31cfa5360c9f305453e3337e337353eaf46362fd6121df4a487bf0af3d2916`.
+
+Across all 16 conditions, 0/16 regenerated NPZ files matched the published file SHA-256. The two original prediction files were absent from the published paths in this checkout and the authorized sibling checkout. For any differing NPZ, target disagreements, argmax disagreements and logit errors remain unmeasured. Aggregate agreement alone cannot establish per-image agreement.
+
+Local output paths, relative to the repository root:
+
+- Metrics: `tmp/repro002-20261127/eval-cpu/metrics/core-v1-clean_cnn-s42-20abe0df/`.
+- Predictions: `tmp/repro002-20261127/eval-cpu/predictions/core-v1-clean_cnn-s42-20abe0df/`.
+- Hash inventory and selected metric comparisons: `tmp/repro002-20261127/comparison.json`. The script is `tmp/repro002-20261127/compare.py`.
+- Environment, commands, exit codes, per-step logs and predeclared tolerance: `tmp/repro002-20261127/`.
