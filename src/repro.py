@@ -2,8 +2,10 @@
 
 from collections.abc import Mapping
 from contextlib import contextmanager
+import csv
 from datetime import datetime, timezone
 import json
+from math import ceil, isfinite
 from pathlib import Path, PurePosixPath
 import re
 import shutil
@@ -17,6 +19,7 @@ _CONFIG = 'config_resolved.yaml'
 _ENVIRONMENT = 'environment.json'
 _MANIFEST = 'run_manifest.json'
 _RECORD_FILES = {_CONFIG, _ENVIRONMENT, _MANIFEST}
+_TRAINING_FILES = {'best.pt', 'last.pt', 'history.csv'}
 _CODE_FIELDS = {'git_sha', 'git_dirty', 'code_snapshot_sha256'}
 _HASH_FIELDS = ('config_hash', 'dataset_sha256', 'split_hash', 'normalization_hash',
                 'init_sha256', 'environment_id', 'code_snapshot_sha256')
@@ -44,8 +47,8 @@ def _validate_manifest(manifest: dict) -> None:
     for key in ('schema_version', 'protocol_version'):
         if type(manifest[key]) is not int or manifest[key] != 1:
             raise ValueError(f'{key} must be 1')
-    if manifest['profile'] != 'synthetic' or manifest['status'] != 'complete':
-        raise ValueError('run record requires a complete synthetic run')
+    if manifest['profile'] not in ('synthetic', 'core') or manifest['status'] != 'complete':
+        raise ValueError('run record requires a complete synthetic or core run')
     if not isinstance(manifest['run_id'], str) or not manifest['run_id'].strip():
         raise ValueError('run_id must be nonempty')
     for key in ('seed', 'total_steps', 'best_epoch'):
@@ -65,6 +68,8 @@ def _validate_manifest(manifest: dict) -> None:
     if (not isinstance(artifacts, dict) or not {_CONFIG, _ENVIRONMENT}.issubset(artifacts)
             or _MANIFEST in artifacts):
         raise ValueError('run artifact list must include resolved config and environment')
+    if manifest['profile'] == 'core' and not _TRAINING_FILES.issubset(artifacts):
+        raise ValueError('core run record requires both checkpoints and history')
     for name, checksum in artifacts.items():
         _require_sha256(checksum, f'artifact {name}')
 
@@ -111,7 +116,8 @@ def _verify_artifacts(run_dir: Path, artifacts: dict) -> None:
 
 
 def _verify_links(run_dir: Path, manifest: dict) -> None:
-    config = load_config(run_dir / _CONFIG, require_core_protocol=False)
+    core = manifest['profile'] == 'core'
+    config = load_config(run_dir / _CONFIG, require_core_protocol=core)
     dataset = config['dataset']
     if (manifest['config_hash'] != config_hash(config) or manifest['model_name'] != config['model_name']
             or manifest['seed'] not in config['seeds'] or manifest['dataset'] != dataset['name']
@@ -119,6 +125,10 @@ def _verify_links(run_dir: Path, manifest: dict) -> None:
             or manifest['split_hash'] != dataset['split_sha256']
             or manifest['normalization_hash'] != dataset['normalization_sha256']):
         raise ValueError('run manifest does not match the resolved config')
+    if core:
+        training = config['training']
+        if manifest['total_steps'] != training['epochs'] * ceil(dataset['train_size'] / training['batch_size']):
+            raise ValueError('core run did not meet the configured optimizer budget')
 
     environment = _read_json(run_dir / _ENVIRONMENT)
     required = {'schema_version', 'python', 'platform', 'machine', 'packages', 'device', 'gpu',
@@ -195,6 +205,67 @@ def verify_run_record(run_dir: Path) -> dict:
     _validate_manifest(manifest)
     _verify_artifacts(run_dir, manifest['artifacts'])
     _verify_links(run_dir, manifest)
+    return manifest
+
+
+def finalize_core_run(run_dir: Path, environment: dict, started_at: datetime) -> dict:
+    """Verify saved core training files and publish the manifest for that run."""
+    import torch
+
+    from src.checkpoints import _atomic_output, load_checkpoint
+    from src.models import CompactCNN
+
+    last = load_checkpoint(_artifact_path(run_dir, 'last.pt'), kind='last')
+    identity, config = last['identity'], last['config']
+    best = load_checkpoint(_artifact_path(run_dir, 'best.pt'), identity=identity, kind='best')
+    if (identity['profile'] != 'core' or identity['run_id'] != run_dir.name
+            or last['epoch'] != config['training']['epochs'] or best['epoch'] != last['best_epoch']):
+        raise ValueError('checkpoint does not identify a completed core run')
+    if best['model'].keys() != last['best_model'].keys() or any(
+        not torch.equal(value, last['best_model'][name]) if isinstance(value, torch.Tensor)
+        else value != last['best_model'][name]
+        for name, value in best['model'].items()
+    ):
+        raise ValueError('best checkpoint weights differ from the validation-selected state')
+    with torch.random.fork_rng(devices=[]):
+        model = CompactCNN(num_classes=config['num_classes'], dropout=config['dropout'])
+    model.load_state_dict(last['model'], strict=True)
+    model.load_state_dict(best['model'], strict=True)
+
+    with _artifact_path(run_dir, 'history.csv').open(encoding='utf-8', newline='') as stream:
+        rows = list(csv.DictReader(stream))
+    if len(rows) != last['epoch']:
+        raise ValueError('core training history has missing or extra epochs')
+    counts = (config['dataset']['train_size'], config['dataset']['val_size'])
+    steps_per_epoch = ceil(counts[0] / config['training']['batch_size'])
+    for row, expected in zip(rows, last['history'], strict=True):
+        if (row.get('experiment_id') != identity['run_id']
+                or row.get('config_hash') != identity['config_hash']
+                or any(row.get(key) != str(value) for key, value in expected.items())
+                or (expected['num_train'], expected['num_val'], expected['optimizer_steps']) != (*counts, steps_per_epoch)
+                or not all(isfinite(expected[key]) for key in ('train_loss', 'val_loss', 'train_accuracy', 'val_accuracy'))):
+            raise ValueError('core training history disagrees with its checkpoint or budget')
+
+    config_path, environment_path = (_artifact_path(run_dir, name) for name in (_CONFIG, _ENVIRONMENT))
+    if not config_path.exists():
+        with _atomic_output(config_path, 'w') as stream:
+            yaml.safe_dump(config, stream, sort_keys=True)
+    if not environment_path.exists():
+        write_json_atomic(environment_path, environment)
+
+    manifest = {
+        'schema_version': 1, 'protocol_version': 1, 'started_at': _utc_text(started_at),
+        'finished_at': _utc_text(datetime.now(timezone.utc)), 'status': 'complete',
+        'dataset': config['dataset']['name'], 'best_epoch': best['epoch'],
+        'total_steps': last['epoch'] * steps_per_epoch,
+        **{key: identity[key] for key in (*_HASH_FIELDS, *_CODE_FIELDS, 'run_id', 'seed', 'model_name', 'profile')},
+        'artifacts': {name: sha256_file(_artifact_path(run_dir, name))
+                      for name in sorted(_TRAINING_FILES | {_CONFIG, _ENVIRONMENT})},
+    }
+    _validate_manifest(manifest)
+    _verify_artifacts(run_dir, manifest['artifacts'])
+    _verify_links(run_dir, manifest)
+    write_json_atomic(run_dir / _MANIFEST, manifest)
     return manifest
 
 

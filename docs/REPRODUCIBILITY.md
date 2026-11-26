@@ -439,6 +439,12 @@ python -m src.metrics --input outputs/metrics/results.csv --output-dir outputs/m
 python -m scripts.make_plots --metrics outputs/metrics/aggregate --runs outputs/runs --output outputs/figures
 ```
 
+The core launcher writes its queue status under `outputs/runs/launcher-*/` and
+places each run's `last.pt`, `best.pt`, `history.csv`, resolved config, environment,
+and verified completion manifest in its own `core-v1-*` directory. Use `--device
+auto` to use the device selected by the checked-in configs. For explicit device
+overrides, use the saved `config_resolved.yaml` when evaluating the checkpoint.
+
 Для metrics CLI нужен заранее собранный полный core `results.csv`; этот файл
 появится только после реализации evaluator и EVAL-004. Каталог `core-v1` должен
 быть новым, CLI существующие результаты не перезаписывает.

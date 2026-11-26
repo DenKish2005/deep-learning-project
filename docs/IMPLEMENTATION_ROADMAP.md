@@ -517,7 +517,7 @@ test evidence + reviewer approval + updated status/artifact paths. Foundation
 - **1. ID:** TRAIN-004.
 - **2. Title:** Six-run orchestration.
 - **3. Purpose:** Управлять 6 runs без ручных ошибок.
-- **4. Current status:** TODO.
+- **4. Current status:** Implemented locally. The launcher plans six core runs, trains sequentially, resumes from `last.pt`, and skips runs with verified completion manifests.
 - **5. Priority:** MUST.
 - **6. Owner:** Person 6 (reviewer — TEAM_TASKS).
 - **7. Prerequisites:** TRAIN-002; SETUP-003.
