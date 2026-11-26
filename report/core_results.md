@@ -48,6 +48,36 @@ on average. The three declines were blur severity 1 and darkening severities
 split, and fixed corruption scales. Test severities 4 and 5 extend beyond the
 training intensities within the same corruption families.
 
+## Training and test figures
+
+**Figure 02. Training and validation loss.** Each panel follows one seed for
+all 40 epochs. Solid lines show training cross-entropy and dashed lines show
+clean-validation cross-entropy. [PNG](../outputs/figures/loss_curves.png) · [PDF](../outputs/figures/loss_curves.pdf)
+
+**Figure 03. Training and validation accuracy.** Diamonds mark each manifest’s
+selected checkpoint on its clean-validation curve. Robust CNN training
+accuracy is measured on augmented inputs. [PNG](../outputs/figures/accuracy_curves.png) · [PDF](../outputs/figures/accuracy_curves.pdf)
+
+**Figure 04. Clean CNN accuracy by corruption severity.** Each panel starts at
+the same clean-test reference. Points show the three-seed mean and shading
+spans one sample SD on either side. Mean accuracy rises slightly from severity
+0 to 1 for both blur and darkening. [PNG](../outputs/figures/baseline_severity.png) · [PDF](../outputs/figures/baseline_severity.pdf)
+
+**Figure 05. Clean and Robust CNN accuracy by corruption severity.** Each model
+starts at its own clean-test mean. Shading shows ±1 sample SD across seeds at
+each level. Severity levels use a separate intensity scale for each family.
+[PNG](../outputs/figures/clean_vs_robust.png) · [PDF](../outputs/figures/clean_vs_robust.pdf)
+
+**Figure 06. Clean-test accuracy versus mean corrupted accuracy.** Each
+seed marker represents one checkpoint. Its mCA gives equal weight to all 15
+corrupted conditions. Stars mark the three-seed means on both axes. All three
+paired seeds gained mCA and lost clean-test accuracy under robust training.
+[PNG](../outputs/figures/clean_vs_mca.png) · [PDF](../outputs/figures/clean_vs_mca.pdf)
+
+Regenerate Figures 02–06 from the repository root with
+`python -m scripts.plot_core_figures`. The [figure manifest](../outputs/figures/figure_manifest.json)
+records source and output hashes.
+
 ## Evidence and review
 
 - [Per-class findings, source tables, and figures](core_v1/per_class_analysis/findings.md)

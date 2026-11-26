@@ -32,6 +32,17 @@ outputs/figures/*
 !outputs/figures/corruption_examples.png
 !outputs/figures/corruption_examples.pdf
 !outputs/figures/corruption_examples.source.json
+!outputs/figures/loss_curves.png
+!outputs/figures/loss_curves.pdf
+!outputs/figures/accuracy_curves.png
+!outputs/figures/accuracy_curves.pdf
+!outputs/figures/baseline_severity.png
+!outputs/figures/baseline_severity.pdf
+!outputs/figures/clean_vs_robust.png
+!outputs/figures/clean_vs_robust.pdf
+!outputs/figures/clean_vs_mca.png
+!outputs/figures/clean_vs_mca.pdf
+!outputs/figures/figure_manifest.json
 
 # Notebook checkpoints
 .ipynb_checkpoints/

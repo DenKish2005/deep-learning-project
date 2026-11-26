@@ -1,0 +1,46 @@
+{
+  "figures": [
+    "loss_curves",
+    "accuracy_curves",
+    "baseline_severity",
+    "clean_vs_robust",
+    "clean_vs_mca"
+  ],
+  "inputs_sha256": {
+    "report/core_v1/raw_results.csv": "e7095d2748a3a6ff387bc5c64f29a7e9b6650ebbe01eac8eccd649722efb42a2",
+    "report/core_v1/tables/condition_summary.csv": "2a85f71b280e75f83d5acba262e88821f56c01f4312d0e021ccdd5fc7d75adb0",
+    "report/core_v1/tables/run_summary.csv": "1cb169636275b6dcbd67cbd37e1de6c9e8cb3fb09c8342b3f219cb401b4c5d29",
+    "report/core_v1/tables/model_summary.csv": "1a9401050c9c0150f4b3d4e30e7b2198747ed96a582948830c9b9e7022765c8a",
+    "outputs/checkpoints/core-v1/core-v1-clean_cnn-s42-20abe0df/history.csv": "437c4db7f7937adc2bea6aa3e018afff41aeb7132a94ba1a0e996593616ac285",
+    "outputs/checkpoints/core-v1/core-v1-clean_cnn-s42-20abe0df/run_manifest.json": "3b40867b6c6763eb72312d131116900da58c556562f4eeaa161b1a588e0bfd54",
+    "outputs/checkpoints/core-v1/core-v1-clean_cnn-s123-20abe0df/history.csv": "01e12f68a2f4d755a832332baaa84dcced2e40c514a73a7045c0feb733a4a624",
+    "outputs/checkpoints/core-v1/core-v1-clean_cnn-s123-20abe0df/run_manifest.json": "f41ae635d7b56016e0c1529c6fb9cb21f533ddea803e0697de740bc4e48ee864",
+    "outputs/checkpoints/core-v1/core-v1-clean_cnn-s2026-20abe0df/history.csv": "4fd4090c78261f54d8a72f7e37dd97e32f8a2b8dfeee75604a9009122f53df2d",
+    "outputs/checkpoints/core-v1/core-v1-clean_cnn-s2026-20abe0df/run_manifest.json": "856f30e4d7205953e8350d9556b19cbea4f69a5ad56f86c8a291b00815951ec0",
+    "outputs/checkpoints/core-v1/core-v1-robust_cnn-s42-52bf0744/history.csv": "a8851c5061c00168d2378d726d8d6fd62db97c23ce5361847f6189576ad0e252",
+    "outputs/checkpoints/core-v1/core-v1-robust_cnn-s42-52bf0744/run_manifest.json": "f730a1c03c9421cf4631a8d629f9df9955346624f36a2b60a02a485a2b59bca7",
+    "outputs/checkpoints/core-v1/core-v1-robust_cnn-s123-52bf0744/history.csv": "ac32035f39cf70eaca49e1d166ea65616491acc3f00f6fcf7b04b260f0606929",
+    "outputs/checkpoints/core-v1/core-v1-robust_cnn-s123-52bf0744/run_manifest.json": "a564c516b20b70041ffb00ddaa44ef36a4f50f30a940641cc51d545cdcea4b0f",
+    "outputs/checkpoints/core-v1/core-v1-robust_cnn-s2026-52bf0744/history.csv": "fb2ba678877d11bda47fbf4ea3864189720ab75018de38dc52738e1462212972",
+    "outputs/checkpoints/core-v1/core-v1-robust_cnn-s2026-52bf0744/run_manifest.json": "73d16c3c8f410643da81e3d93217d2dd30dba71702bfc61a1186baca2d917084"
+  },
+  "scripts_sha256": {
+    "scripts/plot_core_figures.py": "c1a4f4ff3af1622afa4de79c876771fd6c63ac55f202e511fa3de29e3001cc96",
+    "src/metrics.py": "b0d6d02f1ea13ad5af827f7d012de7657bfa6447eaa1834841ecf5232606f3ce",
+    "scripts/analyze_per_class.py": "3c48151470d7dc0a734873acfabd83fdaae95532d2834bcb4b0552d912d321d3"
+  },
+  "outputs_sha256": {
+    "outputs/figures/loss_curves.png": "d91e772454bbbd046e7cc1978524be3aa121292a1837fcec1dde76f533f229f1",
+    "outputs/figures/loss_curves.pdf": "fb7de0acd20f4243c9c1c7dc54ef26fca40a464a220783b05948822e0a1dbd26",
+    "outputs/figures/accuracy_curves.png": "4e1b37bc5d4df6fb2f6375836b11f58517e5f17c1309eb879dab9eba8cccbb38",
+    "outputs/figures/accuracy_curves.pdf": "3f2efffe23d585c6ba81d6deac0b530b5e6d062579c1184b8fe3b823cca2b4d4",
+    "outputs/figures/baseline_severity.png": "67ce5dcc490a279a7c69e8ce4a7845f2c8528bbe6541a300f6e2584d3d50ccc4",
+    "outputs/figures/baseline_severity.pdf": "f6b60cc70ab81f04b3242f019f70b450ed890a16588f7a15fe04833a34c38e58",
+    "outputs/figures/clean_vs_robust.png": "b01d3e84a752f6b98baaf92e6d9c3ebe16a0f1fdafc8bc95f7f6f73106dd2a00",
+    "outputs/figures/clean_vs_robust.pdf": "aba0e4eb56e0c71c0bad3a87b8c7f42e6f6bf0b869911be69d5f7e96c59c8843",
+    "outputs/figures/clean_vs_mca.png": "19da7cca47d1f253ee3f868d3fb194172496a7d37ecd7cf21132a7088b19c682",
+    "outputs/figures/clean_vs_mca.pdf": "f2a7cd3b668f5eeab80071fe459b59fdf7dab91e3e7a7f48607d45f3fa69e014"
+  },
+  "selection": "Manifest best epoch: highest clean validation accuracy, then lowest loss, then earliest epoch.",
+  "aggregation": "Per-seed histories; severity 0 = clean, condition mean +/- sample SD (ddof=1) over three seeds; per-run mCA = mean of 15 corrupted accuracies, then mean over seeds."
+}
