@@ -6,7 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, mkdtemp
 from time import perf_counter
 
 import numpy as np
@@ -270,8 +270,38 @@ def _raw_test_batches(dataset, batch_size: int):
         yield images, targets, original_ids
 
 
+def _read_core_evaluation(summary_path: Path, prediction_path: Path, *, condition: dict,
+                          provenance: EvaluationProvenance, targets: np.ndarray) -> dict:
+    if (summary_path.is_symlink() or prediction_path.is_symlink()
+            or not summary_path.is_file() or not prediction_path.is_file()):
+        raise ValueError(f'missing or non-regular evaluation pair: {summary_path}')
+    summary = json.loads(summary_path.read_text(encoding='utf-8'))
+    expected = {'schema_version': 1, 'profile': 'core', 'status': 'complete', 'eval_seed': _EVAL_SEED,
+                **asdict(provenance), **condition}
+    if any(summary.get(key) != value for key, value in expected.items()):
+        raise ValueError(f'evaluation metadata does not match its checkpoint or condition: {summary_path}')
+    if (Path(summary['predictions_path']).resolve() != prediction_path.resolve()
+            or sha256_file(prediction_path) != summary['predictions_sha256']):
+        raise ValueError(f'evaluation prediction checksum or path mismatch: {prediction_path}')
+    with np.load(prediction_path, allow_pickle=False) as saved:
+        if set(saved.files) != {'indices', 'targets', 'logits'}:
+            raise ValueError(f'invalid prediction file fields: {prediction_path}')
+        indices, labels, logits = (saved[key] for key in ('indices', 'targets', 'logits'))
+    if (indices.dtype != np.int64 or not np.array_equal(indices, np.arange(len(targets)))
+            or labels.dtype != np.int64 or not np.array_equal(labels, targets)
+            or logits.dtype != np.float32 or logits.shape != (len(targets), len(CLASSES))
+            or not np.isfinite(logits).all()):
+        raise ValueError(f'prediction artifacts disagree with the verified test examples: {prediction_path}')
+    scores = classification_metrics(labels, logits.argmax(axis=1))
+    loss = F.cross_entropy(torch.from_numpy(logits).double(), torch.from_numpy(labels)).item()
+    if (any(not np.array_equal(summary[key], value) for key, value in scores.items())
+            or not np.isclose(summary['loss'], loss, rtol=1e-10)):
+        raise ValueError(f'evaluation metrics disagree with saved predictions: {prediction_path}')
+    return summary
+
+
 def evaluate_checkpoint(checkpoint_path: Path, config_path: Path, output_dir: Path, *,
-                        device: str = 'auto') -> list[dict]:
+                        device: str = 'auto', resume: bool = False) -> list[dict]:
     """Run all 16 protocol conditions for one validation-selected core checkpoint."""
     checkpoint_path = Path(checkpoint_path)
     if checkpoint_path.name != 'best.pt' or checkpoint_path.is_symlink() or not checkpoint_path.is_file():
@@ -320,11 +350,15 @@ def evaluate_checkpoint(checkpoint_path: Path, config_path: Path, output_dir: Pa
         config, identity['seed'], 0, policy=policy, partitions=('test',)
     )
     test_dataset = loaders['test'].dataset
-    normalization = {
-        'mean': test_dataset.mean[:, 0, 0].tolist(),
-        'std': test_dataset.std[:, 0, 0].tolist(),
-    }
+    # make_loaders verified the file against the training split. Read the full
+    # statistics record and confirm these are the same file bytes.
+    normalization_bytes = Path(config['dataset']['normalization_path']).read_bytes()
+    if hashlib.sha256(normalization_bytes).hexdigest() != identity['normalization_hash']:
+        raise ValueError('normalization file changed after verification')
+    normalization = json.loads(normalization_bytes)['statistics']
+    validate_normalization(normalization)
     expected_indices = np.arange(_TEST_SIZE, dtype=np.int64)
+    targets = test_dataset.labels[expected_indices]
 
     model = CompactCNN(num_classes=config['num_classes'], dropout=config['dropout'])
     model.load_state_dict(checkpoint['model'], strict=True)
@@ -350,19 +384,26 @@ def evaluate_checkpoint(checkpoint_path: Path, config_path: Path, output_dir: Pa
     summaries = []
     for condition in build_conditions():
         condition_id = f"{condition['corruption']}-s{condition['severity']}"
-        result = evaluate_condition(
-            model,
-            _raw_test_batches(test_dataset, batch_size),
-            condition,
-            normalization=normalization,
-            expected_indices=expected_indices,
-            provenance=provenance,
-            device=torch_device,
-            profile='core',
-        )
         summary_path = metrics_dir / f'{condition_id}.json'
         prediction_path = predictions_dir / f'{condition_id}.npz'
-        summaries.append(save_evaluation(summary_path, prediction_path, result))
+        if summary_path.exists() or summary_path.is_symlink():
+            if not resume:
+                raise FileExistsError(f'evaluation summary already exists: {summary_path}')
+        else:
+            if resume and prediction_path.is_file() and not prediction_path.is_symlink():
+                # A prediction written before an interruption has no summary or provenance.
+                abandoned = prediction_path.parent / '.incomplete'
+                abandoned.mkdir(exist_ok=True)
+                folder = Path(mkdtemp(prefix='orphan-', dir=abandoned))
+                prediction_path.rename(folder / prediction_path.name)
+            result = evaluate_condition(
+                model, _raw_test_batches(test_dataset, batch_size), condition,
+                normalization=normalization, expected_indices=expected_indices,
+                provenance=provenance, device=torch_device, profile='core',
+            )
+            save_evaluation(summary_path, prediction_path, result)
+        summaries.append(_read_core_evaluation(summary_path, prediction_path, condition=condition,
+                                               provenance=provenance, targets=targets))
     return summaries
 
 
@@ -378,9 +419,10 @@ def main(argv=None) -> int:
     parser.add_argument('--output-dir', type=Path, default=Path('outputs'),
                         help='root for separate metrics/ and predictions/ run folders')
     parser.add_argument('--device', choices=('auto', 'cpu', 'cuda'), default='auto')
+    parser.add_argument('--resume', action='store_true', help='Verify and reuse completed condition files')
     args = parser.parse_args(argv)
     summaries = evaluate_checkpoint(
-        args.checkpoint, args.config, args.output_dir, device=args.device
+        args.checkpoint, args.config, args.output_dir, device=args.device, resume=args.resume
     )
     print(f"Saved {len(summaries)} core conditions for {summaries[0]['run_id']}")
     return 0

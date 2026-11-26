@@ -405,67 +405,46 @@ split/stats or interrupted diagnostics exit1 with preservation guidance. Select 
 new output only after preserving/inspecting the failed one. No raw manifests are
 rewritten. Existing download_data modes retain raw-only / split-only semantics.
 
-## Плановые команды pipeline
+## Core training and evaluation
 
-В примерах `python` обозначает interpreter проверенного env; на Windows можно заменить на `.\.venv\Scripts\python.exe`. Команды из root. Device cpu — рабочий fallback после реализации; cuda допустим только после validation. Parameters subset/profile относятся только к smoke/debug и запрещены для core profile.
+Run from the repository root in the verified environment with local CIFAR-10
+and the tracked split and normalization files. On Windows, substitute
+`.\.venv\Scripts\python.exe` for `python` when the environment is inactive.
 
-```powershell
-# TEST-001: offline synthetic unit/integration tests после написания
+```bash
 python -m pytest tests -q
-
-# TRAIN-003: отдельный debug overfit, test set не читается
-python -m src.train --config configs/clean_cnn.yaml --seed 42 --profile debug --overfit-samples 64 --max-steps 300 --device cpu
-
-# TEST-001: actual CIFAR smoke, no core outputs
-$env:RUN_CIFAR_INTEGRATION='1'
-python -m pytest tests/test_smoke.py -q
-
-# TRAIN-004: проверить именно 6 core run specs до вычислений
-python -m scripts.run_experiments --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --seeds 42 123 2026 --profile core --dry-run
-
-# CLEAN-001 / ROBUST-002: пример пары; orchestration ниже охватывает все seeds
-python -m src.train --config configs/clean_cnn.yaml --seed 42 --profile core --device cpu
-python -m src.train --config configs/robust_cnn.yaml --seed 42 --profile core --device cpu
-
-# Полные 6 training runs, completed verified runs пропускаются
-python -m scripts.run_experiments --configs configs/clean_cnn.yaml configs/robust_cnn.yaml --seeds 42 123 2026 --profile core --device cpu --resume-incomplete
-
-# EVAL-002..004: matrix planning и затем 96 evaluations
-python -m scripts.run_all_evaluations --checkpoints-root outputs/checkpoints --require-complete --dry-run
-python -m scripts.run_all_evaluations --checkpoints-root outputs/checkpoints --device cpu --require-complete
-
-# METRIC-002 и PLOT-001..003
-python -m src.metrics --input outputs/metrics/results.csv --output-dir outputs/metrics/aggregate/core-v1
-python -m scripts.make_plots --metrics outputs/metrics/aggregate --runs outputs/runs --output outputs/figures
+python -m scripts.run_experiments --dry-run
+python -m scripts.run_experiments --device auto --resume-incomplete
+python -m scripts.run_all_evaluations --checkpoints-root outputs/runs --require-complete --dry-run
+python -m scripts.run_all_evaluations --checkpoints-root outputs/runs --device auto --require-complete
+python -m src.metrics --input outputs/metrics/results.csv --output-dir outputs/metrics/aggregate/rebuilt
 ```
 
-The core launcher writes its queue status under `outputs/runs/launcher-*/` and
-places each run's `last.pt`, `best.pt`, `history.csv`, resolved config, environment,
-and verified completion manifest in its own `core-v1-*` directory. Use `--device
-auto` to use the device selected by the checked-in configs. For explicit device
-overrides, use the saved `config_resolved.yaml` when evaluating the checkpoint.
+The training launcher writes queue status under `outputs/runs/launcher-*/`.
+Each `core-v1-*` run directory contains `last.pt`, `best.pt`, `history.csv`,
+the resolved config, the environment and the completion manifest. Resuming
+requires a matching run identity. After code or environment changes, use a new
+`--runs-root` for a fresh experiment.
 
-Для metrics CLI нужен заранее собранный полный core `results.csv`; этот файл
-появится только после реализации evaluator и EVAL-004. Каталог `core-v1` должен
-быть новым, CLI существующие результаты не перезаписывает.
+The evaluation launcher requires six complete training manifests and the
+matching checkpoint files. It checks each prediction and reuses verified
+conditions when restarted in the same environment. After all 96 conditions
+pass, it writes `outputs/metrics/results.csv` and seven tables under
+`outputs/metrics/aggregate/core-v1/`. The standalone metrics command rebuilds
+those tables from the full CSV into a new directory.
 
-`--profile debug` explicitly выключает geometry/corruption/dropout только для 64-image diagnostic; manifest содержит overrides, mode и max_steps; core validator rejects debug. `test_smoke` создаёт temporary outputs, profile smoke,2models×1 seed×16 conditions на 100 test images,1 epoch; full validator считает только core.
+To evaluate one validation-selected checkpoint on all 16 conditions, use its
+resolved config. Use a new output directory to compare another backend.
 
-Single-condition evaluation после реализации:
-
-```powershell
-python -m src.evaluate --checkpoint outputs/checkpoints/RUN_ID/best.pt --corruption gaussian_noise --severity 3 --device cpu
+```bash
+python -m src.evaluate --checkpoint outputs/runs/RUN_ID/best.pt --config outputs/runs/RUN_ID/config_resolved.yaml --output-dir outputs/replay --device auto
 ```
 
-`RUN_ID` — явный placeholder; взять точное имя из run manifest. Resume:
-
-```powershell
-python -m src.train --config configs/clean_cnn.yaml --seed 42 --profile core --resume outputs/checkpoints/RUN_ID/last.pt --device cpu
-```
-
-Аргументы всех CLI: `--help` со defaults, invalid argument nonzero exit, JSON status success/failed/interrupted. `run_experiments --resume-incomplete` проверяет hash/config/code identity и не запускает другой config поверх старого directory. `--require-complete` в eval требует все шесть manifests и core profile; pilot16 может запускать src.evaluate отдельно, без core aggregate.
-
-Optional benchmark после BENCH-001: `python -m scripts.run_all_evaluations --checkpoints-root outputs/checkpoints --dataset cifar10c --data-root data/raw/CIFAR-10-C --device cpu --require-complete`; loader берет gaussian_noise/defocus_blur/brightness1..5, отдельные directories и outputs90. Этот flag отсутствует до extension task; он не меняет core 96.
+Replace `RUN_ID` with the actual directory name. `--resume` verifies and
+reuses existing matching outputs. The [testing plan](TESTING_PLAN.md) tracks the
+separate smoke and scientific review gates. The [figure requirements](FINAL_DELIVERABLES.md#план-figures)
+track the remaining results plots. The current plotting CLI renders the
+train-only corruption grid.
 
 ## Provenance и verification
 

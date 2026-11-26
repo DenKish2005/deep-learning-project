@@ -1,6 +1,14 @@
 # CURRENT PROJECT STATUS
 
-## EVAL-001 — 24.11.2026 · core checkpoint evaluator implemented
+## EVAL-004 — 26.11.2026 · local core evaluation complete
+
+The launcher verified the six training manifests and completed all 96 test
+conditions on CUDA. Each condition saved 10,000 indexed predictions and a JSON
+summary. Prediction checksums, reconstructed metrics, and the full matrix passed
+verification. The local results CSV and seven aggregate tables are under
+`outputs/metrics/`, with individual predictions under `outputs/predictions/`.
+
+## Historical EVAL-001 — 24.11.2026 · core checkpoint evaluator implemented
 
 `src/evaluate.py` now loads a validation-selected `best.pt`, checks its core
 profile, model/config, dataset files, split and normalization identities, then
@@ -15,9 +23,8 @@ python -m src.evaluate --checkpoint outputs/runs/<run_id>/best.pt --config confi
 ```
 
 The same command accepts `configs/robust_cnn.yaml` for a Robust checkpoint.
-The implementation has not yet been run on a core checkpoint; no production
-evaluation artifacts or scientific results exist from this change. Full
-96-condition-pair orchestration and metric aggregation remain pending.
+This milestone covered one-checkpoint evaluation. The 26 November update
+above records the completed production evaluation.
 
 ## TRAIN-003 — 22.11.2026 · local CIFAR-10 debug and pilot checks
 

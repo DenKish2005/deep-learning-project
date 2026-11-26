@@ -3,6 +3,8 @@ import hashlib
 import json
 import math
 import os
+from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -11,9 +13,13 @@ from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, TensorDataset
 
+from src import evaluate
+from src.checkpoints import save_checkpoint_atomic
 from src.corruptions import keyed_test_epsilon
+from src.data import CLASSES
 from src.evaluate import EvaluationProvenance, build_conditions, evaluate_condition, save_evaluation
 from src.models import CompactCNN
+from src.utils import config_hash, json_sha256, load_config, sha256_file
 
 
 class KnownLogitClassifier(nn.Module):
@@ -70,6 +76,53 @@ def test_protocol_condition_order_and_parameters():
     assert conditions[-1]['parameter_value'] == {'factor': 0.40}
     conditions[1]['parameter_value']['sigma'] = 1.0
     assert build_conditions()[1]['parameter_value'] == {'sigma': 0.02}
+
+
+def test_checkpoint_cli_uses_full_normalization_and_reuses_verified_outputs(evaluation_inputs, tmp_path, monkeypatch):
+    _, dataset, options = evaluation_inputs
+    images, labels, _ = dataset.tensors
+    config = load_config(Path('configs/clean_cnn.yaml').resolve())
+    monkeypatch.chdir(tmp_path)
+    config['dataset']['normalization_path'] = 'normalization.json'
+    norm_path = Path('normalization.json')
+    norm_path.write_text(json.dumps({'statistics': options['normalization']}))
+    config['dataset']['normalization_sha256'] = sha256_file(norm_path)
+    files = {'test_batch': {'sha256': '1' * 64}}
+    test_data = SimpleNamespace(base=SimpleNamespace(data=images.permute(0, 2, 3, 1).numpy()),
+                                indices=np.arange(len(images)), labels=labels.numpy())
+
+    def make_loaders(*args, partitions, **kwargs):
+        assert partitions == ('test',)
+        return {'test': SimpleNamespace(dataset=test_data)}
+
+    monkeypatch.setattr(evaluate, 'load_config', lambda _: config)
+    monkeypatch.setattr(evaluate, 'verify_cifar10_files', lambda _: {'files': files})
+    monkeypatch.setattr(evaluate, 'make_loaders', make_loaders)
+    monkeypatch.setattr(evaluate, '_TEST_SIZE', len(images))
+    monkeypatch.setattr(evaluate, 'capture_environment', lambda *a, **kw: {'environment_id': 'fixture'})
+    checkpoint = tmp_path / 'best.pt'
+    save_checkpoint_atomic(checkpoint, {
+        'schema_version': 1, 'kind': 'best', 'epoch': 1, 'config': config,
+        'model': CompactCNN().state_dict(), 'identity': {
+            'profile': 'core', 'model_name': 'clean_cnn', 'seed': 42, 'run_id': 'fixture',
+            'config_hash': config_hash(config), 'architecture': config['architecture'],
+            'classes': list(CLASSES), 'split_hash': config['dataset']['split_sha256'],
+            'normalization_hash': config['dataset']['normalization_sha256'],
+            'git_sha': 'fixture', 'dataset_sha256': json_sha256({'test_batch': '1' * 64}),
+        },
+    })
+    dest = tmp_path / 'eval'
+    summaries = evaluate.evaluate_checkpoint(checkpoint, Path('unused'), dest, device='cpu')
+    assert len(summaries) == 16 and all(row['n_samples'] == len(images) for row in summaries)
+
+    def unexpected_inference(*args, **kwargs):
+        pytest.fail('existing verified conditions should be reused')
+
+    monkeypatch.setattr(evaluate, 'evaluate_condition', unexpected_inference)
+    assert evaluate.evaluate_checkpoint(checkpoint, Path('unused'), dest, device='cpu', resume=True) == summaries
+    Path(summaries[0]['predictions_path']).write_bytes(b'changed')
+    with pytest.raises(ValueError, match='checksum'):
+        evaluate.evaluate_checkpoint(checkpoint, Path('unused'), dest, device='cpu', resume=True)
 
 
 @pytest.mark.parametrize('condition_index', [0, 1])
